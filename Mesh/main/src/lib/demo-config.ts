@@ -100,6 +100,17 @@
         category: "Naval Multi-Mission Helicopter",
         annotatedImage: "/annotations/drone-annotate.jpeg"
         }
+    },
+    {
+        id: "demo-9",
+        name: "T-90 Main Battle Tank",
+        path: "/models/t-90.glb",
+        annotation: {
+        name: "T-90 Russian Main Battle Tank",
+        description: "Third-generation Russian main battle tank, successor to the T-72. Powered by V-92S2 diesel engine producing 1,000 horsepower. Armed with 2A46M 125mm smoothbore cannon capable of firing both conventional ammunition and AT-11 Sniper guided missiles. Secondary armament includes 12.7mm NSV machine gun and 7.62mm PKT coaxial machine gun. Protected by Kontakt-5 explosive reactive armor (ERA) and Shtora-1 soft-kill active protection system with infrared jammers. Advanced fire control system with thermal imaging.",
+        category: "Main Battle Tank",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        }
     }
     ];
 

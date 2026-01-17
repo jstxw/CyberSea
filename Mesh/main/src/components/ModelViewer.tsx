@@ -17,7 +17,7 @@ import AIInferenceLoader from "./AIInferenceLoader";
 import OnboardingOverlay from "./OnboardingOverlay";
 import { DEMO_MODELS, getDemoAnnotation, DemoModel } from "@/lib/demo-config";
 
-const IS_PRODUCTION_DEMO = process.env.NEXT_PUBLIC_PRODUCTION_DEMO === "true";
+const IS_PRODUCTION_DEMO = true; // Always show model catalog
 
 interface ComponentData {
   mesh: THREE.Mesh;
@@ -1518,6 +1518,29 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         {/* Top Controls */}
         <div className="absolute top-0 left-0 w-full z-10 p-4 flex justify-end items-center pointer-events-none">
           <div className="flex items-center gap-2 pointer-events-auto">
+            {/* Model Catalog Dropdown */}
+            <select
+              onChange={(e) => {
+                if (e.target.value) {
+                  if (showOnboarding) setShowOnboarding(false);
+                  const model = DEMO_MODELS.find(m => m.id === e.target.value);
+                  if (model) {
+                    setCurrentDemoModelId(e.target.value);
+                    loadModelFromUrl(model.path, false);
+                  }
+                }
+              }}
+              value={currentDemoModelId || ""}
+              className="h-[32px] px-3 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold uppercase tracking-wide cursor-pointer hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-colors min-w-[200px]"
+            >
+              <option value="">🎖️ SELECT VEHICLE</option>
+              {DEMO_MODELS.map((model) => (
+                <option key={model.id} value={model.id}>
+                  {model.name}
+                </option>
+              ))}
+            </select>
+            
             <div className="flex items-center gap-1.5 bg-white border border-[#1D1E15] p-1 backdrop-blur-md h-[32px]">
               <button
                 onClick={() => setViewMode("holo")}
@@ -1610,12 +1633,12 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
           </div>
         </div>
 
-        {/* Generate Prompt Bar - Hidden when onboarding is active to reduce clutter */}
-        {!showOnboarding && (
+        {/* Generate Prompt Bar - Hidden completely since we have catalog dropdown at top */}
+        {!showOnboarding && !IS_PRODUCTION_DEMO && (
         <div className="absolute bottom-0 left-0 w-full z-10 p-4 pointer-events-none">
           <div className="max-w-2xl mx-auto pointer-events-auto">
             <div className="bg-white border border-[#1D1E15] backdrop-blur-md p-1.5 flex gap-2 items-center shadow-lg">
-              {IS_PRODUCTION_DEMO ? (
+              {false ? (
                 <div className="flex-1 relative" ref={bottomDropdownRef}>
                   <button
                     onClick={() => setIsBottomDropdownOpen(!isBottomDropdownOpen)}

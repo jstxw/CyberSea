@@ -74,7 +74,7 @@ export default function OnboardingOverlay({
                 {/* Custom Dropdown Trigger */}
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="w-full bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-xs font-mono p-3 rounded-lg outline-none focus:border-[#DF6C42] transition-colors flex items-center justify-between hover:bg-[#1D1E15]/90"
+                  className="w-full bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-xs font-mono p-3 rounded-lg outline-none focus:border-[#3B82F6] transition-colors flex items-center justify-between hover:bg-[#1D1E15]/90"
                 >
                   <span className={selectedDemo ? "text-[#E5E6DA]" : "text-[#E5E6DA]/60"}>
                     {selectedDemo || "Choose a model to inspect..."}
@@ -99,7 +99,7 @@ export default function OnboardingOverlay({
                       <button
                         key={m.id}
                         onClick={() => handleDemoSelect(m.id, m.name)}
-                        className="w-full text-left px-3 py-2.5 text-xs font-mono text-[#E5E6DA] hover:bg-[#DF6C42] hover:text-white transition-colors border-b border-[#E5E6DA]/10 last:border-0"
+                        className="w-full text-left px-3 py-2.5 text-xs font-mono text-[#E5E6DA] hover:bg-[#3B82F6] hover:text-white transition-colors border-b border-[#E5E6DA]/10 last:border-0"
                       >
                         {m.name}
                       </button>
@@ -121,13 +121,13 @@ export default function OnboardingOverlay({
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder="e.g. V8 Engine, Human Heart..."
-                    className="flex-1 bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-xs font-mono p-3 rounded-lg outline-none focus:border-[#DF6C42] transition-colors placeholder:text-[#E5E6DA]/40"
+                    className="flex-1 bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-xs font-mono p-3 rounded-lg outline-none focus:border-[#3B82F6] transition-colors placeholder:text-[#E5E6DA]/40"
                     onKeyDown={(e) => e.key === "Enter" && handleGenerateSubmit()}
                   />
                   <button
                     onClick={handleGenerateSubmit}
                     disabled={!prompt.trim()}
-                    className="px-4 bg-[#1D1E15] text-[#E5E6DA] text-xs font-bold uppercase rounded-lg hover:bg-[#DF6C42] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 bg-[#1D1E15] text-[#E5E6DA] text-xs font-bold uppercase rounded-lg hover:bg-[#3B82F6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Generate
                   </button>
@@ -147,7 +147,7 @@ export default function OnboardingOverlay({
           {/* Import Button - Orange Accent Version */}
           <button
             onClick={onImport}
-            className="w-full group flex items-center justify-center gap-3 p-4 bg-[#DF6C42] border border-[#1D1E15] rounded-lg shadow-[0_8px_0_0_#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-all cursor-pointer mb-3"
+            className="w-full group flex items-center justify-center gap-3 p-4 bg-[#3B82F6] border border-[#1D1E15] rounded-lg shadow-[0_8px_0_0_#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-all cursor-pointer mb-3"
           >
             <div className="w-8 h-8 bg-[#E5E6DA] rounded-md flex items-center justify-center group-hover:bg-[#E5E6DA]/90 group-hover:text-[#1D1E15] transition-colors text-[#1D1E15]">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -157,7 +157,7 @@ export default function OnboardingOverlay({
               </svg>
             </div>
             <div className="text-left">
-              <div className="text-xs font-bold text-[#E5E6DA] uppercase tracking-wide group-hover:text-[#DF6C42]">Import Local File</div>
+              <div className="text-xs font-bold text-[#E5E6DA] uppercase tracking-wide group-hover:text-[#3B82F6]">Import Local File</div>
               <div className="text-[10px] text-[#E5E6DA]/80 font-mono">Supported formats: .GLB, .GLTF</div>
             </div>
           </button>
@@ -166,11 +166,11 @@ export default function OnboardingOverlay({
         {/* Footer Info */}
         <div className="flex items-center justify-center gap-6 text-[10px] text-[#1D1E15]/40 font-mono uppercase tracking-widest">
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#DF6C42]"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#3B82F6]"></div>
             AI Analysis
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#DF6C42]"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#3B82F6]"></div>
             3D Visualization
           </div>
         </div>

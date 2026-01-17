@@ -210,7 +210,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     // dirLight.shadow.mapSize.height = 2048;
     scene.add(dirLight);
 
-    const accentLight = new THREE.SpotLight(0xdf6c42, 2); // Orange accent
+    const accentLight = new THREE.SpotLight(0x3b82f6, 2); // Orange accent
     accentLight.position.set(-10, 5, -5);
     accentLight.lookAt(0, 0, 0);
     scene.add(accentLight);
@@ -717,8 +717,8 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
             // For Holo mode in light theme, we want dark wireframes
             const holoMat = mats.holo as THREE.MeshPhysicalMaterial;
             if (holoMat) {
-              holoMat.color.setHex(0xdf6c42); // Orange wireframe
-              holoMat.emissive.setHex(0xdf6c42);
+              holoMat.color.setHex(0x3b82f6); // Orange wireframe
+              holoMat.emissive.setHex(0x3b82f6);
               // Reduced intensity to prevent color blowout, increased opacity for visibility
               holoMat.emissiveIntensity = 1.0;
               holoMat.opacity = 0.8;
@@ -1520,7 +1520,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 onClick={() => setViewMode("holo")}
                 className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${
                   viewMode === "holo"
-                    ? "bg-[#DF6C42] text-[#E5E6DA]"
+                    ? "bg-[#3B82F6] text-[#E5E6DA]"
                     : "bg-transparent text-[#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA]"
                 }`}
               >
@@ -1530,7 +1530,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 onClick={() => setViewMode("solid")}
                 className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${
                   viewMode === "solid"
-                    ? "bg-[#DF6C42] text-[#E5E6DA]"
+                    ? "bg-[#3B82F6] text-[#E5E6DA]"
                     : "bg-transparent text-[#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA]"
                 }`}
               >
@@ -1599,7 +1599,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
             {onClose && (
               <button
                 onClick={onClose}
-                className="h-[42px] px-3 bg-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold hover:bg-[#DF6C42] transition-colors uppercase tracking-wide cursor-pointer rounded-lg"
+                className="h-[42px] px-3 bg-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold hover:bg-[#3B82F6] transition-colors uppercase tracking-wide cursor-pointer rounded-lg"
               >
                 Close
               </button>
@@ -1616,7 +1616,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 <div className="flex-1 relative" ref={bottomDropdownRef}>
                   <button
                     onClick={() => setIsBottomDropdownOpen(!isBottomDropdownOpen)}
-                    className="w-full bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-mono px-3 py-2 rounded outline-none focus:border-[#DF6C42] transition-colors flex items-center justify-between hover:bg-[#1D1E15]/90"
+                    className="w-full bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-mono px-3 py-2 rounded outline-none focus:border-[#3B82F6] transition-colors flex items-center justify-between hover:bg-[#1D1E15]/90"
                   >
                     <span className={currentDemoModelId ? "text-[#E5E6DA]" : "text-[#E5E6DA]/60"}>
                       {currentDemoModelId 
@@ -1645,7 +1645,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                             handleDemoSelect({ target: { value: model.id } } as any);
                             setIsBottomDropdownOpen(false);
                           }}
-                          className="w-full text-left px-3 py-2.5 text-[10px] font-mono text-[#E5E6DA] hover:bg-[#DF6C42] hover:text-white transition-colors border-b border-[#E5E6DA]/10 last:border-0"
+                          className="w-full text-left px-3 py-2.5 text-[10px] font-mono text-[#E5E6DA] hover:bg-[#3B82F6] hover:text-white transition-colors border-b border-[#E5E6DA]/10 last:border-0"
                         >
                           {model.name}
                         </button>
@@ -1671,7 +1671,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                   <button
                     onClick={() => generateModel(prompt)}
                     disabled={!prompt.trim() || loading}
-                    className="px-4 py-2 bg-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold hover:bg-[#DF6C42] transition-colors flex-shrink-0 uppercase tracking-wide cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold hover:bg-[#3B82F6] transition-colors flex-shrink-0 uppercase tracking-wide cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Generate
                   </button>
@@ -1705,7 +1705,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
               <h2 className="text-base font-bold text-[#1D1E15] mb-1.5 truncate font-sans">
                 {inspectorData.name}
               </h2>
-              <span className="px-1.5 py-0.5 bg-[#DF6C42]/10 border border-[#DF6C42] rounded text-[10px] text-[#DF6C42] font-mono uppercase">
+              <span className="px-1.5 py-0.5 bg-[#3B82F6]/10 border border-[#3B82F6] rounded text-[10px] text-[#3B82F6] font-mono uppercase">
                 {inspectorData.type}
               </span>
             </div>
@@ -1751,7 +1751,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                   </div>
                   <button
                     onClick={handleSplitMesh}
-                    className="w-full px-3 py-2 bg-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold flex items-center justify-center gap-1.5 mb-2 hover:bg-[#DF6C42] transition-colors uppercase tracking-wide cursor-pointer"
+                    className="w-full px-3 py-2 bg-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold flex items-center justify-center gap-1.5 mb-2 hover:bg-[#3B82F6] transition-colors uppercase tracking-wide cursor-pointer"
                   >
                     <svg
                       width="12"
@@ -1782,7 +1782,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                           }}
                           className={`px-2 py-1 text-[10px] font-bold uppercase border transition-colors cursor-pointer ${
                             isExploded
-                              ? "bg-[#DF6C42] text-[#E5E6DA] border-[#DF6C42]"
+                              ? "bg-[#3B82F6] text-[#E5E6DA] border-[#3B82F6]"
                               : "bg-transparent text-[#1D1E15] border-[#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA]"
                           }`}
                         >
@@ -1851,10 +1851,10 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
           <div className="absolute right-8 top-1/2 -translate-y-1/2 z-40 animate-in fade-in slide-in-from-right-4 duration-500">
             <div className="relative">
               {/* Pointer Arrow - pointing left now */}
-              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-r-[12px] border-r-[#DF6C42]" />
+              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-r-[12px] border-r-[#3B82F6]" />
               
               {/* Hint Box */}
-              <div className="bg-[#DF6C42] border-2 border-[#1D1E15] px-4 py-3 shadow-2xl max-w-[240px]">
+              <div className="bg-[#3B82F6] border-2 border-[#1D1E15] px-4 py-3 shadow-2xl max-w-[240px]">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-[#1D1E15] rounded flex items-center justify-center shrink-0 mt-0.5">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -1876,7 +1876,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 {/* Dismiss Button */}
                 <button
                   onClick={() => setShowInteractionHint(false)}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-[#1D1E15] text-white rounded-full flex items-center justify-center hover:bg-[#1D1E15]/80 transition-colors cursor-pointer border-2 border-[#DF6C42]"
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-[#1D1E15] text-white rounded-full flex items-center justify-center hover:bg-[#1D1E15]/80 transition-colors cursor-pointer border-2 border-[#3B82F6]"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                     <line x1="18" y1="6" x2="6" y2="18"/>
@@ -1901,7 +1901,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
               {/* Close button */}
               <button
                 onClick={() => setShowAnnotatedModal(false)}
-                className="absolute top-2 right-2 z-10 w-8 h-8 bg-[#1D1E15] text-[#E5E6DA] rounded-full flex items-center justify-center hover:bg-[#DF6C42] transition-colors cursor-pointer"
+                className="absolute top-2 right-2 z-10 w-8 h-8 bg-[#1D1E15] text-[#E5E6DA] rounded-full flex items-center justify-center hover:bg-[#3B82F6] transition-colors cursor-pointer"
               >
                 <svg
                   width="16"

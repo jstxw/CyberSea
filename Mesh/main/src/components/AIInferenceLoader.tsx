@@ -19,13 +19,13 @@ interface AIInferenceLoaderProps {
 }
 
 const STAGES = [
-  { label: 'Initializing AI Engine', icon: Zap, color: '#DF6C42' },
+  { label: 'Initializing AI Engine', icon: Zap, color: '#3B82F6' },
   { label: 'Scanning Mesh Geometry', icon: Scan, color: '#1D1E15' },
-  { label: 'Extracting Features', icon: Box, color: '#DF6C42' },
+  { label: 'Extracting Features', icon: Box, color: '#3B82F6' },
   { label: 'Processing Vertices', icon: Cpu, color: '#1D1E15' },
-  { label: 'Analyzing Topology', icon: Activity, color: '#DF6C42' },
+  { label: 'Analyzing Topology', icon: Activity, color: '#3B82F6' },
   { label: 'Running Inference', icon: Search, color: '#1D1E15' },
-  { label: 'Generating Annotations', icon: FileText, color: '#DF6C42' },
+  { label: 'Generating Annotations', icon: FileText, color: '#3B82F6' },
   { label: 'Finalizing Results', icon: CheckCircle, color: '#1D1E15' },
 ];
 
@@ -59,8 +59,8 @@ export default function AIInferenceLoader({
   useEffect(() => {
     if (!scanningMaterialRef.current) {
       scanningMaterialRef.current = new THREE.MeshStandardMaterial({
-        color: 0xDF6C42, 
-        emissive: 0xDF6C42,
+        color: 0x3B82F6, 
+        emissive: 0x3B82F6,
         emissiveIntensity: 2.0,
         roughness: 0.2,
         metalness: 0.8,
@@ -228,9 +228,9 @@ export default function AIInferenceLoader({
       {/* Top Bar */}
       <div className="absolute top-0 left-0 right-0 h-20 bg-[#1D1E15]/90 backdrop-blur-md border-b border-[#E5E6DA]/10 flex items-center justify-between px-8 pointer-events-auto">
         <div className="flex items-center gap-4">
-          <div className="w-2 h-2 bg-[#DF6C42] animate-pulse" />
+          <div className="w-2 h-2 bg-[#3B82F6] animate-pulse" />
           <div className="font-mono text-sm text-[#E5E6DA] tracking-widest uppercase font-light">
-            AI Inference Protocol <span className="text-[#DF6C42]">//</span> V2.4
+            AI Inference Protocol <span className="text-[#3B82F6]">//</span> V2.4
           </div>
         </div>
         <div className="font-mono text-2xl font-light text-[#E5E6DA]">
@@ -246,7 +246,7 @@ export default function AIInferenceLoader({
          </div>
          <div className="h-1 w-full bg-[#E5E6DA]/10 overflow-hidden">
            <motion.div 
-             className="h-full bg-[#DF6C42]"
+             className="h-full bg-[#3B82F6]"
              initial={{ width: 0 }}
              animate={{ width: `${progress}%` }}
              transition={{ ease: "linear" }}
@@ -263,12 +263,12 @@ export default function AIInferenceLoader({
         
         <div className="space-y-2">
           <div className="text-[10px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Current Scan</div>
-          <div className="text-sm font-mono text-[#DF6C42] break-all font-light">
+          <div className="text-sm font-mono text-[#3B82F6] break-all font-light">
             {currentMeshName}
           </div>
           <div className="h-[1px] w-full bg-[#E5E6DA]/10 mt-2 overflow-hidden relative">
              <motion.div 
-               className="absolute inset-0 bg-[#DF6C42]"
+               className="absolute inset-0 bg-[#3B82F6]"
                initial={{ x: "-100%" }}
                animate={{ x: "100%" }}
                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -300,7 +300,7 @@ export default function AIInferenceLoader({
             
             return (
               <div key={index} className={`flex items-center gap-4 ${isActive ? 'opacity-100' : 'opacity-30'}`}>
-                <div className={`p-1.5 rounded-sm ${isActive ? 'bg-[#DF6C42]/20 text-[#DF6C42]' : 'bg-[#E5E6DA]/5 text-[#E5E6DA]'}`}>
+                <div className={`p-1.5 rounded-sm ${isActive ? 'bg-[#3B82F6]/20 text-[#3B82F6]' : 'bg-[#E5E6DA]/5 text-[#E5E6DA]'}`}>
                   <stage.icon size={14} />
                 </div>
                 <div className="text-xs font-mono uppercase text-[#E5E6DA] tracking-wide">{stage.label}</div>
@@ -316,15 +316,15 @@ export default function AIInferenceLoader({
       */}
       <div className="absolute top-20 bottom-16 left-80 right-80 pointer-events-auto cursor-wait">
          {/* Reticle - Full Size */}
-         <div className="w-full h-full border border-[#DF6C42]/20 relative opacity-50">
-            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#DF6C42]" />
-            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#DF6C42]" />
-            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#DF6C42]" />
-            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#DF6C42]" />
+         <div className="w-full h-full border border-[#3B82F6]/20 relative opacity-50">
+            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#3B82F6]" />
+            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#3B82F6]" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#3B82F6]" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#3B82F6]" />
             
             {/* Scanning Line */}
             <motion.div 
-              className="absolute left-0 right-0 h-[2px] bg-[#DF6C42]/50 shadow-[0_0_15px_rgba(223,108,66,0.5)]"
+              className="absolute left-0 right-0 h-[2px] bg-[#3B82F6]/50 shadow-[0_0_15px_rgba(223,108,66,0.5)]"
               initial={{ top: 0 }}
               animate={{ top: "100%" }}
               transition={{ duration: 3, repeat: Infinity, ease: "linear" }}

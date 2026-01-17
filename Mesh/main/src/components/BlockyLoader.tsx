@@ -71,7 +71,7 @@ export default function BlockyLoader({ onFinished }: BlockyLoaderProps) {
               }}
             />
             <motion.div
-              className="bg-[#DF6C42]"
+              className="bg-[#3B82F6]"
               animate={{
                 scale: [1, 0.8, 1],
                 rotate: [0, -90, 0],
@@ -86,7 +86,7 @@ export default function BlockyLoader({ onFinished }: BlockyLoaderProps) {
               }}
             />
              <motion.div
-              className="bg-[#DF6C42]"
+              className="bg-[#3B82F6]"
               animate={{
                 scale: [1, 0.8, 1],
                 rotate: [0, -90, 0],
@@ -147,7 +147,7 @@ export default function BlockyLoader({ onFinished }: BlockyLoaderProps) {
                 initial={{ scaleY: 0 }}
                 animate={{ 
                   scaleY: i < filledBlocks ? 1 : 0.2,
-                  backgroundColor: i < filledBlocks ? '#DF6C42' : '#1D1E15'
+                  backgroundColor: i < filledBlocks ? '#3B82F6' : '#1D1E15'
                 }}
                 transition={{ duration: 0.2 }}
                 className="flex-1 origin-bottom opacity-80"

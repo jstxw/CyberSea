@@ -24,7 +24,7 @@ export default function DashboardPage() {
       
       {/* Demo Banner */}
       {showBanner && (
-        <div className="bg-[#DF6C42] border-b border-[#1D1E15] px-4 py-2 flex items-center justify-between z-50">
+        <div className="bg-[#3B82F6] border-b border-[#1D1E15] px-4 py-2 flex items-center justify-between z-50">
           <div className="flex items-center gap-3 flex-1">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="shrink-0">
               <circle cx="12" cy="12" r="10"/>
@@ -73,7 +73,7 @@ export default function DashboardPage() {
         </div>
         
         <div className="flex items-center gap-4 px-4">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#DF6C42] animate-pulse"></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] animate-pulse"></div>
           <div className="text-[10px] uppercase tracking-widest opacity-50">Connected</div>
         </div>
       </nav>

@@ -45,6 +45,17 @@
         category: "Close Air Support Aircraft",
         annotatedImage: "/annotations/drone-annotate.jpeg"
         }
+    },
+    {
+        id: "demo-4",
+        name: "F/A-18F Super Hornet",
+        path: "/models/f18.glb",
+        annotation: {
+        name: "F/A-18F Super Hornet Multirole Fighter",
+        description: "Twin-engine, carrier-capable multirole fighter designed for both air superiority and strike missions. Advanced variant featuring improved range, weapons capacity, and avionics. Powered by two F414-GE-400 turbofan engines producing 22,000 lbf thrust each. Primary fighter for US Navy carrier operations. Armed with AIM-9 Sidewinder, AIM-120 AMRAAM, AGM-88 HARM, and 20mm M61 Vulcan cannon. Capable of aerial refueling.",
+        category: "Carrier-Based Multirole Fighter",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        }
     }
     ];
 

@@ -60,7 +60,7 @@
     {
         id: "demo-5",
         name: "F16 Jet",
-        path: "/models/human-brain.glb",
+        path: "/models/f16-model.glb",
         annotation: {
         name: "F16 Jet System",
         description: "A high-performance fighter jet aircraft designed for air superiority and ground attack missions. Note this is a demo annotation and actual diagram will depend on the object and mesh selected.",

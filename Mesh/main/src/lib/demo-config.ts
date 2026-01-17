@@ -67,6 +67,17 @@
         category: "Fifth-Generation Stealth Fighter",
         annotatedImage: "/annotations/drone-annotate.jpeg"
         }
+    },
+    {
+        id: "demo-6",
+        name: "F-15E Strike Eagle",
+        path: "/models/f15.glb",
+        annotation: {
+        name: "F-15E Strike Eagle Dual-Role Fighter",
+        description: "Twin-engine, all-weather tactical fighter designed for both air-to-air and deep interdiction missions. Undefeated in air combat with over 100 victories. Two-seat configuration with pilot and weapons systems officer. Powered by twin Pratt & Whitney F100 turbofan engines with 29,000 lbf thrust each. Capable of carrying 24,500 pounds of ordnance on nine external hardpoints. Features AN/APG-70 radar, LANTIRN targeting pods, and advanced electronic warfare suite. Speed: Mach 2.5+.",
+        category: "Dual-Role Strike Fighter",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        }
     }
     ];
 

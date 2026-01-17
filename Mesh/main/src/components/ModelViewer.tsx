@@ -858,6 +858,90 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     setShowAnnotatedModal(false);
   };
 
+  // Smart component naming based on position and size
+  const generateComponentName = (
+    centroid: THREE.Vector3,
+    size: THREE.Vector3,
+    modelCenter: THREE.Vector3,
+    componentIndex: number,
+    totalComponents: number
+  ): string => {
+    const relativePos = centroid.clone().sub(modelCenter);
+    
+    // Determine position descriptors
+    const isForward = relativePos.z > 0.5;
+    const isRear = relativePos.z < -0.5;
+    const isTop = relativePos.y > 0.5;
+    const isBottom = relativePos.y < -0.5;
+    const isLeft = relativePos.x < -0.5;
+    const isRight = relativePos.x > 0.5;
+    
+    // Determine size descriptors
+    const volume = size.x * size.y * size.z;
+    const isLarge = volume > 2.0;
+    const isSmall = volume < 0.3;
+    
+    const aspectRatio = Math.max(size.x, size.y, size.z) / Math.min(size.x, size.y, size.z);
+    const isElongated = aspectRatio > 3;
+    const isFlatHorizontal = size.y < Math.min(size.x, size.z) * 0.3;
+    const isFlatVertical = size.x < Math.min(size.y, size.z) * 0.3 || size.z < Math.min(size.x, size.y) * 0.3;
+    
+    // Generate descriptive names
+    if (isLarge && Math.abs(relativePos.length()) < 0.5) {
+      return "Main Fuselage";
+    }
+    
+    if (isForward && isSmall) {
+      return "Nose Section";
+    }
+    
+    if (isForward && !isSmall) {
+      return isTop ? "Forward Upper Body" : "Forward Section";
+    }
+    
+    if (isRear && isSmall) {
+      return "Tail Section";
+    }
+    
+    if (isRear) {
+      return isTop ? "Tail Assembly" : "Rear Section";
+    }
+    
+    if ((isLeft || isRight) && isFlatHorizontal && isElongated) {
+      return isLeft ? "Left Wing" : "Right Wing";
+    }
+    
+    if ((isLeft || isRight) && !isFlatHorizontal) {
+      return isLeft ? "Left Component" : "Right Component";
+    }
+    
+    if (isTop && isFlatHorizontal) {
+      return "Top Panel";
+    }
+    
+    if (isBottom && isFlatHorizontal) {
+      return "Undercarriage";
+    }
+    
+    if (isTop) {
+      return "Upper Structure";
+    }
+    
+    if (isBottom) {
+      return "Lower Structure";
+    }
+    
+    if (isFlatVertical && isElongated) {
+      return "Stabilizer";
+    }
+    
+    if (isSmall) {
+      return `Detail Component ${componentIndex + 1}`;
+    }
+    
+    return `Section ${componentIndex + 1}`;
+  };
+
   const handleSplitMesh = async () => {
     // Use ref as fallback to ensure we have the latest selected object (especially for Bluetooth triggers)
     const currentObject = selectedObject || selectedObjectRef.current;
@@ -1013,34 +1097,64 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         const mats =
           (mesh as any).userData.mats ||
           createDualMaterials(new THREE.Color(0x00aaff));
-        const newMesh = new THREE.Mesh(
-          newGeo,
-          viewMode === "solid" ? mats.solid : mats.holo
-        );
-        (newMesh as any).userData = {
-          name: `${(mesh as any).userData.name || "Part"} - Sub ${idx + 1}`,
-          description: "Split component.",
-          type: "Sub-assembly",
-          mats,
-        };
-        newMesh.castShadow = false;
-        newMesh.receiveShadow = false;
-
-        // Calculate component centroid
+        
+        // Calculate component centroid and size
         const positions = newGeo.attributes.position;
         let sumX = 0,
           sumY = 0,
           sumZ = 0;
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+        let minZ = Infinity, maxZ = -Infinity;
+        
         for (let i = 0; i < positions.count; i++) {
-          sumX += positions.getX(i);
-          sumY += positions.getY(i);
-          sumZ += positions.getZ(i);
+          const x = positions.getX(i);
+          const y = positions.getY(i);
+          const z = positions.getZ(i);
+          sumX += x;
+          sumY += y;
+          sumZ += z;
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+          minY = Math.min(minY, y);
+          maxY = Math.max(maxY, y);
+          minZ = Math.min(minZ, z);
+          maxZ = Math.max(maxZ, z);
         }
+        
         const geometryCenter = new THREE.Vector3(
           sumX / positions.count,
           sumY / positions.count,
           sumZ / positions.count
         );
+        
+        const componentSize = new THREE.Vector3(
+          maxX - minX,
+          maxY - minY,
+          maxZ - minZ
+        );
+        
+        // Generate smart component name
+        const smartName = generateComponentName(
+          geometryCenter,
+          componentSize,
+          localCenter,
+          idx,
+          components.length
+        );
+        
+        const newMesh = new THREE.Mesh(
+          newGeo,
+          viewMode === "solid" ? mats.solid : mats.holo
+        );
+        (newMesh as any).userData = {
+          name: smartName,
+          description: "Component awaiting AI identification. Click 'Identify with AI' for detailed analysis.",
+          type: "Aircraft Component",
+          mats,
+        };
+        newMesh.castShadow = false;
+        newMesh.receiveShadow = false;
 
         // Center the geometry to its own origin so rotation/scaling works from center
         newGeo.translate(

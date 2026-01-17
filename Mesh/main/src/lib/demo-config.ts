@@ -122,6 +122,17 @@
         category: "Guided Missile Destroyer",
         annotatedImage: "/annotations/drone-annotate.jpeg"
         }
+    },
+    {
+        id: "demo-11",
+        name: "M1025 HMMWV (Humvee)",
+        path: "/models/hmmwv_m998a1_soft_top/scene.gltf",
+        annotation: {
+        name: "M1025 HMMWV Armament Carrier",
+        description: "High Mobility Multipurpose Wheeled Vehicle (HMMWV), commonly known as Humvee. Four-wheel-drive military light truck with independent suspension and high ground clearance for extreme off-road capability. M1025 variant designed as armament/weapons carrier supporting TOW missile system, Mk 19 grenade launcher, or M2 .50 caliber machine gun. Powered by 6.5L V8 diesel engine producing 190 horsepower. Payload capacity: 2,500 pounds. Central tire inflation system allows on-the-fly tire pressure adjustment for different terrain. Can be equipped with add-on armor kits.",
+        category: "Light Tactical Vehicle",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        }
     }
     ];
 

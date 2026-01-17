@@ -89,6 +89,17 @@
         category: "Unmanned Combat Aerial Vehicle",
         annotatedImage: "/annotations/drone-annotate.jpeg"
         }
+    },
+    {
+        id: "demo-8",
+        name: "SH-60B Seahawk",
+        path: "/models/seahawk.glb",
+        annotation: {
+        name: "SH-60B Seahawk Naval Helicopter",
+        description: "Twin-turboshaft, multi-mission naval helicopter designed for anti-submarine warfare (ASW), anti-surface warfare (ASUW), and search and rescue (SAR). Ship-based variant of the UH-60 Black Hawk. Powered by two General Electric T700-GE-401C engines. Equipped with APS-124 search radar, MAD (Magnetic Anomaly Detector), sonobuoys, and dipping sonar for submarine detection. Armed with Mk 46 or Mk 50 torpedoes, AGM-119 Penguin anti-ship missiles. Four-blade main rotor with automatic folding for shipboard storage.",
+        category: "Naval Multi-Mission Helicopter",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        }
     }
     ];
 

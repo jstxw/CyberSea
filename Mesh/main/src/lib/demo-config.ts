@@ -111,6 +111,17 @@
         category: "Main Battle Tank",
         annotatedImage: "/annotations/drone-annotate.jpeg"
         }
+    },
+    {
+        id: "demo-10",
+        name: "Arleigh Burke-class Destroyer",
+        path: "/models/destroyer.glb",
+        annotation: {
+        name: "DDG-51 Arleigh Burke-class Guided Missile Destroyer",
+        description: "Multi-mission guided missile destroyer designed for air, surface, and subsurface warfare. Powered by four General Electric LM2500 gas turbines producing 100,000 shaft horsepower. Equipped with Aegis Combat System and AN/SPY-1D phased array radar for simultaneous tracking of hundreds of targets. Vertical Launch System (VLS) with 90-96 cells carrying SM-2, SM-3, SM-6 missiles, Tomahawk cruise missiles, and ASROC anti-submarine rockets. Armed with 5-inch Mk 45 naval gun, Phalanx CIWS, and torpedo tubes. Length: 509 feet, displacement: 9,200 tons.",
+        category: "Guided Missile Destroyer",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        }
     }
     ];
 

@@ -26,17 +26,6 @@
     },
     {
         id: "demo-2",
-        name: "F-16 Fighting Falcon",
-        path: "/models/f16-model.glb",
-        annotation: {
-        name: "F-16 Fighting Falcon Multirole Fighter",
-        description: "Fourth-generation multirole fighter aircraft designed for air-to-air combat and air-to-ground attack missions. Features advanced avionics, afterburning turbofan engine, and proven air superiority capabilities. Highly maneuverable with 9G capability. Primary armament includes AIM-9 Sidewinder missiles, AIM-120 AMRAAM, and M61 Vulcan 20mm cannon.",
-        category: "Multirole Fighter Aircraft",
-        annotatedImage: "/annotations/f16-annotate.jpeg"
-        }
-    },
-    {
-        id: "demo-3",
         name: "A-10 Thunderbolt II 'Warthog'",
         path: "/models/a10.glb",
         annotation: {
@@ -47,7 +36,7 @@
         }
     },
     {
-        id: "demo-4",
+        id: "demo-3",
         name: "F/A-18F Super Hornet",
         path: "/models/f18.glb",
         annotation: {
@@ -58,7 +47,7 @@
         }
     },
     {
-        id: "demo-5",
+        id: "demo-4",
         name: "F-35 Lightning II",
         path: "/models/f35.glb",
         annotation: {
@@ -69,7 +58,7 @@
         }
     },
     {
-        id: "demo-6",
+        id: "demo-5",
         name: "F-15E Strike Eagle",
         path: "/models/f15.glb",
         annotation: {
@@ -80,7 +69,7 @@
         }
     },
     {
-        id: "demo-7",
+        id: "demo-6",
         name: "MQ-9 Reaper",
         path: "/models/reaper.glb",
         annotation: {
@@ -91,7 +80,7 @@
         }
     },
     {
-        id: "demo-8",
+        id: "demo-7",
         name: "SH-60B Seahawk",
         path: "/models/seahawk.glb",
         annotation: {
@@ -102,7 +91,7 @@
         }
     },
     {
-        id: "demo-9",
+        id: "demo-8",
         name: "T-90 Main Battle Tank",
         path: "/models/t-90.glb",
         annotation: {
@@ -113,7 +102,7 @@
         }
     },
     {
-        id: "demo-10",
+        id: "demo-9",
         name: "Arleigh Burke-class Destroyer",
         path: "/models/destroyer.glb",
         annotation: {
@@ -124,7 +113,7 @@
         }
     },
     {
-        id: "demo-11",
+        id: "demo-10",
         name: "M1025 HMMWV (Humvee)",
         path: "/models/hmmwv_m998a1_soft_top/scene.gltf",
         annotation: {

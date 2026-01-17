@@ -8,7 +8,10 @@ import { useState } from 'react';
 const ModelViewer = dynamic(() => import('@/components/ModelViewer'), {
   ssr: false,
   loading: () => (
-    <div className="min-h-screen bg-black flex items-center justify-center">
+    <div className="min-h-screen bg-black flex items-center justify-center" style={{
+      backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+      backgroundSize: '30px 30px'
+    }}>
       <div className="text-[#E5E6DA]/60 font-mono text-xs uppercase tracking-wider">Loading 3D Viewer...</div>
     </div>
   ),
@@ -20,7 +23,10 @@ export default function DashboardPage() {
   const [showBanner, setShowBanner] = useState(IS_PRODUCTION_DEMO);
 
   return (
-    <div className="min-h-screen bg-black font-mono flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-black font-mono flex flex-col overflow-hidden" style={{
+      backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+      backgroundSize: '30px 30px'
+    }}>
       
       {/* Demo Banner */}
       {showBanner && (

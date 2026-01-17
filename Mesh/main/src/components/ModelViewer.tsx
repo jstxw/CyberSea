@@ -1496,7 +1496,10 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   };
 
   return (
-    <div className="absolute inset-0 bg-black z-0">
+    <div className="absolute inset-0 bg-black z-0" style={{
+      backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+      backgroundSize: '30px 30px'
+    }}>
       <div className="w-full h-full relative">
         {/* Onboarding Overlay */}
         {showOnboarding && (

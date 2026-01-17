@@ -70,10 +70,16 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0a0a0a] text-[#E5E6DA] font-mono flex flex-col">
+    <div className="relative min-h-screen bg-[#0a0a0a] text-[#E5E6DA] font-mono flex flex-col" style={{
+      backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+      backgroundSize: '30px 30px'
+    }}>
 
       {/* Navigation Header */}
-      <nav className="border-b border-[#E5E6DA] px-0 h-16 flex justify-between items-center bg-[#0a0a0a] z-50">
+      <nav className="border-b border-[#E5E6DA] px-0 h-16 flex justify-between items-center bg-[#0a0a0a] z-50" style={{
+        backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+        backgroundSize: '30px 30px'
+      }}>
         <div className="flex items-center h-full flex-1">
           {/* Nav Items */}
           <div className="hidden md:flex h-full items-center px-6 gap-8 text-[10px] font-medium uppercase tracking-wide flex-1">
@@ -120,12 +126,10 @@ export default function Home() {
       <main className="flex-1 grid grid-cols-12">
 
         {/* Left Sidebar (Empty/Decor) */}
-        <div className="hidden lg:block col-span-1 relative bg-[#0a0a0a] overflow-hidden">
-          {/* Diagonal Lines SVG Background */}
-          <div className="absolute inset-0 opacity-[0.1]" style={{
-            backgroundImage: 'repeating-linear-gradient(45deg, #1D1E15 0, #1D1E15 1px, transparent 0, transparent 50%)',
-            backgroundSize: '10px 10px'
-          }} />
+        <div className="hidden lg:block col-span-1 relative bg-[#0a0a0a] overflow-hidden" style={{
+          backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+          backgroundSize: '30px 30px'
+        }}>
         </div>
 
         {/* Main Hero Content */}
@@ -163,6 +167,10 @@ export default function Home() {
             {/* Mobile 3D Visualization Box */}
             <motion.div
               className="lg:hidden h-64 border border-[#E5E6DA] relative overflow-hidden bg-[#0a0a0a] shrink-0 my-4"
+              style={{
+                backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+                backgroundSize: '30px 30px'
+              }}
               variants={staggerItem}
             >
               <div className="absolute inset-0 flex items-center justify-center">
@@ -191,19 +199,28 @@ export default function Home() {
         </div>
 
         {/* Right Visualization Column */}
-        <div className="col-span-12 lg:col-span-4 flex flex-col divide-y divide-[#E5E6DA] bg-[#0a0a0a]">
+        <div className="col-span-12 lg:col-span-4 flex flex-col divide-y divide-[#E5E6DA] bg-[#0a0a0a]" style={{
+          backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+          backgroundSize: '30px 30px'
+        }}>
 
 
 
           {/* Empty Space (formerly Metrics Grid) */}
-          <div className="flex-1 bg-[#0a0a0a]">
+          <div className="flex-1 bg-[#0a0a0a]" style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+            backgroundSize: '30px 30px'
+          }}>
           </div>
         </div>
 
       </main>
 
       {/* How It Works Section */}
-      <section id="process" className="border-t border-[#E5E6DA] bg-[#0a0a0a]">
+      <section id="process" className="border-t border-[#E5E6DA] bg-[#0a0a0a]" style={{
+        backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+        backgroundSize: '30px 30px'
+      }}>
         <div className="grid grid-cols-12 divide-x divide-[#E5E6DA]">
           {/* Left Sidebar Spacer */}
           <div className="hidden lg:block col-span-1"></div>
@@ -281,7 +298,10 @@ export default function Home() {
       </section>
 
       {/* Metrics Section */}
-      <section id="metrics" className="border-t border-[#E5E6DA] bg-[#0a0a0a]">
+      <section id="metrics" className="border-t border-[#E5E6DA] bg-[#0a0a0a]" style={{
+        backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+        backgroundSize: '30px 30px'
+      }}>
         <div className="grid grid-cols-12 divide-x divide-[#E5E6DA]">
           {/* Left Sidebar Spacer */}
           <div className="hidden lg:block col-span-1"></div>
@@ -457,7 +477,10 @@ export default function Home() {
       </section>
 
       {/* Integrations Section */}
-      <section id="integrations" className="border-t border-[#E5E6DA] bg-[#0a0a0a]">
+      <section id="integrations" className="border-t border-[#E5E6DA] bg-[#0a0a0a]" style={{
+        backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+        backgroundSize: '30px 30px'
+      }}>
         <div className="grid grid-cols-12 divide-x divide-[#E5E6DA]">
           {/* Left Sidebar Spacer */}
           <div className="hidden lg:block col-span-1"></div>
@@ -542,7 +565,10 @@ export default function Home() {
       </section>
 
       {/* Upload & Export Section */}
-      <section id="upload-export" className="border-t border-[#E5E6DA] bg-[#0a0a0a]">
+      <section id="upload-export" className="border-t border-[#E5E6DA] bg-[#0a0a0a]" style={{
+        backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+        backgroundSize: '30px 30px'
+      }}>
         <div className="grid grid-cols-12 divide-x divide-[#E5E6DA]">
           {/* Left Sidebar Spacer */}
           <div className="hidden lg:block col-span-1"></div>
@@ -635,7 +661,10 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer id="visualize" className="border-t border-[#E5E6DA] bg-[#0a0a0a]">
+      <footer id="visualize" className="border-t border-[#E5E6DA] bg-[#0a0a0a]" style={{
+        backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+        backgroundSize: '30px 30px'
+      }}>
         <div className="grid grid-cols-12 divide-x divide-[#E5E6DA]">
           {/* Left Sidebar Spacer */}
           <div className="hidden lg:block col-span-1"></div>
@@ -711,7 +740,10 @@ export default function Home() {
           />
 
           {/* Modal Content */}
-          <div className="relative bg-[#0a0a0a] border-2 border-[#E5E6DA] p-8 max-w-sm w-full">
+          <div className="relative bg-[#0a0a0a] border-2 border-[#E5E6DA] p-8 max-w-sm w-full" style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+            backgroundSize: '30px 30px'
+          }}>
             {/* Close Button */}
             <button
               onClick={() => setShowMobileModal(false)}

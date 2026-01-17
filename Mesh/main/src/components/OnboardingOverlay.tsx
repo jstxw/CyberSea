@@ -46,16 +46,14 @@ export default function OnboardingOverlay({
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm animate-in fade-in duration-500">
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm animate-in fade-in duration-500" style={{
+      backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+      backgroundSize: '30px 30px'
+    }}>
       <div className="w-full max-w-lg p-8 text-center space-y-8">
 
         {/* Header */}
-        <div className="space-y-3 text-left pl-1">
-          <p className="text-[#E5E6DA]/60 font-mono text-xs uppercase tracking-wider max-w-md leading-relaxed">
-            Advanced spatial visualization & analysis platform. <br />
-            Connect hardware or explore procedural models.
-          </p>
-        </div>
+
 
         {/* Actions Container */}
         <div className="bg-[#FFFFFF] border border-[#FFFFFF] p-1.5  shadow-2xl">
@@ -138,10 +136,8 @@ export default function OnboardingOverlay({
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-[#E5E6DA]/10"></div>
             </div>
-            <span className="relative bg-[#E5E6DA] px-2 text-[10px] text-[#1D1E15]/40 font-mono uppercase tracking-widest">OR</span>
           </div>
 
-          {/* Import Button - Orange Accent Version */}
           <button
             onClick={onImport}
             className="w-full group flex items-center justify-center gap-3 p-4 bg-[#3B82F6] border border-[#1D1E15]  shadow-[0_8px_0_0_#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-all cursor-pointer mb-3"

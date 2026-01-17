@@ -51,7 +51,10 @@ export default function BlockyLoader({ onFinished }: BlockyLoaderProps) {
   const filledBlocks = Math.floor((progress / 100) * totalBlocks);
 
   return (
-    <div className="fixed inset-0 bg-black backdrop-blur-md z-[60] flex flex-col items-center justify-center font-mono">
+    <div className="fixed inset-0 bg-black backdrop-blur-md z-[60] flex flex-col items-center justify-center font-mono" style={{
+      backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+      backgroundSize: '30px 30px'
+    }}>
       <div className="w-96 space-y-6">
         {/* Hexagon/Cube Animation */}
         <div className="flex justify-center mb-8">

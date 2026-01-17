@@ -1645,44 +1645,44 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 }
               }}
               value={currentDemoModelId || ""}
-              className="h-[32px] px-4 bg-white border-2 border-[#3B82F6] text-[#1D1E15] text-[11px] font-bold uppercase tracking-wide cursor-pointer hover:bg-[#3B82F6] hover:text-white transition-all duration-200 min-w-[280px] shadow-sm"
-              style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+              className="h-[32px] px-4 bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold uppercase tracking-wider cursor-pointer hover:bg-[#2a2b26] transition-all duration-200 min-w-[280px] shadow-md"
+              style={{ fontFamily: 'monospace' }}
             >
-              <option value="" className="text-[11px] font-bold">🎖️ SELECT MILITARY VEHICLE</option>
-              <option disabled className="text-[10px] text-gray-400">──── AIRCRAFT ────</option>
+              <option value="" className="text-[10px] font-bold bg-[#1D1E15]">SELECT MILITARY VEHICLE</option>
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── AIRCRAFT ────</option>
               {DEMO_MODELS.filter(m => ['demo-2', 'demo-3', 'demo-4', 'demo-5', 'demo-6'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[11px] py-2">
-                  ✈️ {model.name}
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
                 </option>
               ))}
-              <option disabled className="text-[10px] text-gray-400">──── DRONES ────</option>
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── DRONES ────</option>
               {DEMO_MODELS.filter(m => ['demo-1', 'demo-7'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[11px] py-2">
-                  🎯 {model.name}
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
                 </option>
               ))}
-              <option disabled className="text-[10px] text-gray-400">──── HELICOPTERS ────</option>
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── HELICOPTERS ────</option>
               {DEMO_MODELS.filter(m => ['demo-8'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[11px] py-2">
-                  🚁 {model.name}
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
                 </option>
               ))}
-              <option disabled className="text-[10px] text-gray-400">──── ARMOR ────</option>
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── ARMOR ────</option>
               {DEMO_MODELS.filter(m => ['demo-9'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[11px] py-2">
-                  🛡️ {model.name}
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
                 </option>
               ))}
-              <option disabled className="text-[10px] text-gray-400">──── NAVAL ────</option>
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── NAVAL ────</option>
               {DEMO_MODELS.filter(m => ['demo-10'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[11px] py-2">
-                  🚢 {model.name}
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
                 </option>
               ))}
-              <option disabled className="text-[10px] text-gray-400">──── GROUND VEHICLES ────</option>
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── GROUND VEHICLES ────</option>
               {DEMO_MODELS.filter(m => ['demo-11'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[11px] py-2">
-                  🚙 {model.name}
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
                 </option>
               ))}
             </select>

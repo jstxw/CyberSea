@@ -75,15 +75,7 @@ export default function Home() {
       {/* Navigation Header */}
       <nav className="border-b border-[#E5E6DA] px-0 h-16 flex justify-between items-center bg-[#0a0a0a] z-50">
         <div className="flex items-center h-full flex-1">
-          {/* Logo Box - Aligned with Left Sidebar */}
-          {/* Scaled down from 179px */}
-          <div className="w-[134px] h-full flex items-center justify-center bg-[#0a0a0a] shrink-0">
-            <div className="w-10 h-10 flex items-center justify-center">
-              <img src="/logo.png" alt="Mesh Logo" className="w-6 h-6 object-contain invert" />
-            </div>
-          </div>
-
-          {/* Nav Items starting right after the box */}
+          {/* Nav Items */}
           <div className="hidden md:flex h-full items-center px-6 gap-8 text-[10px] font-medium uppercase tracking-wide flex-1">
             {[
               { name: 'Protocol', href: '#process' },
@@ -146,18 +138,10 @@ export default function Home() {
             animate="visible"
             variants={staggerContainer}
           >
-            <motion.img
-              src="/logo.png"
-              alt="Mesh Logo"
-              className="w-8 h-8 lg:w-12 lg:h-12 object-contain invert"
-              variants={staggerItem}
-            />
-
             <motion.div
               className="inline-flex items-center gap-2 px-2 py-0.5 border border-[#E5E6DA] text-[8px] lg:text-[10px] uppercase tracking-wider w-fit"
               variants={staggerItem}
             >
-
               <div className="w-1.5 h-1.5 bg-[#3B82F6]"></div>
               Mesh
             </motion.div>

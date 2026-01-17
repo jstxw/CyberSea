@@ -13,19 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mesh — Coordination Layer for GeoSpatial Data",
-  description: "Fast, verifiable, and trust-minimized 3D model processing",
+  title: "Mesh — Military Equipment Intelligence Platform",
+  description: "AI-powered threat identification training system for military personnel",
   openGraph: {
     images: ["/hero.png"],
   },
   twitter: {
     card: "summary_large_image",
     images: ["/hero.png"],
-  },
-  icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
   },
 };
 

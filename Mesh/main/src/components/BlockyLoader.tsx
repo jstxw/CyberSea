@@ -51,13 +51,13 @@ export default function BlockyLoader({ onFinished }: BlockyLoaderProps) {
   const filledBlocks = Math.floor((progress / 100) * totalBlocks);
 
   return (
-    <div className="fixed inset-0 bg-[#E5E6DA]/90 backdrop-blur-md z-[60] flex flex-col items-center justify-center font-mono">
+    <div className="fixed inset-0 bg-black backdrop-blur-md z-[60] flex flex-col items-center justify-center font-mono">
       <div className="w-96 space-y-6">
         {/* Hexagon/Cube Animation */}
         <div className="flex justify-center mb-8">
           <div className="relative w-24 h-24 grid grid-cols-2 gap-2">
             <motion.div
-              className="bg-[#1D1E15]"
+              className="bg-gray-600"
               animate={{
                 scale: [1, 0.8, 1],
                 rotate: [0, 90, 0],
@@ -101,7 +101,7 @@ export default function BlockyLoader({ onFinished }: BlockyLoaderProps) {
               }}
             />
              <motion.div
-              className="bg-[#1D1E15]"
+              className="bg-black border border-gray-600"
               animate={{
                 scale: [1, 0.8, 1],
                 rotate: [0, 90, 0],
@@ -127,7 +127,7 @@ export default function BlockyLoader({ onFinished }: BlockyLoaderProps) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
               transition={{ duration: 0.3, ease: "backOut" }}
-              className="absolute inset-x-0 text-[#1D1E15] text-sm uppercase tracking-widest font-bold"
+              className="absolute inset-x-0 text-[#E5E6DA] text-sm uppercase tracking-widest font-bold"
             >
               {MESSAGES[currentMessage]}
             </motion.div>
@@ -136,7 +136,7 @@ export default function BlockyLoader({ onFinished }: BlockyLoaderProps) {
 
         {/* Blocky Progress Bar */}
         <div className="space-y-3">
-          <div className="flex justify-between text-sm font-medium text-[#1D1E15] uppercase tracking-wider">
+          <div className="flex justify-between text-sm font-medium text-[#E5E6DA] uppercase tracking-wider">
             <span>System Status: Loading</span>
             <span className="text-3xl">{Math.min(100, Math.floor(progress))}%</span>
           </div>
@@ -145,9 +145,9 @@ export default function BlockyLoader({ onFinished }: BlockyLoaderProps) {
               <motion.div
                 key={i}
                 initial={{ scaleY: 0 }}
-                animate={{ 
+                animate={{
                   scaleY: i < filledBlocks ? 1 : 0.2,
-                  backgroundColor: i < filledBlocks ? '#3B82F6' : '#1D1E15'
+                  backgroundColor: i < filledBlocks ? '#3B82F6' : '#4B5563'
                 }}
                 transition={{ duration: 0.2 }}
                 className="flex-1 origin-bottom opacity-80"
@@ -155,9 +155,9 @@ export default function BlockyLoader({ onFinished }: BlockyLoaderProps) {
             ))}
           </div>
         </div>
-        
+
         <div className="text-center pt-4">
-             <div className="inline-block px-3 py-1 bg-[#1D1E15]/5 border border-[#1D1E15]/20 text-[#1D1E15]/60 text-[10px] uppercase tracking-widest">
+             <div className="inline-block px-3 py-1 bg-[#E5E6DA]/5 border border-[#E5E6DA]/20 text-[#E5E6DA]/60 text-[10px] uppercase tracking-widest">
                 V.2.0.4 - GEOSPATIAL ENGINE
              </div>
         </div>

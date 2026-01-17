@@ -132,12 +132,25 @@ export default function Home() {
         }}>
         </div>
 
+        {/* Left Visualization Column */}
+        <div className="hidden lg:block lg:col-span-4 flex-col divide-y divide-[#E5E6DA] bg-[#0a0a0a]" style={{
+          backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+          backgroundSize: '30px 30px'
+        }}>
+          {/* Empty Space */}
+          <div className="flex-1 bg-[#0a0a0a]" style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+            backgroundSize: '30px 30px'
+          }}>
+          </div>
+        </div>
+
         {/* Main Hero Content */}
         <div className="col-span-12 lg:col-span-7 flex flex-col">
 
           {/* Hero Section */}
           <motion.div
-            className="pl-4 lg:pl-10 flex flex-col justify-center gap-4 lg:gap-6 flex-1"
+            className="px-4 lg:pr-10 flex flex-col justify-center gap-4 lg:gap-6 flex-1"
             initial="hidden"
             animate="visible"
             variants={staggerContainer}
@@ -196,22 +209,6 @@ export default function Home() {
               </Link>
             </motion.div>
           </motion.div>
-        </div>
-
-        {/* Right Visualization Column */}
-        <div className="col-span-12 lg:col-span-4 flex flex-col divide-y divide-[#E5E6DA] bg-[#0a0a0a]" style={{
-          backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
-          backgroundSize: '30px 30px'
-        }}>
-
-
-
-          {/* Empty Space (formerly Metrics Grid) */}
-          <div className="flex-1 bg-[#0a0a0a]" style={{
-            backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
-            backgroundSize: '30px 30px'
-          }}>
-          </div>
         </div>
 
       </main>

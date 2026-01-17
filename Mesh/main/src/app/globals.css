@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Unica+One&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -115,6 +116,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    font-family: 'Unica One', sans-serif;
   }
   body {
     @apply bg-background text-foreground;

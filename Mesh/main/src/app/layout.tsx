@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mesh — Military Equipment Intelligence Platform",
+  title: "Military Equipment Intelligence Platform",
   description: "AI-powered threat identification training system for military personnel",
   openGraph: {
     images: ["/hero.png"],

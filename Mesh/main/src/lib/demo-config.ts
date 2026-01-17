@@ -56,6 +56,17 @@
         category: "Carrier-Based Multirole Fighter",
         annotatedImage: "/annotations/drone-annotate.jpeg"
         }
+    },
+    {
+        id: "demo-5",
+        name: "F-35 Lightning II",
+        path: "/models/f35.glb",
+        annotation: {
+        name: "F-35 Lightning II Fifth-Generation Stealth Fighter",
+        description: "Single-seat, single-engine, all-weather stealth multirole combat aircraft. Fifth-generation fighter featuring advanced sensor fusion, integrated avionics, and network-centric warfare capabilities. Powered by Pratt & Whitney F135 afterburning turbofan with 43,000 lbf thrust. Internal weapons bay maintains stealth profile. Equipped with AN/APG-81 AESA radar, distributed aperture system (DAS), and electro-optical targeting system. Capable of air-to-air, air-to-ground, and ISR missions.",
+        category: "Fifth-Generation Stealth Fighter",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        }
     }
     ];
 

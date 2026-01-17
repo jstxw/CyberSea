@@ -78,6 +78,17 @@
         category: "Dual-Role Strike Fighter",
         annotatedImage: "/annotations/drone-annotate.jpeg"
         }
+    },
+    {
+        id: "demo-7",
+        name: "MQ-9 Reaper",
+        path: "/models/reaper.glb",
+        annotation: {
+        name: "MQ-9 Reaper Combat UAV",
+        description: "Remotely piloted, medium-altitude, long-endurance unmanned combat aerial vehicle. Primary hunter-killer UAV for precision strike and ISR missions. Powered by Honeywell TPE331-10 turboprop engine, enabling 27-hour endurance and 50,000 ft ceiling. Armed with AGM-114 Hellfire missiles, GBU-12 Paveway II laser-guided bombs, and GBU-38 JDAM. Features MTS-B multi-spectral targeting system with infrared and electro-optical sensors. Operated via satellite link with ground control station.",
+        category: "Unmanned Combat Aerial Vehicle",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        }
     }
     ];
 

@@ -34,6 +34,17 @@
         category: "Multirole Fighter Aircraft",
         annotatedImage: "/annotations/f16-annotate.jpeg"
         }
+    },
+    {
+        id: "demo-3",
+        name: "A-10 Thunderbolt II 'Warthog'",
+        path: "/models/a10.glb",
+        annotation: {
+        name: "A-10 Thunderbolt II Close Air Support Aircraft",
+        description: "Twin-engine attack aircraft designed for close air support (CAS) of ground forces. Armed with the GAU-8/A Avenger 30mm rotary cannon, the most powerful aircraft cannon ever mounted. Capable of carrying 16,000 pounds of mixed ordnance including AGM-65 Maverick missiles, Mk 82 bombs, and cluster munitions. Titanium armor bathtub protects pilot from ground fire. Legendary for survivability and tank-killing capability.",
+        category: "Close Air Support Aircraft",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        }
     }
     ];
 

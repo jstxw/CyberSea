@@ -35,46 +35,39 @@ export async function POST(request: NextRequest) {
 
     // First, get the text description
     const analysisPrompt = `
-You are analyzing a 3D wireframe mesh from an interactive learning system. The user hovers over different parts of a 3D model to learn what each component represents.
+You are a military equipment analyst examining a 3D wireframe of military vehicles/aircraft. Identify the specific component shown based on position, geometry, and visual features.
 
-The model type is: "${modelType}"
-The specific mesh name is: "${meshAnalysis.name}"
-${searchQuery ? `The original search query was: "${searchQuery}"` : ""}
+EQUIPMENT TYPE: "${modelType}"
+COMPONENT NAME: "${meshAnalysis.name}"
+${searchQuery ? `ORIGINAL SEARCH: "${searchQuery}"` : ""}
 
-Analyze the highlighted part of the mesh and identify what part it likely represents. You have both geometric data and a visual image of the highlighted mesh.
+GEOMETRIC DATA:
+- Position: (${meshAnalysis.position.x.toFixed(2)}, ${meshAnalysis.position.y.toFixed(2)}, ${meshAnalysis.position.z.toFixed(2)})
+- Size: ${meshAnalysis.size.width.toFixed(2)} × ${meshAnalysis.size.height.toFixed(2)} × ${meshAnalysis.size.depth.toFixed(2)}
+- Complexity: ${meshAnalysis.vertexCount} vertices
+- Center: (${meshAnalysis.centerPoint.x.toFixed(2)}, ${meshAnalysis.centerPoint.y.toFixed(2)}, ${meshAnalysis.centerPoint.z.toFixed(2)})
 
-Mesh Properties:
-- Name: "${meshAnalysis.name}"
-- Position: (${meshAnalysis.position.x.toFixed(
-      2
-    )}, ${meshAnalysis.position.y.toFixed(
-      2
-    )}, ${meshAnalysis.position.z.toFixed(2)})
-- Size: ${meshAnalysis.size.width.toFixed(
-      2
-    )} x ${meshAnalysis.size.height.toFixed(
-      2
-    )} x ${meshAnalysis.size.depth.toFixed(2)}
-- Vertex Count: ${meshAnalysis.vertexCount}
-- Center Point: (${meshAnalysis.centerPoint.x.toFixed(
-      2
-    )}, ${meshAnalysis.centerPoint.y.toFixed(
-      2
-    )}, ${meshAnalysis.centerPoint.z.toFixed(2)})
+IDENTIFICATION GUIDE:
+For Aircraft: cockpit, fuselage (forward/aft/center), wings (left/right), tail assembly, vertical/horizontal stabilizers, engine nacelles, landing gear, weapon hardpoints
+For Helicopters: main rotor assembly, tail rotor, fuselage, cockpit, engine cowling, landing skids/gear
+For Tanks: turret, hull (glacis/side/rear), tracks, road wheels, drive sprockets, gun barrel, cupola
+For Ships: bow, stern, superstructure, hull sections, radar mast, weapons systems, flight deck
+For Vehicles: chassis, cab, engine compartment, cargo bed, axles, suspension
 
-${
-  searchQuery
-    ? `Context from search: The user was looking for "${searchQuery}" when they found this model. Use this context to better understand what type of model this should be and what parts it might contain.`
-    : ""
-}
+Use technical military terminology. Consider:
+- Forward position = nose/bow/front
+- Rear position = tail/stern/rear
+- Top position = dorsal/upper/canopy
+- Side projections = wings/stabilizers/sponsons
+- Central mass = fuselage/hull/main body
 
-Provide your analysis in this JSON format:
+Return JSON:
 {
-  "name": "Identified part name",
-  "description": "Brief educational description (1-2 sentences explaining what this part is and its function)",
-  "category": "anatomical|technical|structural|unknown",
-  "confidence": how confident you are in your answer in a percentage (0-100),
-  "reasoning": "Why you identified it this way based on position/size/shape/visual appearance"
+  "name": "Specific military component name (e.g., 'Forward Fuselage Section', 'Port Wing', 'Main Turret')",
+  "description": "Technical explanation of this component's military function and tactical significance (2-3 sentences)",
+  "category": "structural|propulsion|weapons|avionics|armor|landing gear|control surface",
+  "confidence": confidence percentage (0-100),
+  "reasoning": "Why this identification based on position, shape, size, and military equipment design principles"
 }
 `;
 

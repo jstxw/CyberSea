@@ -17,7 +17,7 @@ import AIInferenceLoader from "./AIInferenceLoader";
 import OnboardingOverlay from "./OnboardingOverlay";
 import { DEMO_MODELS, getDemoAnnotation, DemoModel } from "@/lib/demo-config";
 
-const IS_PRODUCTION_DEMO = process.env.NEXT_PUBLIC_PRODUCTION_DEMO === "true";
+const IS_PRODUCTION_DEMO = true; // Always show model catalog
 
 interface ComponentData {
   mesh: THREE.Mesh;
@@ -858,6 +858,90 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     setShowAnnotatedModal(false);
   };
 
+  // Smart component naming based on position and size
+  const generateComponentName = (
+    centroid: THREE.Vector3,
+    size: THREE.Vector3,
+    modelCenter: THREE.Vector3,
+    componentIndex: number,
+    totalComponents: number
+  ): string => {
+    const relativePos = centroid.clone().sub(modelCenter);
+    
+    // Determine position descriptors
+    const isForward = relativePos.z > 0.5;
+    const isRear = relativePos.z < -0.5;
+    const isTop = relativePos.y > 0.5;
+    const isBottom = relativePos.y < -0.5;
+    const isLeft = relativePos.x < -0.5;
+    const isRight = relativePos.x > 0.5;
+    
+    // Determine size descriptors
+    const volume = size.x * size.y * size.z;
+    const isLarge = volume > 2.0;
+    const isSmall = volume < 0.3;
+    
+    const aspectRatio = Math.max(size.x, size.y, size.z) / Math.min(size.x, size.y, size.z);
+    const isElongated = aspectRatio > 3;
+    const isFlatHorizontal = size.y < Math.min(size.x, size.z) * 0.3;
+    const isFlatVertical = size.x < Math.min(size.y, size.z) * 0.3 || size.z < Math.min(size.x, size.y) * 0.3;
+    
+    // Generate descriptive names
+    if (isLarge && Math.abs(relativePos.length()) < 0.5) {
+      return "Main Fuselage";
+    }
+    
+    if (isForward && isSmall) {
+      return "Nose Section";
+    }
+    
+    if (isForward && !isSmall) {
+      return isTop ? "Forward Upper Body" : "Forward Section";
+    }
+    
+    if (isRear && isSmall) {
+      return "Tail Section";
+    }
+    
+    if (isRear) {
+      return isTop ? "Tail Assembly" : "Rear Section";
+    }
+    
+    if ((isLeft || isRight) && isFlatHorizontal && isElongated) {
+      return isLeft ? "Left Wing" : "Right Wing";
+    }
+    
+    if ((isLeft || isRight) && !isFlatHorizontal) {
+      return isLeft ? "Left Component" : "Right Component";
+    }
+    
+    if (isTop && isFlatHorizontal) {
+      return "Top Panel";
+    }
+    
+    if (isBottom && isFlatHorizontal) {
+      return "Undercarriage";
+    }
+    
+    if (isTop) {
+      return "Upper Structure";
+    }
+    
+    if (isBottom) {
+      return "Lower Structure";
+    }
+    
+    if (isFlatVertical && isElongated) {
+      return "Stabilizer";
+    }
+    
+    if (isSmall) {
+      return `Detail Component ${componentIndex + 1}`;
+    }
+    
+    return `Section ${componentIndex + 1}`;
+  };
+
   const handleSplitMesh = async () => {
     // Use ref as fallback to ensure we have the latest selected object (especially for Bluetooth triggers)
     const currentObject = selectedObject || selectedObjectRef.current;
@@ -1013,34 +1097,64 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         const mats =
           (mesh as any).userData.mats ||
           createDualMaterials(new THREE.Color(0x00aaff));
-        const newMesh = new THREE.Mesh(
-          newGeo,
-          viewMode === "solid" ? mats.solid : mats.holo
-        );
-        (newMesh as any).userData = {
-          name: `${(mesh as any).userData.name || "Part"} - Sub ${idx + 1}`,
-          description: "Split component.",
-          type: "Sub-assembly",
-          mats,
-        };
-        newMesh.castShadow = false;
-        newMesh.receiveShadow = false;
-
-        // Calculate component centroid
+        
+        // Calculate component centroid and size
         const positions = newGeo.attributes.position;
         let sumX = 0,
           sumY = 0,
           sumZ = 0;
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+        let minZ = Infinity, maxZ = -Infinity;
+        
         for (let i = 0; i < positions.count; i++) {
-          sumX += positions.getX(i);
-          sumY += positions.getY(i);
-          sumZ += positions.getZ(i);
+          const x = positions.getX(i);
+          const y = positions.getY(i);
+          const z = positions.getZ(i);
+          sumX += x;
+          sumY += y;
+          sumZ += z;
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+          minY = Math.min(minY, y);
+          maxY = Math.max(maxY, y);
+          minZ = Math.min(minZ, z);
+          maxZ = Math.max(maxZ, z);
         }
+        
         const geometryCenter = new THREE.Vector3(
           sumX / positions.count,
           sumY / positions.count,
           sumZ / positions.count
         );
+        
+        const componentSize = new THREE.Vector3(
+          maxX - minX,
+          maxY - minY,
+          maxZ - minZ
+        );
+        
+        // Generate smart component name
+        const smartName = generateComponentName(
+          geometryCenter,
+          componentSize,
+          localCenter,
+          idx,
+          components.length
+        );
+        
+        const newMesh = new THREE.Mesh(
+          newGeo,
+          viewMode === "solid" ? mats.solid : mats.holo
+        );
+        (newMesh as any).userData = {
+          name: smartName,
+          description: "Component awaiting AI identification. Click 'Identify with AI' for detailed analysis.",
+          type: "Aircraft Component",
+          mats,
+        };
+        newMesh.castShadow = false;
+        newMesh.receiveShadow = false;
 
         // Center the geometry to its own origin so rotation/scaling works from center
         newGeo.translate(
@@ -1518,6 +1632,61 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         {/* Top Controls */}
         <div className="absolute top-0 left-0 w-full z-10 p-4 flex justify-end items-center pointer-events-none">
           <div className="flex items-center gap-2 pointer-events-auto">
+            {/* Model Catalog Dropdown */}
+            <select
+              onChange={(e) => {
+                if (e.target.value) {
+                  if (showOnboarding) setShowOnboarding(false);
+                  const model = DEMO_MODELS.find(m => m.id === e.target.value);
+                  if (model) {
+                    setCurrentDemoModelId(e.target.value);
+                    loadModelFromUrl(model.path, false);
+                  }
+                }
+              }}
+              value={currentDemoModelId || ""}
+              className="h-[32px] px-4 bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold uppercase tracking-wider cursor-pointer hover:bg-[#2a2b26] transition-all duration-200 min-w-[280px] shadow-md"
+              style={{ fontFamily: 'monospace' }}
+            >
+              <option value="" className="text-[10px] font-bold bg-[#1D1E15]">SELECT MILITARY VEHICLE</option>
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── AIRCRAFT ────</option>
+              {DEMO_MODELS.filter(m => ['demo-2', 'demo-3', 'demo-4', 'demo-5', 'demo-6'].includes(m.id)).map((model) => (
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
+                </option>
+              ))}
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── DRONES ────</option>
+              {DEMO_MODELS.filter(m => ['demo-1', 'demo-7'].includes(m.id)).map((model) => (
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
+                </option>
+              ))}
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── HELICOPTERS ────</option>
+              {DEMO_MODELS.filter(m => ['demo-8'].includes(m.id)).map((model) => (
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
+                </option>
+              ))}
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── ARMOR ────</option>
+              {DEMO_MODELS.filter(m => ['demo-9'].includes(m.id)).map((model) => (
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
+                </option>
+              ))}
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── NAVAL ────</option>
+              {DEMO_MODELS.filter(m => ['demo-10'].includes(m.id)).map((model) => (
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
+                </option>
+              ))}
+              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── GROUND VEHICLES ────</option>
+              {DEMO_MODELS.filter(m => ['demo-11'].includes(m.id)).map((model) => (
+                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
+                  {model.name}
+                </option>
+              ))}
+            </select>
+            
             <div className="flex items-center gap-1.5 bg-white border border-[#1D1E15] p-1 backdrop-blur-md h-[32px]">
               <button
                 onClick={() => setViewMode("holo")}
@@ -1610,12 +1779,12 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
           </div>
         </div>
 
-        {/* Generate Prompt Bar - Hidden when onboarding is active to reduce clutter */}
-        {!showOnboarding && (
+        {/* Generate Prompt Bar - Hidden completely since we have catalog dropdown at top */}
+        {!showOnboarding && !IS_PRODUCTION_DEMO && (
         <div className="absolute bottom-0 left-0 w-full z-10 p-4 pointer-events-none">
           <div className="max-w-2xl mx-auto pointer-events-auto">
             <div className="bg-white border border-[#1D1E15] backdrop-blur-md p-1.5 flex gap-2 items-center shadow-lg">
-              {IS_PRODUCTION_DEMO ? (
+              {false ? (
                 <div className="flex-1 relative" ref={bottomDropdownRef}>
                   <button
                     onClick={() => setIsBottomDropdownOpen(!isBottomDropdownOpen)}
@@ -1720,32 +1889,57 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 <p className="text-[10px] text-[#1D1E15] leading-relaxed break-words">
                   {inspectorData.description}
                 </p>
-                <button
-                  onClick={identifyPart}
-                  disabled={isIdentifying}
-                  className="mt-3 w-full px-3 py-2 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-colors uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isIdentifying ? (
-                    <>
-                      <div className="w-2 h-2 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      Identifying...
-                    </>
-                  ) : (
-                    <>
+                
+                {/* Prominent AI Identification Section */}
+                <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 h-6 bg-[#3B82F6] rounded flex items-center justify-center shrink-0">
                       <svg
-                        width="12"
-                        height="12"
+                        width="14"
+                        height="14"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
+                        stroke="white"
+                        strokeWidth="2.5"
                       >
                         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
                       </svg>
-                      Identify with AI
-                    </>
-                  )}
-                </button>
+                    </div>
+                    <div>
+                      <h4 className="text-[10px] font-bold text-[#1D1E15] uppercase tracking-wide">AI Analysis</h4>
+                      <p className="text-[9px] text-[#1D1E15]/60">Get detailed component intel</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={identifyPart}
+                    disabled={isIdentifying}
+                    className="mt-2 w-full px-4 py-3 bg-[#3B82F6] border-2 border-[#1D1E15] text-white text-[11px] font-bold hover:bg-[#1D1E15] hover:border-[#3B82F6] transition-all uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    {isIdentifying ? (
+                      <>
+                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        ANALYZING...
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                        >
+                          <circle cx="11" cy="11" r="8"/>
+                          <path d="m21 21-4.35-4.35"/>
+                          <path d="M11 8v6"/>
+                          <path d="M8 11h6"/>
+                        </svg>
+                        IDENTIFY COMPONENT
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
               {showSplitSection && (
                 <div className="mt-2 p-3 bg-[#1D1E15]/5 border border-[#1D1E15]/10 rounded-xl">

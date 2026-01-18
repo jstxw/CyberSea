@@ -5,6 +5,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import ship from '../../public/ship.png';
 
 const CubeViewer = dynamic(() => import('@/components/CubeViewer'), { ssr: false });
 
@@ -133,16 +134,20 @@ export default function Home() {
         </div>
 
         {/* Left Visualization Column */}
-        <div className="hidden lg:block lg:col-span-4 flex-col divide-y divide-[#E5E6DA] bg-[#0a0a0a]" style={{
+        <div className="hidden lg:flex lg:col-span-4 flex-col items-center justify-center bg-[#0a0a0a]" style={{
           backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
           backgroundSize: '30px 30px'
         }}>
-          {/* Empty Space */}
-          <div className="flex-1 bg-[#0a0a0a]" style={{
-            backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
-            backgroundSize: '30px 30px'
-          }}>
-          </div>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+            className="w-full h-full flex items-center justify-center"
+          >
+            <motion.div variants={staggerItem} className="scale-300">
+              <img src={ship.src} alt="Military ship wireframe" className="w-full h-auto" />
+            </motion.div>
+          </motion.div>
         </div>
 
         {/* Main Hero Content */}
@@ -150,31 +155,24 @@ export default function Home() {
 
           {/* Hero Section */}
           <motion.div
-            className="px-4 lg:pr-10 flex flex-col justify-center gap-4 lg:gap-6 flex-1"
+            className="px-4 lg:px-4 flex flex-col justify-center items-end text-right gap-4 lg:gap-6 flex-1"
             initial="hidden"
             animate="visible"
             variants={staggerContainer}
           >
-            <motion.div
-              className="inline-flex items-center gap-2 px-2 py-0.5 border border-[#E5E6DA] text-[8px] lg:text-[10px] uppercase tracking-wider w-fit"
-              variants={staggerItem}
-            >
-              <div className="w-1.5 h-1.5 bg-[#3B82F6]"></div>
-              Mesh
-            </motion.div>
 
             <motion.h2
-              className="text-3xl lg:text-5xl font-sans font-medium leading-none tracking-tight text-[#E5E6DA]"
+              className="text-3xl lg:text-5xl mt-24 mr-36 font-latos font-medium leading-none tracking-tight text-[#E5E6DA]"
               variants={staggerItem}
             >
               Military Equipment<br /> Intelligence Platform
             </motion.h2>
 
             <motion.p
-              className="text-xs lg:text-sm opacity-70 max-w-lg lg:max-w-xl leading-relaxed"
+              className="text-xs lg:text-sm mr-36 opacity-70 max-w-lg lg:max-w-xl leading-relaxed"
               variants={staggerItem}
             >
-              Accelerate combat readiness with real-time 3D wireframe analysis of military equipment. Our platform combines advanced mesh processing with AI-powered component recognition to train personnel on identifying enemy vehicles, aircraft, and weapon systems. Master threat assessment through interactive visualization — built for speed, accuracy, and mission success.
+              Accelerate combat readiness with real-time 3D wireframe analysis of military equipment. Our platform combines advanced geometric processing with AI-powered component recognition to train personnel on identifying enemy vehicles, aircraft, and weapon systems. Master threat assessment through interactive visualization — built for speed, accuracy, and mission success.
             </motion.p>
 
             {/* Mobile 3D Visualization Box */}
@@ -197,12 +195,10 @@ export default function Home() {
               className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 pt-2 mb-40"
               variants={staggerItem}
             >
-              <button className="w-full sm:w-auto px-6 py-3 border border-[#E5E6DA] text-[10px] uppercase font-bold hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors cursor-pointer">
-                View Capabilities
-              </button>
+
               <Link
                 href="/dashboard"
-                className="w-full sm:w-auto px-6 py-3 bg-[#3B82F6] text-[#E5E6DA] text-[10px] uppercase font-bold hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors text-center sm:text-left mb-2 sm:mb-0"
+                className="w-full sm:w-auto px-6 mr-36 py-3 bg-[#3B82¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸F6] text-[#E5E6DA] text-[10px] uppercase font-bold hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors text-center sm:text-left mb-2 sm:mb-0"
                 onClick={handleLaunchDemoClick}
               >
                 Access Training Platform
@@ -231,13 +227,7 @@ export default function Home() {
               viewport={{ once: true, amount: 0.2 }}
               variants={staggerContainer}
             >
-              <motion.div
-                className="inline-flex items-center gap-2 px-2 py-0.5 border border-[#E5E6DA] text-[10px] uppercase tracking-wider w-fit mb-8"
-                variants={fadeInDown}
-              >
-                <div className="w-1.5 h-1.5 bg-[#3B82F6]"></div>
-                PROTOCOL
-              </motion.div>
+
 
               <motion.h3
                 className="text-4xl font-sans font-medium leading-none tracking-tight text-[#E5E6DA] mb-12"

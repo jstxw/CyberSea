@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { Zap, Scan, Box, Cpu, Activity, Search, FileText, CheckCircle, ChevronRight } from 'lucide-react';
+import { Zap, Scan, Box, Cpu, Activity, Search, FileText, CheckCircle, ChevronRight, Users, Fuel, DollarSign, Wrench, Gauge, Navigation } from 'lucide-react';
+import { VehicleStats } from '@/lib/demo-config';
 
 interface AIInferenceLoaderProps {
   onFinished?: () => void;
@@ -16,6 +17,7 @@ interface AIInferenceLoaderProps {
   composer?: any;
   allObjects?: THREE.Object3D[];
   controls?: OrbitControls | null;
+  vehicleStats?: VehicleStats | null;
 }
 
 const STAGES = [
@@ -29,12 +31,13 @@ const STAGES = [
   { label: 'Finalizing Results', icon: CheckCircle },
 ];
 
-export default function AIInferenceLoader({ 
-  onFinished, 
-  objectName = 'Object', 
+export default function AIInferenceLoader({
+  onFinished,
+  objectName = 'Object',
   shouldClose = false,
   allObjects = [],
-  controls
+  controls,
+  vehicleStats
 }: AIInferenceLoaderProps) {
   const [currentStage, setCurrentStage] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -323,6 +326,57 @@ export default function AIInferenceLoader({
             </div>
           )}
         </div>
+
+        {/* Vehicle Statistics */}
+        {vehicleStats && (
+          <div className="mt-auto pt-6 border-t border-[#E5E6DA]/10">
+            <div className="text-[9px] text-[#E5E6DA]/50 uppercase tracking-widest font-mono mb-4">VEHICLE SPECIFICATIONS</div>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Users size={12} className="text-[#3B82F6]" />
+                <div className="flex-1">
+                  <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Crew</div>
+                  <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{vehicleStats.crew}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Fuel size={12} className="text-[#3B82F6]" />
+                <div className="flex-1">
+                  <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Fuel Capacity</div>
+                  <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{vehicleStats.fuelCapacity}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <DollarSign size={12} className="text-[#3B82F6]" />
+                <div className="flex-1">
+                  <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Unit Cost</div>
+                  <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{vehicleStats.unitCost}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Wrench size={12} className="text-[#3B82F6]" />
+                <div className="flex-1">
+                  <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Maintenance</div>
+                  <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{vehicleStats.maintenanceCost}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Gauge size={12} className="text-[#3B82F6]" />
+                <div className="flex-1">
+                  <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Max Speed</div>
+                  <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{vehicleStats.maxSpeed}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Navigation size={12} className="text-[#3B82F6]" />
+                <div className="flex-1">
+                  <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Range</div>
+                  <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{vehicleStats.range}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Center Viewport - Status Overlay */}

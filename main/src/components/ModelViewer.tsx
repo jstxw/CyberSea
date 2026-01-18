@@ -1773,6 +1773,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
             Back to Home
           </Link>
 
+          {!showInferenceLoader && (
           <div className="flex items-center gap-2 pointer-events-auto">
             {/* Model Catalog Dropdown */}
             <select
@@ -1855,31 +1856,6 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                 Solid
               </button>
             </div>
-            <input
-              type="file"
-              id="file-input"
-              accept=".glb,.gltf"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-            <label
-              htmlFor="file-input"
-              className="h-[32px] px-3 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-colors flex items-center gap-1.5 cursor-pointer uppercase tracking-wide"
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" />
-                <line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
-              Upload
-            </label>
             <button
               onClick={exportGLB}
               className="h-[32px] px-3 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
@@ -1923,6 +1899,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
               </button>
             )}
           </div>
+          )}
         </div>
 
         {/* Generate Prompt Bar - Hidden completely since we have catalog dropdown at top */}
@@ -2012,6 +1989,67 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
         </div>
         )}
 
+        {/* Vehicle Stats Panel - Right Side */}
+        {!showOnboarding && currentDemoModelId && DEMO_MODELS.find(m => m.id === currentDemoModelId)?.stats && (
+          <div className="absolute top-20 right-4 w-56 bg-[#0a0a0a]/95 border border-[#E5E6DA]/20 backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20">
+            <div className="px-4 py-3 border-b border-[#E5E6DA]/10">
+              <div className="text-[9px] text-[#E5E6DA]/50 uppercase tracking-widest font-mono">Vehicle Specifications</div>
+            </div>
+            <div className="p-4 space-y-3">
+              {(() => {
+                const stats = DEMO_MODELS.find(m => m.id === currentDemoModelId)?.stats;
+                if (!stats) return null;
+                return (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                      <div className="flex-1">
+                        <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Crew</div>
+                        <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.crew}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><path d="M3 22h18"/><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/></svg>
+                      <div className="flex-1">
+                        <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Fuel Capacity</div>
+                        <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.fuelCapacity}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      <div className="flex-1">
+                        <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Unit Cost</div>
+                        <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.unitCost}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                      <div className="flex-1">
+                        <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Maintenance</div>
+                        <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.maintenanceCost}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                      <div className="flex-1">
+                        <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Max Speed</div>
+                        <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.maxSpeed}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                      <div className="flex-1">
+                        <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Range</div>
+                        <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.range}</div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+
         {/* Inspector Panel - Always Visible */}
         <div
           className="absolute top-20 left-4 bottom-20 w-64 bg-white border border-[#1D1E15] backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20 translate-x-0"
@@ -2089,18 +2127,6 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                   {/* Prominent AI Identification Section */}
                   <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 bg-[#3B82F6] rounded flex items-center justify-center shrink-0">
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="white"
-                        strokeWidth="2.5"
-                      >
-                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                      </svg>
-                    </div>
                     <div>
                       <h4 className="text-[10px] font-bold text-[#1D1E15] uppercase tracking-wide">AI Analysis</h4>
                       <p className="text-[9px] text-[#1D1E15]/60">Get detailed component intel</p>
@@ -2295,13 +2321,10 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
 
         {/* Interaction Hint Popup */}
         {showInteractionHint && (
-          <div className="absolute right-8 top-1/2 -translate-y-1/2 z-40 animate-in fade-in slide-in-from-right-4 duration-500">
+          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="relative">
-              {/* Pointer Arrow - pointing left now */}
-              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-r-[12px] border-r-[#3B82F6]" />
-              
               {/* Hint Box */}
-              <div className="bg-[#3B82F6] border-2 border-[#1D1E15] px-4 py-3 shadow-2xl max-w-[240px]">
+              <div className="bg-[#3B82F6] border-2 border-[#1D1E15] px-4 py-3 shadow-2xl max-w-[320px]">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-[#1D1E15] rounded flex items-center justify-center shrink-0 mt-0.5">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -2319,7 +2342,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                     </p>
                   </div>
                 </div>
-                
+
                 {/* Dismiss Button */}
                 <button
                   onClick={() => setShowInteractionHint(false)}
@@ -2465,6 +2488,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
               composer={composerRef.current}
               allObjects={generatedObjectsRef.current}
               controls={controlsRef.current}
+              vehicleStats={currentDemoModelId ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.stats : null}
             />
           )}
         </AnimatePresence>

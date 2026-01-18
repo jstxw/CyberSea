@@ -79,8 +79,8 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
     globeGroup.add(wireframe);
 
     // Rotate globe to show Canadian Arctic (longitude -95° to face camera)
-    // The texture has 0° longitude at center, so rotate by ~95° to bring Canada forward
-    globeGroup.rotation.y = Math.PI * 0.53; // ~95° rotation
+    // Add 180° to align trade routes with Canadian Arctic instead of European Arctic
+    globeGroup.rotation.y = Math.PI * 1.53; // ~95° + 180° rotation
 
     // Trade routes (add to globeGroup so they rotate with earth)
     TRADE_ROUTES.forEach((route) => {

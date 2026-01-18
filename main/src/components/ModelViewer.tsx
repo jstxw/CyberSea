@@ -82,6 +82,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
   const [isBottomDropdownOpen, setIsBottomDropdownOpen] = useState(false);
   const bottomDropdownRef = useRef<HTMLDivElement>(null);
   const [showInteractionHint, setShowInteractionHint] = useState(false);
+  const [showA10Image, setShowA10Image] = useState(false);
 
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -280,7 +281,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     let lastT = performance.now();
     const animate = () => {
       animationFrameRef.current = requestAnimationFrame(animate);
-      
+
       const now = performance.now();
       const dt = Math.max(0, now - lastT);
       lastT = now;
@@ -345,7 +346,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
 
   const handleMouseMove = (event: React.MouseEvent) => {
     if (
-      showInferenceLoader || 
+      showInferenceLoader ||
       !containerRef.current ||
       !raycasterRef.current ||
       !cameraRef.current ||
@@ -384,9 +385,8 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
         if (tooltipRef.current) {
           tooltipRef.current.textContent = (object as any).userData.name;
           tooltipRef.current.style.opacity = "1";
-          tooltipRef.current.style.transform = `translate(${
-            event.clientX + 10
-          }px, ${event.clientY + 10}px)`;
+          tooltipRef.current.style.transform = `translate(${event.clientX + 10
+            }px, ${event.clientY + 10}px)`;
         }
       }
     } else {
@@ -651,9 +651,9 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
       if (!searchRes.ok) {
         throw new Error(
           searchData.error +
-            (searchData.details
-              ? `: ${JSON.stringify(searchData.details)}`
-              : "") || "Search failed"
+          (searchData.details
+            ? `: ${JSON.stringify(searchData.details)}`
+            : "") || "Search failed"
         );
       }
 
@@ -715,7 +715,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
       console.error("Generation error:", error);
       alert(
         "Failed to generate model. " +
-          (error instanceof Error ? error.message : "")
+        (error instanceof Error ? error.message : "")
       );
       setLoading(false);
       // Keep generateStarted true so the bar stays at bottom even on error
@@ -902,7 +902,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
   ): string => {
     const relativePos = centroid.clone().sub(modelCenter);
     const normalized = relativePos.clone().normalize();
-    
+
     // Position descriptors (normalized coordinates)
     const isForward = relativePos.z > 0.3;
     const isRear = relativePos.z < -0.3;
@@ -911,22 +911,22 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     const isLeft = relativePos.x < -0.3;
     const isRight = relativePos.x > 0.3;
     const isCentral = Math.abs(relativePos.x) < 0.3 && Math.abs(relativePos.z) < 0.3;
-    
+
     // Size and shape descriptors
     const volume = size.x * size.y * size.z;
     const isLarge = volume > 1.5;
     const isMedium = volume > 0.5 && volume <= 1.5;
     const isSmall = volume <= 0.5;
     const isTiny = volume < 0.1;
-    
+
     const aspectRatio = Math.max(size.x, size.y, size.z) / Math.min(size.x, size.y, size.z);
     const isElongated = aspectRatio > 4;
     const isFlatHorizontal = size.y < Math.min(size.x, size.z) * 0.4;
     const isFlatVertical = (size.x < Math.min(size.y, size.z) * 0.4) || (size.z < Math.min(size.x, size.y) * 0.4);
     const isCylindrical = aspectRatio > 2.5 && !isFlatHorizontal && !isFlatVertical;
-    
+
     // Identify specific military components
-    
+
     // ENGINE COMPONENTS
     if (isRear && isCylindrical && isMedium) {
       return isLeft ? "Port Engine Nacelle" : isRight ? "Starboard Engine Nacelle" : "Engine Assembly";
@@ -934,7 +934,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     if (isRear && isCylindrical && isSmall) {
       return "Exhaust Nozzle";
     }
-    
+
     // COCKPIT / CANOPY
     if (isForward && isTop && isSmall && !isFlatHorizontal) {
       return "Cockpit Canopy";
@@ -942,7 +942,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     if (isForward && isTop && isTiny) {
       return "Windscreen";
     }
-    
+
     // NOSE / RADOME
     if (isForward && isCentral && isElongated) {
       return "Nose Cone (Radome)";
@@ -950,7 +950,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     if (isForward && isSmall && !isTop && !isBottom) {
       return "Forward Avionics Bay";
     }
-    
+
     // WING COMPONENTS
     if ((isLeft || isRight) && isFlatHorizontal && isElongated) {
       const side = isLeft ? "Port" : "Starboard";
@@ -961,7 +961,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     if ((isLeft || isRight) && isFlatHorizontal && !isElongated) {
       return isLeft ? "Port Flap" : "Starboard Aileron";
     }
-    
+
     // TAIL ASSEMBLY
     if (isRear && isTop && isFlatVertical && isElongated) {
       return "Vertical Stabilizer";
@@ -972,7 +972,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     if (isRear && isTop && isSmall) {
       return "Rudder Assembly";
     }
-    
+
     // FUSELAGE SECTIONS
     if (isLarge && isCentral) {
       if (isForward) return "Forward Fuselage";
@@ -984,7 +984,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
       if (isRear) return "Tail Boom";
       return "Mid-Fuselage";
     }
-    
+
     // WEAPONS & HARDPOINTS
     if (isBottom && isTiny && (isLeft || isRight)) {
       return isLeft ? "Port Wing Pylon" : "Starboard Wing Pylon";
@@ -992,19 +992,19 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     if (isBottom && isSmall && isCentral) {
       return "Weapons Bay Door";
     }
-    
+
     // LANDING GEAR
     if (isBottom && isSmall) {
       if (isForward) return "Nose Landing Gear Bay";
       if (isRear || isLeft || isRight) return "Main Landing Gear Well";
       return "Landing Gear Strut";
     }
-    
+
     // AIR INTAKES
     if (!isTop && !isBottom && (isLeft || isRight) && isCylindrical) {
       return isLeft ? "Port Air Intake" : "Starboard Air Intake";
     }
-    
+
     // AVIONICS & SENSORS
     if (isTop && isTiny) {
       return "Antenna Mount";
@@ -1012,7 +1012,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     if (isTop && isSmall && isCentral) {
       return "Avionics Hump";
     }
-    
+
     // STRUCTURAL PANELS
     if (isFlatVertical && !isElongated) {
       if (isLeft) return "Port Side Panel";
@@ -1020,7 +1020,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
       if (isRear) return "Rear Bulkhead";
       return "Access Panel";
     }
-    
+
     // GENERIC DESCRIPTIVE FALLBACKS
     if (isTop && isFlatHorizontal) {
       return "Upper Skin Panel";
@@ -1037,14 +1037,14 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     if (isSmall) {
       return `Detail Component ${componentIndex + 1}`;
     }
-    
+
     return `Sub-Assembly ${componentIndex + 1}`;
   };
 
   const handleSplitMesh = async () => {
     // Use ref as fallback to ensure we have the latest selected object (especially for Bluetooth triggers)
     const currentObject = selectedObject || selectedObjectRef.current;
-    
+
     if (
       !currentObject ||
       !(currentObject as THREE.Mesh).geometry ||
@@ -1196,7 +1196,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
         const mats =
           (mesh as any).userData.mats ||
           createDualMaterials(new THREE.Color(0x00aaff));
-        
+
         // Calculate component centroid and size
         const positions = newGeo.attributes.position;
         let sumX = 0,
@@ -1205,7 +1205,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
         let minX = Infinity, maxX = -Infinity;
         let minY = Infinity, maxY = -Infinity;
         let minZ = Infinity, maxZ = -Infinity;
-        
+
         for (let i = 0; i < positions.count; i++) {
           const x = positions.getX(i);
           const y = positions.getY(i);
@@ -1220,19 +1220,19 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
           minZ = Math.min(minZ, z);
           maxZ = Math.max(maxZ, z);
         }
-        
+
         const geometryCenter = new THREE.Vector3(
           sumX / positions.count,
           sumY / positions.count,
           sumZ / positions.count
         );
-        
+
         const componentSize = new THREE.Vector3(
           maxX - minX,
           maxY - minY,
           maxZ - minZ
         );
-        
+
         // Generate smart component name
         const smartName = generateComponentName(
           geometryCenter,
@@ -1241,7 +1241,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
           idx,
           components.length
         );
-        
+
         const newMesh = new THREE.Mesh(
           newGeo,
           viewMode === "solid" ? mats.solid : mats.holo
@@ -1377,7 +1377,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !sceneRef.current) return;
-    
+
     // Hide onboarding if active
     if (showOnboarding) setShowOnboarding(false);
 
@@ -1460,7 +1460,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
   const identifyPart = async () => {
     // Use ref as fallback if state hasn't updated yet (e.g., after auto-selection)
     const currentObject = selectedObject || selectedObjectRef.current;
-    
+
     if (
       !currentObject ||
       !rendererRef.current ||
@@ -1478,18 +1478,18 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     }
 
     const objectName = (currentObject as any).userData?.name || currentObject.name || "Unknown";
-    
+
     if (IS_PRODUCTION_DEMO && currentDemoModelId) {
       console.log("Production Demo: Loading preloaded annotation for", objectName);
-      
+
       // Show loader for 5 seconds to simulate AI processing
       setIsIdentifying(true);
       setShowInferenceLoader(true);
-      
+
       setTimeout(() => {
         // In production demo, we use the single default annotation for the model
         const annotation = getDemoAnnotation(currentDemoModelId);
-        
+
         if (annotation) {
           setInspectorData((prev) => ({
             ...prev,
@@ -1504,7 +1504,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
         } else {
           console.warn("No demo annotation found for model:", currentDemoModelId);
           // Fallback
-           setInspectorData((prev) => ({
+          setInspectorData((prev) => ({
             ...prev,
             name: objectName,
             description: "This is a demo part without a specific preloaded annotation.",
@@ -1512,12 +1512,17 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
           }));
           alert("No preloaded annotation for this model in demo mode.");
         }
-        
+
         // Hide loader
         setIsIdentifying(false);
         setShowInferenceLoader(false);
+
+        // Show image after identification completes
+        if (currentDemoModelId === "demo-1" || currentDemoModelId === "demo-2" || currentDemoModelId === "demo-3") {
+          setShowA10Image(true);
+        }
       }, 5000); // 5 second delay
-      
+
       return;
     }
 
@@ -1535,7 +1540,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
       });
     }
     console.log("identifyPart: Object is in current scene:", objectInScene);
-    
+
     if (!objectInScene) {
       console.error("identifyPart: Object is not in current scene - may be from old model, skipping cache check");
     } else {
@@ -1544,7 +1549,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
       const cachedData = annotationsCacheRef.current[currentObject.uuid];
       console.log("identifyPart: Checking central cache for UUID:", currentObject.uuid);
       console.log("identifyPart: Cached data exists:", !!cachedData);
-      
+
       if (cachedData && cachedData.annotatedImage) {
         console.log("identifyPart: Using cached result from central store for", objectName);
         setAnnotatedImage(cachedData.annotatedImage);
@@ -1553,7 +1558,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
         return;
       }
     }
-    
+
     console.log("identifyPart: No cache found or object not in scene - will run AI identification for", objectName);
 
     setIsIdentifying(true);
@@ -1633,14 +1638,14 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
       if (currentObject) {
         const objectName = (currentObject as any).userData?.name || currentObject.name || "Unknown";
         console.log("identifyPart: Caching annotation data to central store for UUID:", currentObject.uuid);
-        
+
         annotationsCacheRef.current[currentObject.uuid] = {
           name: data.name,
           description: data.description,
           type: data.category,
           annotatedImage: data.annotatedImage || null,
         };
-        
+
         // Also update userData for fallback/inspector compatibility
         (currentObject as any).userData = {
           ...(currentObject as any).userData,
@@ -1656,8 +1661,12 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
 
       // 6. Show annotated image if available
       if (data.annotatedImage) {
+        console.log("identifyPart: Setting annotated image and opening modal");
         setAnnotatedImage(data.annotatedImage);
         setShowAnnotatedModal(true);
+        setAiIdentifyActive(true); // Mark as active so button can close it
+      } else {
+        console.log("identifyPart: No annotated image in response");
       }
     } catch (error) {
       console.error("identifyPart: Error during AI identification:", error);
@@ -1697,16 +1706,16 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
   const handleDemoSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const modelId = e.target.value;
     if (!modelId) return;
-    
+
     // Hide onboarding if active
     if (showOnboarding) setShowOnboarding(false);
-    
+
     // Try to use model registry first, fallback to DEMO_MODELS for compatibility
     let model = getModelById(modelId);
     if (!model) {
       model = DEMO_MODELS.find(m => m.id === modelId);
     }
-    
+
     if (model) {
       console.log("Loading demo model:", model.name || model.displayName, model.path);
       setCurrentDemoModelId(modelId);
@@ -1715,18 +1724,18 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
       console.error("Model not found in registry:", modelId);
     }
   };
-  
+
   // Helper for Onboarding overlay to trigger demo select
   const handleOnboardingDemoSelect = (modelId: string) => {
     if (!modelId) return;
     setShowOnboarding(false);
-    
+
     // Try to use model registry first, fallback to DEMO_MODELS for compatibility
     let model = getModelById(modelId);
     if (!model) {
       model = DEMO_MODELS.find(m => m.id === modelId);
     }
-    
+
     if (model) {
       console.log("Loading demo model:", model.name || model.displayName, model.path);
       setCurrentDemoModelId(modelId);
@@ -1750,13 +1759,17 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
               // Don't dismiss immediately, wait for file selection in handleFileUpload
             }}
             onDismiss={() => setShowOnboarding(false)}
+            onSketchfabLoad={(url) => {
+              setShowOnboarding(false);
+              loadModelFromUrl(url, true);
+            }}
           />
         )}
-        
+
         {/* Top Controls */}
         <div className="absolute top-0 left-0 w-full z-10 p-4 flex justify-between items-center pointer-events-none">
           {/* Back Button */}
-          <Link 
+          <Link
             href="/"
             className="pointer-events-auto h-[32px] px-4 bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-colors flex items-center gap-2 uppercase tracking-wide cursor-pointer shadow-md"
           >
@@ -1768,225 +1781,210 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
               stroke="currentColor"
               strokeWidth="2.5"
             >
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
+              <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
             Back to Home
           </Link>
 
           {!showInferenceLoader && (
-          <div className="flex items-center gap-2 pointer-events-auto">
-            {/* Model Catalog Dropdown */}
-            <select
-              onChange={(e) => {
-                if (e.target.value) {
-                  if (showOnboarding) setShowOnboarding(false);
-                  // Try to use model registry first, fallback to DEMO_MODELS for compatibility
-                  let model = getModelById(e.target.value);
-                  if (!model) {
-                    model = DEMO_MODELS.find(m => m.id === e.target.value);
-                  }
-                  if (model) {
-                    setCurrentDemoModelId(e.target.value);
-                    loadModelFromUrl(model.path, false);
-                  }
-                }
-              }}
-              value={currentDemoModelId || ""}
-              className="h-[32px] px-4 bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold uppercase tracking-wider cursor-pointer hover:bg-[#2a2b26] transition-all duration-200 min-w-[280px] shadow-md"
-              style={{ fontFamily: 'monospace' }}
-            >
-              <option value="" className="text-[10px] font-bold bg-[#1D1E15]">SELECT MILITARY VEHICLE</option>
-              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── AIRCRAFT ────</option>
-              {DEMO_MODELS.filter(m => ['demo-2', 'demo-3', 'demo-4', 'demo-5', 'demo-6'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
-                  {model.name}
-                </option>
-              ))}
-              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── DRONES ────</option>
-              {DEMO_MODELS.filter(m => ['demo-1', 'demo-7'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
-                  {model.name}
-                </option>
-              ))}
-              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── HELICOPTERS ────</option>
-              {DEMO_MODELS.filter(m => ['demo-8'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
-                  {model.name}
-                </option>
-              ))}
-              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── ARMOR ────</option>
-              {DEMO_MODELS.filter(m => ['demo-9'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
-                  {model.name}
-                </option>
-              ))}
-              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── NAVAL ────</option>
-              {DEMO_MODELS.filter(m => ['demo-10'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
-                  {model.name}
-                </option>
-              ))}
-              <option disabled className="text-[9px] text-[#E5E6DA]/40 bg-[#1D1E15]">──── GROUND VEHICLES ────</option>
-              {DEMO_MODELS.filter(m => ['demo-11'].includes(m.id)).map((model) => (
-                <option key={model.id} value={model.id} className="text-[10px] py-2 bg-[#1D1E15] hover:bg-[#2a2b26]">
-                  {model.name}
-                </option>
-              ))}
-            </select>
-            
-            <div className="flex items-center gap-1.5 bg-[#2a2b22] border border-white/20 p-1 backdrop-blur-md h-[32px]">
-              <button
-                onClick={() => setViewMode("holo")}
-                className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${
-                  viewMode === "holo"
+            <div className="flex items-center gap-2 pointer-events-auto">
+              {/* Model Catalog Dropdown */}
+              <div className="relative" ref={bottomDropdownRef}>
+                <button
+                  onClick={() => setIsBottomDropdownOpen(!isBottomDropdownOpen)}
+                  className="h-8 px-4 bg-[#2a2b22] border border-white/20 rounded text-[#E5E6DA] text-[10px] font-bold uppercase tracking-wider cursor-pointer hover:bg-[#3a3b32] transition-all duration-200 min-w-[280px] flex items-center justify-between gap-2"
+                  style={{ fontFamily: 'monospace' }}
+                >
+                  <span>{currentDemoModelId ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.name.toUpperCase() : 'SELECT A MODEL'}</span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`transition-transform ${isBottomDropdownOpen ? 'rotate-180' : ''}`}>
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                {isBottomDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-1 bg-[#2a2b22] border border-white/20 rounded min-w-[280px] max-h-[300px] overflow-y-auto z-50">
+                    <div
+                      className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[#E5E6DA] hover:bg-[#3a3b32] cursor-pointer"
+                      onClick={() => {
+                        setIsBottomDropdownOpen(false);
+                      }}
+                    >
+                      SELECT A MODEL
+                    </div>
+                    {DEMO_MODELS.map((model) => (
+                      <div
+                        key={model.id}
+                        className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider cursor-pointer ${currentDemoModelId === model.id ? 'bg-[#3B82F6] text-white' : 'text-[#E5E6DA] hover:bg-[#3a3b32]'}`}
+                        onClick={() => {
+                          if (showOnboarding) setShowOnboarding(false);
+                          let modelData = getModelById(model.id);
+                          if (!modelData) {
+                            modelData = DEMO_MODELS.find(m => m.id === model.id);
+                          }
+                          if (modelData) {
+                            setCurrentDemoModelId(model.id);
+                            loadModelFromUrl(modelData.path, false);
+                          }
+                          setIsBottomDropdownOpen(false);
+                        }}
+                      >
+                        {model.name.toUpperCase()}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-1.5 bg-[#2a2b22] border border-white/20 p-1 backdrop-blur-md h-[32px]">
+                <button
+                  onClick={() => setViewMode("holo")}
+                  className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${viewMode === "holo"
                     ? "bg-[#3B82F6] text-white"
                     : "bg-transparent text-white/70 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                Wireframe
-              </button>
-              <button
-                onClick={() => setViewMode("solid")}
-                className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${
-                  viewMode === "solid"
+                    }`}
+                >
+                  Wireframe
+                </button>
+                <button
+                  onClick={() => setViewMode("solid")}
+                  className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${viewMode === "solid"
                     ? "bg-[#3B82F6] text-white"
                     : "bg-transparent text-white/70 hover:bg-white/10 hover:text-white"
-                }`}
+                    }`}
+                >
+                  Solid
+                </button>
+              </div>
+              <button
+                onClick={exportGLB}
+                className="h-[32px] px-3 bg-[#2a2b22] border border-white/20 text-white text-[10px] font-bold hover:bg-white/10 transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
               >
-                Solid
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Export
               </button>
+              <button
+                onClick={resetView}
+                className="h-[32px] px-3 bg-[#2a2b22] border border-white/20 text-white text-[10px] font-bold hover:bg-white/10 transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12" />
+                </svg>
+                Reset
+              </button>
+              {onClose && (
+                <button
+                  onClick={onClose}
+                  className="h-[42px] px-3 bg-white text-[#1D1E15] text-[10px] font-bold hover:bg-[#3B82F6] hover:text-white transition-colors uppercase tracking-wide cursor-pointer rounded-lg border border-[#1D1E15]"
+                >
+                  Close
+                </button>
+              )}
             </div>
-            <button
-              onClick={exportGLB}
-              className="h-[32px] px-3 bg-[#2a2b22] border border-white/20 text-white text-[10px] font-bold hover:bg-white/10 transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              Export
-            </button>
-            <button
-              onClick={resetView}
-              className="h-[32px] px-3 bg-[#2a2b22] border border-white/20 text-white text-[10px] font-bold hover:bg-white/10 transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12" />
-              </svg>
-              Reset
-            </button>
-            {onClose && (
-              <button
-                onClick={onClose}
-                className="h-[42px] px-3 bg-white text-[#1D1E15] text-[10px] font-bold hover:bg-[#3B82F6] hover:text-white transition-colors uppercase tracking-wide cursor-pointer rounded-lg border border-[#1D1E15]"
-              >
-                Close
-              </button>
-            )}
-          </div>
           )}
         </div>
 
         {/* Generate Prompt Bar - Hidden completely since we have catalog dropdown at top */}
         {!showOnboarding && !IS_PRODUCTION_DEMO && (
-        <div className="absolute bottom-0 left-0 w-full z-10 p-4 pointer-events-none">
-          <div className="max-w-2xl mx-auto pointer-events-auto">
-            <div className="bg-white border border-[#1D1E15] backdrop-blur-md p-1.5 flex gap-2 items-center shadow-lg">
-              {false ? (
-                <div className="flex-1 relative" ref={bottomDropdownRef}>
-                  <button
-                    onClick={() => setIsBottomDropdownOpen(!isBottomDropdownOpen)}
-                    className="w-full bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-mono px-3 py-2 rounded outline-none focus:border-[#3B82F6] transition-colors flex items-center justify-between hover:bg-[#1D1E15]/90"
-                  >
-                    <span className={currentDemoModelId ? "text-[#E5E6DA]" : "text-[#E5E6DA]/60"}>
-                      {currentDemoModelId 
-                        ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.name 
-                        : "Select a Demo Model"}
-                    </span>
-                    <svg 
-                      width="12" 
-                      height="12" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2"
-                      className={`transition-transform duration-200 ${isBottomDropdownOpen ? "rotate-180" : ""}`}
+          <div className="absolute bottom-0 left-0 w-full z-10 p-4 pointer-events-none">
+            <div className="max-w-2xl mx-auto pointer-events-auto">
+              <div className="bg-white border border-[#1D1E15] backdrop-blur-md p-1.5 flex gap-2 items-center shadow-lg">
+                {false ? (
+                  <div className="flex-1 relative" ref={bottomDropdownRef}>
+                    <button
+                      onClick={() => setIsBottomDropdownOpen(!isBottomDropdownOpen)}
+                      className="w-full bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-mono px-3 py-2 rounded outline-none focus:border-[#3B82F6] transition-colors flex items-center justify-between hover:bg-[#1D1E15]/90"
                     >
-                      <path d="M6 9l6 6 6-6"/>
-                    </svg>
-                  </button>
+                      <span className={currentDemoModelId ? "text-[#E5E6DA]" : "text-[#E5E6DA]/60"}>
+                        {currentDemoModelId
+                          ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.name
+                          : "Select a Demo Model"}
+                      </span>
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className={`transition-transform duration-200 ${isBottomDropdownOpen ? "rotate-180" : ""}`}
+                      >
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
 
-                  {isBottomDropdownOpen && (
-                    <div className="absolute bottom-full left-0 right-0 mb-1 bg-[#1D1E15] border border-[#1D1E15] rounded shadow-lg overflow-hidden z-50 max-h-48 overflow-y-auto">
-                      {DEMO_MODELS.map((model) => (
-                        <button
-                          key={model.id}
-                          onClick={() => {
-                            handleDemoSelect({ target: { value: model.id } } as any);
-                            setIsBottomDropdownOpen(false);
-                          }}
-                          className="w-full text-left px-3 py-2.5 text-[10px] font-mono text-[#E5E6DA] hover:bg-[#3B82F6] hover:text-white transition-colors border-b border-[#E5E6DA]/10 last:border-0"
-                        >
-                          {model.name}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <input
-                    id="prompt-input"
-                    type="text"
-                    placeholder="Generate procedural model"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        generateModel(prompt);
-                      }
-                    }}
-                    className="flex-1 bg-transparent border-none outline-none text-[#1D1E15] placeholder-[#1D1E15]/40 text-[10px] font-mono px-3"
-                  />
-                  <button
-                    onClick={() => generateModel(prompt)}
-                    disabled={!prompt.trim() || loading}
-                    className="px-4 py-2 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#3B82F6] hover:text-white transition-colors flex-shrink-0 uppercase tracking-wide cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Generate
-                  </button>
-                </>
-              )}
+                    {isBottomDropdownOpen && (
+                      <div className="absolute bottom-full left-0 right-0 mb-1 bg-[#1D1E15] border border-[#1D1E15] rounded shadow-lg overflow-hidden z-50 max-h-48 overflow-y-auto">
+                        {DEMO_MODELS.map((model) => (
+                          <button
+                            key={model.id}
+                            onClick={() => {
+                              handleDemoSelect({ target: { value: model.id } } as any);
+                              setIsBottomDropdownOpen(false);
+                            }}
+                            className="w-full text-left px-3 py-2.5 text-[10px] font-mono text-[#E5E6DA] hover:bg-[#3B82F6] hover:text-white transition-colors border-b border-[#E5E6DA]/10 last:border-0"
+                          >
+                            {model.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      id="prompt-input"
+                      type="text"
+                      placeholder="Generate procedural model"
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          generateModel(prompt);
+                        }
+                      }}
+                      className="flex-1 bg-transparent border-none outline-none text-[#1D1E15] placeholder-[#1D1E15]/40 text-[10px] font-mono px-3"
+                    />
+                    <button
+                      onClick={() => generateModel(prompt)}
+                      disabled={!prompt.trim() || loading}
+                      className="px-4 py-2 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#3B82F6] hover:text-white transition-colors flex-shrink-0 uppercase tracking-wide cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Generate
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
         )}
 
         {/* Control Instructions */}
         {!showOnboarding && (
-        <div className="absolute bottom-16 right-4 z-10 pointer-events-none">
-          <div className="text-[9px] font-mono text-[#E5E6DA]/60 space-y-0.5 text-right">
-            <div>Left Click + Drag: Rotate</div>
-            <div>Right Click + Drag: Pan</div>
-            <div>Scroll: Zoom In/Out</div>
-            <div>⌘ + Click + Drag: Pan (Mac)</div>
+          <div className="absolute bottom-16 right-4 z-10 pointer-events-none">
+            <div className="text-[9px] font-mono text-[#E5E6DA]/60 space-y-0.5 text-right">
+              <div>Left Click + Drag: Rotate</div>
+              <div>Right Click + Drag: Pan</div>
+              <div>Scroll: Zoom In/Out</div>
+              <div>⌘ + Click + Drag: Pan (Mac)</div>
+            </div>
           </div>
-        </div>
         )}
 
         {/* Vehicle Stats Panel - Right Side */}
@@ -2002,42 +2000,42 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                 return (
                   <>
                     <div className="flex items-center gap-3">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
                       <div className="flex-1">
                         <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Crew</div>
                         <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.crew}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><path d="M3 22h18"/><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><path d="M3 22h18" /><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18" /></svg>
                       <div className="flex-1">
                         <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Fuel Capacity</div>
                         <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.fuelCapacity}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
                       <div className="flex-1">
                         <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Unit Cost</div>
                         <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.unitCost}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></svg>
                       <div className="flex-1">
                         <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Maintenance</div>
                         <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.maintenanceCost}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" /></svg>
                       <div className="flex-1">
                         <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Max Speed</div>
                         <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.maxSpeed}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2"><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>
                       <div className="flex-1">
                         <div className="text-[8px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">Range</div>
                         <div className="text-[11px] text-[#E5E6DA]/80 font-mono">{stats.range}</div>
@@ -2054,67 +2052,67 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
         <div
           className="absolute top-20 left-4 bottom-20 w-64 bg-[#1D1E15]/90 border border-white/20 backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20 translate-x-0"
         >
-            <div className="flex-shrink-0 border-b border-white/10 pb-3 px-4 pt-4">
-              {/* Component Dropdown */}
-              <div className="mb-3">
-                <label className="text-[9px] text-white/50 uppercase tracking-wider mb-1 block">
-                  Component Selector
-                </label>
-                <select
-                  value={selectedObject ? (selectedObject as any).uuid : "overall"}
-                  onChange={(e) => {
-                    if (e.target.value === "overall") {
-                      resetView();
-                    } else {
-                      // Find and select the component by UUID
-                      sceneRef.current?.traverse((child) => {
-                        if (child.uuid === e.target.value && (child as THREE.Mesh).isMesh) {
-                          handleObjectClick(child);
-                        }
-                      });
-                    }
-                  }}
-                  className="w-full px-2 py-1.5 bg-[#2a2b22] border border-white/20 text-[10px] font-mono text-white cursor-pointer hover:border-[#3B82F6] transition-colors"
-                >
-                  <option value="overall">📊 Overall Model View</option>
-                  {generatedObjectsRef.current.map((group) => {
-                    const components: JSX.Element[] = [];
-                    group.traverse((child) => {
-                      if ((child as THREE.Mesh).isMesh && (child as any).userData?.name) {
-                        const mesh = child as THREE.Mesh;
-                        components.push(
-                          <option key={mesh.uuid} value={mesh.uuid}>
-                            🔹 {(mesh as any).userData.name}
-                          </option>
-                        );
+          <div className="flex-shrink-0 border-b border-white/10 pb-3 px-4 pt-4">
+            {/* Component Dropdown */}
+            <div className="mb-3">
+              <label className="text-[9px] text-white/50 uppercase tracking-wider mb-1 block">
+                Component Selector
+              </label>
+              <select
+                value={selectedObject ? (selectedObject as any).uuid : "overall"}
+                onChange={(e) => {
+                  if (e.target.value === "overall") {
+                    resetView();
+                  } else {
+                    // Find and select the component by UUID
+                    sceneRef.current?.traverse((child) => {
+                      if (child.uuid === e.target.value && (child as THREE.Mesh).isMesh) {
+                        handleObjectClick(child);
                       }
                     });
-                    return components;
-                  })}
-                </select>
-              </div>
-
-              <div className="flex items-start justify-between gap-2 mb-1.5">
-                <h2 className="text-base font-bold text-white truncate font-sans flex-1">
-                  {inspectorData.name || "Component Inspector"}
-                </h2>
-                {showSplitSection && (
-                  <div className="flex items-center gap-1 bg-gradient-to-br from-[#3B82F6]/30 to-[#3B82F6]/20 border border-[#3B82F6] rounded px-1.5 py-0.5 shrink-0 animate-pulse">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5">
-                      <path d="M21 8v13H3V8" />
-                      <path d="M1 3h22v5H1z" />
-                      <path d="M10 12h4" />
-                    </svg>
-                    <span className="text-[8px] font-bold text-[#3B82F6] uppercase">Splittable</span>
-                  </div>
-                )}
-              </div>
-              <span className="px-1.5 py-0.5 bg-[#3B82F6]/20 border border-[#3B82F6] rounded text-[10px] text-[#3B82F6] font-mono uppercase">
-                {inspectorData.type || "Select a component"}
-              </span>
+                  }
+                }}
+                className="w-full px-2 py-1.5 bg-[#2a2b22] border border-white/20 text-[10px] font-mono text-white cursor-pointer hover:border-[#3B82F6] transition-colors"
+              >
+                <option value="overall">📊 Overall Model View</option>
+                {generatedObjectsRef.current.map((group) => {
+                  const components: React.ReactElement[] = [];
+                  group.traverse((child) => {
+                    if ((child as THREE.Mesh).isMesh && (child as any).userData?.name) {
+                      const mesh = child as THREE.Mesh;
+                      components.push(
+                        <option key={mesh.uuid} value={mesh.uuid}>
+                          🔹 {(mesh as any).userData.name}
+                        </option>
+                      );
+                    }
+                  });
+                  return components;
+                })}
+              </select>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 font-mono">
-              {selectedObject ? (
+
+            <div className="flex items-start justify-between gap-2 mb-1.5">
+              <h2 className="text-base font-bold text-white truncate font-sans flex-1">
+                {inspectorData.name || "Component Inspector"}
+              </h2>
+              {showSplitSection && (
+                <div className="flex items-center gap-1 bg-gradient-to-br from-[#3B82F6]/30 to-[#3B82F6]/20 border border-[#3B82F6] rounded px-1.5 py-0.5 shrink-0 animate-pulse">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5">
+                    <path d="M21 8v13H3V8" />
+                    <path d="M1 3h22v5H1z" />
+                    <path d="M10 12h4" />
+                  </svg>
+                  <span className="text-[8px] font-bold text-[#3B82F6] uppercase">Splittable</span>
+                </div>
+              )}
+            </div>
+            <span className="px-1.5 py-0.5 bg-[#3B82F6]/20 border border-[#3B82F6] rounded text-[10px] text-[#3B82F6] font-mono uppercase">
+              {inspectorData.type || "Select a component"}
+            </span>
+          </div>
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 font-mono">
+            {selectedObject ? (
               <>
                 <div>
                   <h3 className="text-[10px] text-white/50 uppercase tracking-wider mb-1.5">
@@ -2126,135 +2124,134 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
 
                   {/* Prominent AI Identification Section */}
                   <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/20 to-[#3B82F6]/10 border-2 border-[#3B82F6]/30 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div>
-                      <h4 className="text-[10px] font-bold text-white uppercase tracking-wide">AI Analysis</h4>
-                      <p className="text-[9px] text-white/60">Get detailed component intel</p>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div>
+                        <h4 className="text-[10px] font-bold text-white uppercase tracking-wide">AI Analysis</h4>
+                        <p className="text-[9px] text-white/60">Get detailed component intel</p>
+                      </div>
                     </div>
+                    <button
+                      onClick={identifyPart}
+                      disabled={isIdentifying}
+                      className="mt-2 w-full px-4 py-3 bg-[#3B82F6] border-2 border-[#3B82F6] text-white text-[11px] font-bold hover:bg-[#3B82F6]/80 transition-all uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                      {isIdentifying ? (
+                        <>
+                          <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          ANALYZING...
+                        </>
+                      ) : (
+                        <>
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                          >
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.35-4.35" />
+                            <path d="M11 8v6" />
+                            <path d="M8 11h6" />
+                          </svg>
+                          IDENTIFY COMPONENT
+                        </>
+                      )}
+                    </button>
                   </div>
-                  <button
-                    onClick={identifyPart}
-                    disabled={isIdentifying}
-                    className="mt-2 w-full px-4 py-3 bg-[#3B82F6] border-2 border-[#3B82F6] text-white text-[11px] font-bold hover:bg-[#3B82F6]/80 transition-all uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    {isIdentifying ? (
-                      <>
-                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        ANALYZING...
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                        >
-                          <circle cx="11" cy="11" r="8"/>
-                          <path d="m21 21-4.35-4.35"/>
-                          <path d="M11 8v6"/>
-                          <path d="M8 11h6"/>
-                        </svg>
-                        IDENTIFY COMPONENT
-                      </>
-                    )}
-                  </button>
-                </div>
                 </div>
                 {showSplitSection && (
-                <div className="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl">
-                  <div className="text-[10px] text-white/70 mb-2 font-bold uppercase tracking-wider">
-                    Actions
-                  </div>
-                  <button
-                    onClick={handleSplitMesh}
-                    className="w-full px-3 py-2 bg-[#2a2b22] border border-white/20 text-white text-[10px] font-bold flex items-center justify-center gap-1.5 mb-2 hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-colors uppercase tracking-wide cursor-pointer"
-                  >
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
+                  <div className="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl">
+                    <div className="text-[10px] text-white/70 mb-2 font-bold uppercase tracking-wider">
+                      Actions
+                    </div>
+                    <button
+                      onClick={handleSplitMesh}
+                      className="w-full px-3 py-2 bg-[#2a2b22] border border-white/20 text-white text-[10px] font-bold flex items-center justify-center gap-1.5 mb-2 hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-colors uppercase tracking-wide cursor-pointer"
                     >
-                      <path d="M21 8v13H3V8" />
-                      <path d="M1 3h22v5H1z" />
-                      <path d="M10 12h4" />
-                    </svg>
-                    Split Mesh
-                  </button>
-                  <p className="text-[10px] text-white/60 mb-2 leading-relaxed break-words">
-                    Separates disconnected geometry into distinct parts.
-                  </p>
-                  {showExplodedControls && (
-                    <div className="mt-2 pt-2 border-t border-white/10">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label className="text-[10px] text-white font-bold uppercase">
-                          Exploded View
-                        </label>
-                        <button
-                          onClick={() => {
-                            setIsExploded(!isExploded);
-                          }}
-                          className={`px-2 py-1 text-[10px] font-bold uppercase border transition-colors cursor-pointer ${
-                            isExploded
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M21 8v13H3V8" />
+                        <path d="M1 3h22v5H1z" />
+                        <path d="M10 12h4" />
+                      </svg>
+                      Split Mesh
+                    </button>
+                    <p className="text-[10px] text-white/60 mb-2 leading-relaxed break-words">
+                      Separates disconnected geometry into distinct parts.
+                    </p>
+                    {showExplodedControls && (
+                      <div className="mt-2 pt-2 border-t border-white/10">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="text-[10px] text-white font-bold uppercase">
+                            Exploded View
+                          </label>
+                          <button
+                            onClick={() => {
+                              setIsExploded(!isExploded);
+                            }}
+                            className={`px-2 py-1 text-[10px] font-bold uppercase border transition-colors cursor-pointer ${isExploded
                               ? "bg-[#3B82F6] text-white border-[#3B82F6]"
                               : "bg-transparent text-white border-white/30 hover:bg-white/10"
-                          }`}
-                        >
-                          {isExploded ? "On" : "Off"}
-                        </button>
+                              }`}
+                          >
+                            {isExploded ? "On" : "Off"}
+                          </button>
+                        </div>
+                        <div className="mt-1.5">
+                          <label className="text-[10px] text-white/60 block mb-1">
+                            Distance: {explosionDistance.toFixed(1)}
+                          </label>
+                          <input
+                            type="range"
+                            min="0"
+                            max="3"
+                            step="0.1"
+                            value={explosionDistance}
+                            onChange={(e) =>
+                              setExplosionDistance(parseFloat(e.target.value))
+                            }
+                            className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
+                          />
+                        </div>
                       </div>
-                      <div className="mt-1.5">
-                        <label className="text-[10px] text-white/60 block mb-1">
-                          Distance: {explosionDistance.toFixed(1)}
-                        </label>
-                        <input
-                          type="range"
-                          min="0"
-                          max="3"
-                          step="0.1"
-                          value={explosionDistance}
-                          onChange={(e) =>
-                            setExplosionDistance(parseFloat(e.target.value))
-                          }
-                          className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
-                        />
-                      </div>
+                    )}
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-white/5 p-2 border border-white/10">
+                    <div className="text-[10px] text-white/50 mb-1 uppercase">
+                      Geometry
                     </div>
-                  )}
-                </div>
-              )}
-              <div className="grid grid-cols-2 gap-2">
-                <div className="bg-white/5 p-2 border border-white/10">
-                  <div className="text-[10px] text-white/50 mb-1 uppercase">
-                    Geometry
+                    <div className="text-white font-bold text-[10px]">
+                      High Poly
+                    </div>
                   </div>
-                  <div className="text-white font-bold text-[10px]">
-                    High Poly
-                  </div>
-                </div>
-                <div className="bg-white/5 p-2 border border-white/10">
-                  <div className="text-[10px] text-white/50 mb-1 uppercase">
-                    Status
-                  </div>
-                  <div className="text-white font-bold text-[10px]">
-                    Active
+                  <div className="bg-white/5 p-2 border border-white/10">
+                    <div className="text-[10px] text-white/50 mb-1 uppercase">
+                      Status
+                    </div>
+                    <div className="text-white font-bold text-[10px]">
+                      Active
+                    </div>
                   </div>
                 </div>
-              </div>
               </>
-              ) : (
+            ) : (
               <div className="space-y-4">
                 <div className="flex flex-col items-center text-center px-6 py-4">
                   <div className="w-16 h-16 bg-[#3B82F6]/20 rounded-full flex items-center justify-center mb-3">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
-                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                      <path d="M2 17l10 5 10-5"/>
-                      <path d="M2 12l10 5 10-5"/>
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                      <path d="M2 17l10 5 10-5" />
+                      <path d="M2 12l10 5 10-5" />
                     </svg>
                   </div>
                   <h3 className="text-sm font-bold text-white mb-2 uppercase tracking-wide">
@@ -2300,9 +2297,9 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                   </div>
                 )}
               </div>
-              )}
-            </div>
+            )}
           </div>
+        </div>
 
         {/* Tooltip */}
         <div
@@ -2328,9 +2325,9 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-[#1D1E15] rounded flex items-center justify-center shrink-0 mt-0.5">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                      <path d="M2 17l10 5 10-5"/>
-                      <path d="M2 12l10 5 10-5"/>
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                      <path d="M2 17l10 5 10-5" />
+                      <path d="M2 12l10 5 10-5" />
                     </svg>
                   </div>
                   <div className="flex-1">
@@ -2349,8 +2346,8 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                   className="absolute -top-2 -right-2 w-6 h-6 bg-[#1D1E15] text-white rounded-full flex items-center justify-center hover:bg-[#1D1E15]/80 transition-colors cursor-pointer border-2 border-[#3B82F6]"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
                   </svg>
                 </button>
               </div>
@@ -2381,6 +2378,36 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
             />
           )}
         </AnimatePresence>
+
+        {/* Model-specific Image Overlay */}
+        {showA10Image && (
+          <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+            <div className="relative max-w-4xl max-h-[90vh] p-4">
+              <button
+                onClick={() => setShowA10Image(false)}
+                className="absolute -top-2 -right-2 z-10 w-10 h-10 bg-[#1D1E15] text-white rounded-full flex items-center justify-center hover:bg-[#3B82F6] transition-colors cursor-pointer border-2 border-[#3B82F6]"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+              <img
+                src={
+                  currentDemoModelId === "demo-1" ? "/UAV.png" :
+                    currentDemoModelId === "demo-3" ? "/1.png" :
+                      "/A10.png"
+                }
+                alt={
+                  currentDemoModelId === "demo-1" ? "UAV Drone" :
+                    currentDemoModelId === "demo-3" ? "F/A-18F Super Hornet" :
+                      "A10"
+                }
+                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

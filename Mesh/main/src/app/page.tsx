@@ -114,7 +114,7 @@ export default function Home() {
           <div className="text-sm uppercase tracking-widest opacity-50">Mesh</div>
           <Link
             href="/dashboard"
-            className="px-5 py-1.5 bg-[#3B82F6] text-[#E5E6DA] text-sm uppercase font-bold hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors"
+            className="px-5 py-1.5 bg-transparent border border-[#E5E6DA] text-[#E5E6DA] text-sm uppercase font-bold hover:bg-white hover:text-[#0a0a0a] transition-colors"
             onClick={handleLaunchDemoClick}
           >
             Access Platform

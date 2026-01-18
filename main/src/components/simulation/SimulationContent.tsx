@@ -86,32 +86,51 @@ export default function SimulationContent({ assetId }: SimulationContentProps) {
           </div>
 
           {/* Legend */}
-          <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-sm p-3 rounded border border-white/10">
-            <div className="text-[10px] uppercase tracking-wider text-white/50 mb-2">Legend</div>
-            <div className="space-y-1 text-[10px]">
-              <div className="flex items-center gap-2">
+          <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm p-2.5 rounded border border-white/10">
+            <div className="text-[9px] uppercase tracking-wider text-white/50 mb-1.5">Trade Routes</div>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[9px] mb-2">
+              <div className="flex items-center gap-1.5">
                 <div className="w-3 h-0.5 bg-[#3B82F6]" />
-                <span className="text-white/70">NW Passage East</span>
+                <span className="text-white/70">NW East</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <div className="w-3 h-0.5 bg-[#10B981]" />
-                <span className="text-white/70">NW Passage West</span>
+                <span className="text-white/70">NW West</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-0.5 bg-[#8B5CF6]" />
+                <span className="text-white/70">Arctic Bridge</span>
+              </div>
+              <div className="flex items-center gap-1.5">
                 <div className="w-3 h-0.5 bg-[#F59E0B]" />
-                <span className="text-white/70">Arctic Shipping</span>
+                <span className="text-white/70">Beaufort</span>
               </div>
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-0.5 bg-[#EC4899]" />
+                <span className="text-white/70">Hudson</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-0.5 bg-[#06B6D4]" />
+                <span className="text-white/70">Transpolar</span>
+              </div>
+            </div>
+            <div className="text-[9px] uppercase tracking-wider text-white/50 mb-1.5">Locations</div>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[9px]">
+              <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-[#3B82F6]" />
                 <span className="text-white/70">Base</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-[#10B981]" />
                 <span className="text-white/70">Port</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-[#F59E0B]" />
                 <span className="text-white/70">Resource</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
+                <span className="text-white/70">Radar</span>
               </div>
             </div>
           </div>

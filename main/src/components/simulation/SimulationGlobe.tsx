@@ -93,13 +93,17 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
       scene.add(tube);
     });
 
-    // Points of interest (add to globeGroup)
+    // Points of interest
     POINTS_OF_INTEREST.forEach((poi) => {
       const [x, y, z] = latLongToVector3(poi.coordinates.lat, poi.coordinates.lng, 1.02);
 
-      // Marker
-      const markerGeo = new THREE.SphereGeometry(0.015, 16, 16);
-      const markerColor = poi.type === 'base' ? 0x3B82F6 : poi.type === 'port' ? 0x10B981 : 0xF59E0B;
+      // Marker with color based on type
+      const markerGeo = new THREE.SphereGeometry(0.012, 16, 16);
+      const markerColor =
+        poi.type === 'base' ? 0x3B82F6 :    // Blue for bases
+        poi.type === 'port' ? 0x10B981 :    // Green for ports
+        poi.type === 'radar' ? 0x8B5CF6 :   // Purple for radar
+        0xF59E0B;                            // Orange for resources
       const markerMat = new THREE.MeshBasicMaterial({ color: markerColor });
       const marker = new THREE.Mesh(markerGeo, markerMat);
       marker.position.set(x, y, z);

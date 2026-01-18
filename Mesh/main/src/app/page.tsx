@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const CubeViewer = dynamic(() => import('@/components/CubeViewer'), { ssr: false });
+const WaterRipple = dynamic(() => import('@/components/WaterRipple'), { ssr: false });
 
 export default function Home() {
   const [showMobileModal, setShowMobileModal] = useState(false);
@@ -74,138 +75,97 @@ export default function Home() {
       {/* Global Grid Overlay */}
       <div className="fixed inset-0 pointer-events-none z-50" style={{
         backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)',
-        backgroundSize: '30px 30px'
+        backgroundSize: '50px 50px'
       }}></div>
 
       {/* Hero Section with Blue Gradient */}
-      <div className="relative z-10" style={{
-        backgroundImage: 'linear-gradient(to bottom, #3a6ea5 0%, #2a5080 30%, #1a3a5c 60%, #0a1a2e 100%)',
-        backgroundColor: '#3a6ea5'
-      }}>
-        {/* Navigation Header */}
-        <nav className="px-0 h-16 flex justify-between items-center relative z-20">
-        <div className="flex items-center h-full flex-1">
-          {/* Nav Items */}
-          <div className="hidden md:flex h-full items-center px-6 gap-8 text-sm font-medium uppercase tracking-wide flex-1">
-            {[
-              { name: 'Protocol', href: '#process' },
-              { name: 'Intelligence', href: '#metrics' },
-              { name: 'Systems', href: '#integrations' },
-              { name: 'Simulator', href: '#mesh-viewer' },
-              { name: 'Operations', href: '#visualize' }
-            ].map((item) => (
-              <div key={item.name} className="flex items-center gap-8 group">
-                <a
-                  href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const element = document.querySelector(item.href);
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                  }}
-                  className="hover:text-[#3B82F6] transition-colors cursor-pointer"
-                >
-                  {item.name}
-                </a>
-                <span className="text-[#E5E6DA]/20 group-last:hidden">/</span>
-              </div>
-            ))}
+      <div
+        className="relative z-10"
+        style={{
+          backgroundImage: 'radial-gradient(ellipse at 70% 40%, #11648d 0%, #061f3d 100%)',
+          backgroundColor: '#061f3d'
+        }}
+      >
+        {/* Water Ripple Effect */}
+        <WaterRipple />
+
+        {/* Main Content Grid */}
+        <main className="flex-1 grid grid-cols-12">
+
+          {/* Left Sidebar (Empty/Decor) */}
+          <div className="hidden lg:block col-span-1 relative overflow-hidden">
           </div>
-        </div>
 
-        <div className="flex items-center gap-4 px-6">
-          <Link
-            href="/dashboard"
-            className="px-5 py-1.5 bg-transparent corner-brackets text-[#E5E6DA] text-[12px] uppercase font-bold hover:bg-white/20 transition-colors duration-300"
-            onClick={handleLaunchDemoClick}
-          >
-            Access Platform
-          </Link>
-        </div>
-      </nav>
-
-      {/* Main Content Grid */}
-      <main className="flex-1 grid grid-cols-12">
-
-        {/* Left Sidebar (Empty/Decor) */}
-        <div className="hidden lg:block col-span-1 relative overflow-hidden">
-        </div>
-
-        {/* Left Visualization Column */}
-        <div className="hidden lg:flex lg:col-span-4 flex-col items-center justify-center">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="w-full h-full flex items-center justify-center"
-          >
-          </motion.div>
-        </div>
-
-        {/* Main Hero Content */}
-        <div className="col-span-12 lg:col-span-7 flex flex-col">
-
-          {/* Hero Section */}
-          <motion.div
-            className="px-4 lg:px-4 flex flex-col justify-center items-end text-right gap-4 lg:gap-6 flex-1"
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-          >
-
-            <motion.h2
-              className="text-3xl lg:text-5xl mt-24 mr-36 font-latos font-medium leading-none tracking-tight text-[#E5E6DA]"
-              variants={staggerItem}
-            >
-              Military Design Lab
-            </motion.h2>
-
-            <motion.p
-              className="text-xs lg:text-sm font-latos mr-36 opacity-70 max-w-lg lg:max-w-xl leading-relaxed"
-              variants={staggerItem}
-            >
-              Accelerate combat readiness with real-time 3D wireframe analysis of military equipment. Our platform combines advanced geometric processing with AI-powered component recognition to train personnel on identifying enemy vehicles, aircraft, and weapon systems. Master threat assessment through interactive visualization — built for speed, accuracy, and mission success.
-            </motion.p>
-
-            {/* Mobile 3D Visualization Box */}
+          {/* Left Visualization Column */}
+          <div className="hidden lg:flex lg:col-span-4 flex-col items-center justify-center">
             <motion.div
-              className="lg:hidden h-64 border border-[#E5E6DA] relative overflow-hidden shrink-0 my-4"
-              variants={staggerItem}
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="w-full h-full flex items-center justify-center"
             >
-              <div className="absolute inset-0 flex items-center justify-center">
-                <CubeViewer />
-              </div>
-              {/* Overlay UI Elements */}
-              <div className="absolute top-4 left-4 text-[10px] uppercase opacity-50">Rendering...</div>
             </motion.div>
+          </div>
 
+          {/* Main Hero Content */}
+          <div className="col-span-12 lg:col-span-7 flex flex-col">
+
+            {/* Hero Section */}
             <motion.div
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 pt-2 mb-40"
-              variants={staggerItem}
+              className="px-4 lg:px-4 flex flex-col justify-center items-end text-right gap-4 lg:gap-6 flex-1"
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
             >
 
-              <div className="corner-arrows-wrapper w-full sm:w-auto mb-2 sm:mb-0">
+              <motion.h2
+                className="text-4xl lg:text-6xl mt-40 mr-36 font-latos font-bold leading-none tracking-tight text-[#E5E6DA] uppercase"
+                variants={staggerItem}
+              >
+                Cybersea
+              </motion.h2>
+
+              <motion.p
+                className="text-xs lg:text-sm font-latos mr-36 opacity-70 max-w-lg lg:max-w-xl leading-relaxed"
+                variants={staggerItem}
+              >
+                3D wireframe analysis meets AI-powered recognition. Train faster.<br />Identify threats accurately. From vehicles to aircraft to weapon systems.
+              </motion.p>
+
+              {/* Mobile 3D Visualization Box */}
+              <motion.div
+                className="lg:hidden h-64 border border-[#E5E6DA] relative overflow-hidden shrink-0 my-4"
+                variants={staggerItem}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <CubeViewer />
+                </div>
+                {/* Overlay UI Elements */}
+                <div className="absolute top-4 left-4 text-[10px] uppercase opacity-50">Rendering...</div>
+              </motion.div>
+
+              <motion.div
+                className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 pt-2 mb-40"
+                variants={staggerItem}
+              >
+
                 <Link
                   href="/dashboard"
-                  className="corner-arrows-button w-full sm:w-auto px-10 mr-36 py-3 bg-transparent text-[#E5E6DA] text-[12px] uppercase font-bold hover:text-white transition-colors text-center sm:text-left block"
+                  className="w-full sm:w-auto px-10 mr-36 py-3 bg-transparent corner-brackets text-[#E5E6DA] text-[12px] uppercase font-bold hover:bg-white/20 transition-colors duration-300 text-center sm:text-left mb-2 sm:mb-0"
                   onClick={handleLaunchDemoClick}
                 >
-                  <span className="corner-arrows-top-right"></span>
-                  <span className="corner-arrows-bottom-left"></span>
-                  <span className="relative z-10">Access Training Platform</span>
+                  Access Training Platform
                 </Link>
-              </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        </div>
+          </div>
 
-      </main>
+        </main>
 
         {/* Wave Divider */}
         <div className="relative w-full overflow-hidden" style={{ lineHeight: 0 }}>
           <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-16 md:h-24">
-            <path d="M0,0 C150,60 350,0 600,40 C850,80 1050,20 1200,60 L1200,120 L0,120 Z" fill="#0a0a0a" />
+            <path d="M0,100 C100,70 150,90 250,60 C350,30 450,70 550,45 C650,20 750,50 900,25 C1000,10 1100,5 1200,0 L1200,120 L0,120 Z" fill="#0a0a0a" />
           </svg>
         </div>
       </div>

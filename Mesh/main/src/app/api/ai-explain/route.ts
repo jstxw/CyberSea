@@ -83,22 +83,42 @@ GROUND VEHICLE COMPONENTS:
 - Engine: Engine block housing, radiator mount, air filter housing, exhaust manifold
 - Drivetrain: Transmission housing, transfer case, axle assembly, wheel hub
 
-ANALYSIS REQUIREMENTS:
-1. DO NOT use generic terms like "fuselage" or "hull" - be specific (e.g., "Forward Avionics Bay" not "nose")
-2. Identify SYSTEMS not just shapes (e.g., "APU Housing" not "rear compartment")
-3. Include weapons/avionics/propulsion details when applicable
-4. Reference actual military equipment nomenclature
-5. Mention if this component can be further broken down into sub-assemblies
+ENGINEERING DATA PROVIDED:
+- Dimensions: ${meshAnalysis.size.width.toFixed(2)} × ${meshAnalysis.size.height.toFixed(2)} × ${meshAnalysis.size.depth.toFixed(2)} units
+- Approx. Volume: ${meshAnalysis.volume ? meshAnalysis.volume.toFixed(2) : 'N/A'} cubic units
+- Surface Area: ${meshAnalysis.surfaceArea ? meshAnalysis.surfaceArea.toFixed(2) : 'N/A'} square units
+- Geometric Complexity: ${meshAnalysis.complexity ? (meshAnalysis.complexity * 100).toFixed(0) + '%' : 'N/A'}
 
-Return JSON with this exact structure:
+ANALYSIS REQUIREMENTS:
+1. DO NOT use generic terms like "fuselage" or "hull" - be CAD-level specific (e.g., "Forward Avionics Equipment Bay Frame Assembly" not "nose")
+2. Identify SUBSYSTEMS and ASSEMBLIES not just shapes (e.g., "APU Firewall Housing Assembly" not "rear compartment")
+3. Include weapons/avionics/propulsion/structural details with part nomenclature
+4. Reference actual military equipment specifications, model numbers, and technical manuals
+5. Use the provided dimensions and complexity to assess component type and scale
+6. Determine if this component contains nested sub-assemblies based on complexity score and geometry
+
+IDENTIFICATION PRIORITY:
+- High Complexity (>60%): Likely multi-part assembly (engine block, turret mechanism, landing gear assembly)
+- Medium Complexity (30-60%): Structural component with internal features (wing section, armor plate with mounts)
+- Low Complexity (<30%): Simple part (panel, bracket, fastener assembly)
+
+Return JSON with this EXACT structure (all fields required):
 {
-  "name": "HIGHLY SPECIFIC component name (e.g., 'Turbofan Engine Intake', 'Turret Ring Assembly', 'Main Rotor Hub')",
-  "description": "Detailed technical description including: (1) Primary military function, (2) Key features/sub-components, (3) Tactical/operational significance. Be specific about what's inside this assembly.",
-  "category": "propulsion|weapons|avionics|armor|structural|landing gear|control surface|sensor|communications",
+  "name": "ULTRA-SPECIFIC CAD-level component name with assembly level (e.g., 'F110-GE-129 Turbofan Engine Intake Assembly', 'M256 120mm Gun Breech Block Assembly', 'AH-64D Main Rotor Hub Elastomeric Bearing Assembly')",
+  "description": "CAD-level technical description: (1) Primary military function & operational role, (2) Key sub-components and their interactions, (3) Materials/construction methods, (4) Performance specifications, (5) Maintenance/access points. Minimum 4 sentences.",
+  "category": "propulsion|weapons|avionics|armor|structural|landing gear|control surface|sensor|communications|hydraulics|electrical|fuel system",
   "confidence": confidence percentage (0-100),
-  "reasoning": "Detailed explanation of identification based on geometric properties, position in vehicle, typical military equipment design patterns, and visible structural features",
-  "hasSubComponents": true or false - whether this part likely contains multiple sub-assemblies that could be split further,
-  "specifications": "Technical specs if identifiable (e.g., 'Houses twin turbofan engines, ~40,000 lbf thrust each' or 'Composite armor, ~600mm RHA equivalent')"
+  "reasoning": "Engineering analysis: How dimensions, complexity, position, and geometric features indicate this specific component. Reference standard military equipment architecture.",
+  "hasSubComponents": true or false - Based on complexity score and typical assembly structure, can this be decomposed further?,
+  "specifications": {
+    "partNumber": "Military part/model number if identifiable (e.g., 'F110-GE-129', 'M256', 'AN/APG-81')",
+    "material": "Primary construction material (e.g., 'Titanium alloy Ti-6Al-4V', 'Rolled Homogeneous Armor', 'Carbon fiber composite')",
+    "weight_estimated_kg": "Estimated weight based on volume and material (number or 'N/A')",
+    "manufacturer": "OEM if identifiable (e.g., 'General Electric', 'Rheinmetall', 'Northrop Grumman')",
+    "operatingParameters": "Key specs (e.g., '40,000 lbf thrust', '600mm RHA equivalent', 'Max RPM: 300')",
+    "serviceLife_hours": "Typical service interval (number or 'N/A')",
+    "maintenanceAccess": "How technicians access this component (e.g., 'Requires wing panel removal', 'Turret top hatch access')"
+  }
 }
 `;
 

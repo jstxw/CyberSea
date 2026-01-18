@@ -42,6 +42,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   const [prompt, setPrompt] = useState("");
   const [isExploded, setIsExploded] = useState(false);
   const [explosionDistance, setExplosionDistance] = useState(1.0);
+  const [engineExplosionDistance, setEngineExplosionDistance] = useState(3.0); // Engines explode further
   const [selectedObject, setSelectedObject] = useState<THREE.Object3D | null>(
     null
   );
@@ -80,6 +81,61 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   const bottomDropdownRef = useRef<HTMLDivElement>(null);
   const [showInteractionHint, setShowInteractionHint] = useState(false);
 
+  // Get context-aware explosion labels based on model type
+  const getExplosionLabels = () => {
+    const modelName = currentDemoModelId ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.name.toLowerCase() || '' : '';
+    
+    // Detect model type and return appropriate labels
+    if (modelName.includes('tank') || modelName.includes('t-90') || modelName.includes('challenger') || modelName.includes('leopard')) {
+      return {
+        primary: 'Hull/Chassis',
+        secondary: 'Turret/Weapons',
+        secondaryDesc: 'Turret assembly moves further'
+      };
+    } else if (modelName.includes('helicopter') || modelName.includes('seahawk')) {
+      return {
+        primary: 'Fuselage/Frame',
+        secondary: 'Rotor/Engines',
+        secondaryDesc: 'Rotor and powerplant systems'
+      };
+    } else if (modelName.includes('humvee') || modelName.includes('vehicle')) {
+      return {
+        primary: 'Chassis/Body',
+        secondary: 'Wheels/Suspension',
+        secondaryDesc: 'Running gear components'
+      };
+    } else if (modelName.includes('destroyer') || modelName.includes('ship')) {
+      return {
+        primary: 'Hull/Superstructure',
+        secondary: 'Weapons/Sensors',
+        secondaryDesc: 'Weapons and radar systems'
+      };
+    } else if (modelName.includes('drone') || modelName.includes('uav')) {
+      return {
+        primary: 'Airframe/Body',
+        secondary: 'Propulsion/Props',
+        secondaryDesc: 'Motors and propeller assemblies'
+      };
+    } else {
+      // Default for aircraft (A-10, F-35, F-18, etc.)
+      return {
+        primary: 'Airframe/Chassis',
+        secondary: 'Engines/Propulsion',
+        secondaryDesc: 'Engines move further for visibility'
+      };
+    }
+  };
+  
+  // Advanced inspection modes
+  const [measurementMode, setMeasurementMode] = useState(false);
+  const [measurementPoints, setMeasurementPoints] = useState<THREE.Vector3[]>([]);
+  const [xrayMode, setXrayMode] = useState(false);
+  const [xrayOpacity, setXrayOpacity] = useState(0.3);
+  const [crossSectionMode, setCrossSectionMode] = useState(false);
+  const [crossSectionPosition, setCrossSectionPosition] = useState(0);
+  const [crossSectionAxis, setCrossSectionAxis] = useState<'x' | 'y' | 'z'>('y');
+  const [technicalView, setTechnicalView] = useState<'perspective' | 'top' | 'front' | 'side'>('perspective');
+
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -87,6 +143,9 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   const composerRef = useRef<EffectComposer | null>(null);
   const bloomPassRef = useRef<UnrealBloomPass | null>(null);
   const shadowPlaneRef = useRef<THREE.Mesh | null>(null);
+  const measurementLinesRef = useRef<THREE.Line[]>([]);
+  const measurementLabelsRef = useRef<HTMLDivElement[]>([]);
+  const clippingPlaneRef = useRef<THREE.Plane | null>(null);
   const generatedObjectsRef = useRef<THREE.Object3D[]>([]);
   const hoveredObjectRef = useRef<THREE.Object3D | null>(null);
   const placeholderRef = useRef<THREE.Mesh | null>(null);
@@ -128,21 +187,15 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Show interaction hint when model loads (with delay for render to complete)
+  // Show interaction hint when model loads
   useEffect(() => {
     if (modelReady && !showOnboarding) {
-      // Delay showing hint to let the render settle
-      const showTimer = setTimeout(() => {
-        setShowInteractionHint(true);
-      }, 1000);
-      // Auto-hide after 8 seconds from when it appears
-      const hideTimer = setTimeout(() => {
+      setShowInteractionHint(true);
+      // Auto-hide after 8 seconds
+      const timer = setTimeout(() => {
         setShowInteractionHint(false);
-      }, 9000);
-      return () => {
-        clearTimeout(showTimer);
-        clearTimeout(hideTimer);
-      };
+      }, 8000);
+      return () => clearTimeout(timer);
     }
   }, [modelReady, showOnboarding]);
 
@@ -281,7 +334,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     let lastT = performance.now();
     const animate = () => {
       animationFrameRef.current = requestAnimationFrame(animate);
-
+      
       const now = performance.now();
       const dt = Math.max(0, now - lastT);
       lastT = now;
@@ -346,7 +399,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
 
   const handleMouseMove = (event: React.MouseEvent) => {
     if (
-      showInferenceLoader ||
+      showInferenceLoader || 
       !containerRef.current ||
       !raycasterRef.current ||
       !cameraRef.current ||
@@ -385,8 +438,9 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         if (tooltipRef.current) {
           tooltipRef.current.textContent = (object as any).userData.name;
           tooltipRef.current.style.opacity = "1";
-          tooltipRef.current.style.transform = `translate(${event.clientX + 10
-            }px, ${event.clientY + 10}px)`;
+          tooltipRef.current.style.transform = `translate(${
+            event.clientX + 10
+          }px, ${event.clientY + 10}px)`;
         }
       }
     } else {
@@ -405,6 +459,152 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     }
   };
 
+  // Measurement tool functions
+  const createMeasurementLine = (start: THREE.Vector3, end: THREE.Vector3) => {
+    if (!sceneRef.current) return;
+    
+    const distance = start.distanceTo(end);
+    
+    // Create line geometry
+    const points = [start, end];
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({ 
+      color: 0x00ff00, 
+      linewidth: 3,
+      depthTest: false,
+      depthWrite: false
+    });
+    const line = new THREE.Line(geometry, material);
+    line.renderOrder = 999; // Render on top
+    
+    sceneRef.current.add(line);
+    measurementLinesRef.current.push(line);
+    
+    // Create sphere markers at endpoints
+    const sphereGeometry = new THREE.SphereGeometry(0.05, 16, 16);
+    const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    
+    const startSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    startSphere.position.copy(start);
+    sceneRef.current.add(startSphere);
+    measurementLinesRef.current.push(startSphere as any);
+    
+    const endSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    endSphere.position.copy(end);
+    sceneRef.current.add(endSphere);
+    measurementLinesRef.current.push(endSphere as any);
+    
+    console.log(`Measurement: ${distance.toFixed(3)} units`);
+  };
+  
+  const clearMeasurements = () => {
+    if (!sceneRef.current) return;
+    
+    measurementLinesRef.current.forEach(line => {
+      sceneRef.current!.remove(line);
+      line.geometry?.dispose();
+      (line.material as THREE.Material)?.dispose();
+    });
+    
+    measurementLinesRef.current = [];
+    setMeasurementPoints([]);
+  };
+  
+  // X-Ray mode functions
+  const toggleXRayMode = () => {
+    if (!sceneRef.current) return;
+    
+    const newXrayMode = !xrayMode;
+    setXrayMode(newXrayMode);
+    
+    sceneRef.current.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh && child !== shadowPlaneRef.current) {
+        const mesh = child as THREE.Mesh;
+        const material = mesh.material as THREE.Material;
+        
+        if (newXrayMode) {
+          material.transparent = true;
+          material.opacity = xrayOpacity;
+          material.depthWrite = false;
+        } else {
+          material.transparent = false;
+          material.opacity = 1.0;
+          material.depthWrite = true;
+        }
+      }
+    });
+  };
+  
+  // Cross-section functions
+  const updateCrossSection = (position: number, axis: 'x' | 'y' | 'z') => {
+    if (!sceneRef.current || !rendererRef.current) return;
+    
+    const axisMap = { x: 0, y: 1, z: 2 };
+    const normal = new THREE.Vector3();
+    normal.setComponent(axisMap[axis], 1);
+    
+    const constant = position;
+    const plane = new THREE.Plane(normal, constant);
+    
+    clippingPlaneRef.current = plane;
+    rendererRef.current.clippingPlanes = [plane];
+    rendererRef.current.localClippingEnabled = true;
+  };
+  
+  const toggleCrossSection = () => {
+    const newMode = !crossSectionMode;
+    setCrossSectionMode(newMode);
+    
+    if (newMode) {
+      updateCrossSection(crossSectionPosition, crossSectionAxis);
+    } else {
+      if (rendererRef.current) {
+        rendererRef.current.clippingPlanes = [];
+        rendererRef.current.localClippingEnabled = false;
+      }
+    }
+  };
+  
+  // Technical view functions
+  const setCameraView = (view: 'perspective' | 'top' | 'front' | 'side') => {
+    if (!cameraRef.current || !controlsRef.current) return;
+    
+    setTechnicalView(view);
+    
+    // Calculate bounding box of all objects
+    const box = new THREE.Box3();
+    generatedObjectsRef.current.forEach(obj => {
+      box.expandByObject(obj);
+    });
+    
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const distance = maxDim * 2;
+    
+    switch (view) {
+      case 'top':
+        cameraRef.current.position.set(center.x, center.y + distance, center.z);
+        cameraRef.current.up.set(0, 0, -1);
+        break;
+      case 'front':
+        cameraRef.current.position.set(center.x, center.y, center.z + distance);
+        cameraRef.current.up.set(0, 1, 0);
+        break;
+      case 'side':
+        cameraRef.current.position.set(center.x + distance, center.y, center.z);
+        cameraRef.current.up.set(0, 1, 0);
+        break;
+      case 'perspective':
+        cameraRef.current.position.set(center.x + distance, center.y + distance, center.z + distance);
+        cameraRef.current.up.set(0, 1, 0);
+        break;
+    }
+    
+    controlsRef.current.target.copy(center);
+    controlsRef.current.update();
+  };
+
   const handleClick = (event: React.MouseEvent) => {
     if (showInferenceLoader || !raycasterRef.current || !cameraRef.current || !sceneRef.current)
       return;
@@ -416,6 +616,25 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     );
 
     if (intersects.length > 0) {
+      const point = intersects[0].point;
+      
+      // Measurement mode: add points and draw lines
+      if (measurementMode) {
+        setMeasurementPoints(prev => {
+          const newPoints = [...prev, point.clone()];
+          
+          // If we have 2 points, create a measurement line
+          if (newPoints.length === 2) {
+            createMeasurementLine(newPoints[0], newPoints[1]);
+            return []; // Reset for next measurement
+          }
+          
+          return newPoints;
+        });
+        return;
+      }
+      
+      // Normal object selection
       const object = intersects[0].object;
       if ((object as any).userData?.name) {
         handleObjectClick(object);
@@ -651,9 +870,9 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
       if (!searchRes.ok) {
         throw new Error(
           searchData.error +
-          (searchData.details
-            ? `: ${JSON.stringify(searchData.details)}`
-            : "") || "Search failed"
+            (searchData.details
+              ? `: ${JSON.stringify(searchData.details)}`
+              : "") || "Search failed"
         );
       }
 
@@ -715,7 +934,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
       console.error("Generation error:", error);
       alert(
         "Failed to generate model. " +
-        (error instanceof Error ? error.message : "")
+          (error instanceof Error ? error.message : "")
       );
       setLoading(false);
       // Keep generateStarted true so the bar stays at bottom even on error
@@ -902,7 +1121,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   ): string => {
     const relativePos = centroid.clone().sub(modelCenter);
     const normalized = relativePos.clone().normalize();
-
+    
     // Position descriptors (normalized coordinates)
     const isForward = relativePos.z > 0.3;
     const isRear = relativePos.z < -0.3;
@@ -911,22 +1130,22 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     const isLeft = relativePos.x < -0.3;
     const isRight = relativePos.x > 0.3;
     const isCentral = Math.abs(relativePos.x) < 0.3 && Math.abs(relativePos.z) < 0.3;
-
+    
     // Size and shape descriptors
     const volume = size.x * size.y * size.z;
     const isLarge = volume > 1.5;
     const isMedium = volume > 0.5 && volume <= 1.5;
     const isSmall = volume <= 0.5;
     const isTiny = volume < 0.1;
-
+    
     const aspectRatio = Math.max(size.x, size.y, size.z) / Math.min(size.x, size.y, size.z);
     const isElongated = aspectRatio > 4;
     const isFlatHorizontal = size.y < Math.min(size.x, size.z) * 0.4;
     const isFlatVertical = (size.x < Math.min(size.y, size.z) * 0.4) || (size.z < Math.min(size.x, size.y) * 0.4);
     const isCylindrical = aspectRatio > 2.5 && !isFlatHorizontal && !isFlatVertical;
-
+    
     // Identify specific military components
-
+    
     // ENGINE COMPONENTS
     if (isRear && isCylindrical && isMedium) {
       return isLeft ? "Port Engine Nacelle" : isRight ? "Starboard Engine Nacelle" : "Engine Assembly";
@@ -934,7 +1153,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     if (isRear && isCylindrical && isSmall) {
       return "Exhaust Nozzle";
     }
-
+    
     // COCKPIT / CANOPY
     if (isForward && isTop && isSmall && !isFlatHorizontal) {
       return "Cockpit Canopy";
@@ -942,7 +1161,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     if (isForward && isTop && isTiny) {
       return "Windscreen";
     }
-
+    
     // NOSE / RADOME
     if (isForward && isCentral && isElongated) {
       return "Nose Cone (Radome)";
@@ -950,7 +1169,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     if (isForward && isSmall && !isTop && !isBottom) {
       return "Forward Avionics Bay";
     }
-
+    
     // WING COMPONENTS
     if ((isLeft || isRight) && isFlatHorizontal && isElongated) {
       const side = isLeft ? "Port" : "Starboard";
@@ -961,7 +1180,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     if ((isLeft || isRight) && isFlatHorizontal && !isElongated) {
       return isLeft ? "Port Flap" : "Starboard Aileron";
     }
-
+    
     // TAIL ASSEMBLY
     if (isRear && isTop && isFlatVertical && isElongated) {
       return "Vertical Stabilizer";
@@ -972,7 +1191,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     if (isRear && isTop && isSmall) {
       return "Rudder Assembly";
     }
-
+    
     // FUSELAGE SECTIONS
     if (isLarge && isCentral) {
       if (isForward) return "Forward Fuselage";
@@ -984,7 +1203,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
       if (isRear) return "Tail Boom";
       return "Mid-Fuselage";
     }
-
+    
     // WEAPONS & HARDPOINTS
     if (isBottom && isTiny && (isLeft || isRight)) {
       return isLeft ? "Port Wing Pylon" : "Starboard Wing Pylon";
@@ -992,19 +1211,19 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     if (isBottom && isSmall && isCentral) {
       return "Weapons Bay Door";
     }
-
+    
     // LANDING GEAR
     if (isBottom && isSmall) {
       if (isForward) return "Nose Landing Gear Bay";
       if (isRear || isLeft || isRight) return "Main Landing Gear Well";
       return "Landing Gear Strut";
     }
-
+    
     // AIR INTAKES
     if (!isTop && !isBottom && (isLeft || isRight) && isCylindrical) {
       return isLeft ? "Port Air Intake" : "Starboard Air Intake";
     }
-
+    
     // AVIONICS & SENSORS
     if (isTop && isTiny) {
       return "Antenna Mount";
@@ -1012,7 +1231,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     if (isTop && isSmall && isCentral) {
       return "Avionics Hump";
     }
-
+    
     // STRUCTURAL PANELS
     if (isFlatVertical && !isElongated) {
       if (isLeft) return "Port Side Panel";
@@ -1020,7 +1239,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
       if (isRear) return "Rear Bulkhead";
       return "Access Panel";
     }
-
+    
     // GENERIC DESCRIPTIVE FALLBACKS
     if (isTop && isFlatHorizontal) {
       return "Upper Skin Panel";
@@ -1037,14 +1256,105 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     if (isSmall) {
       return `Detail Component ${componentIndex + 1}`;
     }
-
+    
     return `Sub-Assembly ${componentIndex + 1}`;
+  };
+
+  // CAD-style measurement functions
+  const calculateApproximateVolume = (geometry: THREE.BufferGeometry): number => {
+    // Calculate volume using divergence theorem approximation
+    const positions = geometry.attributes.position;
+    let volume = 0;
+    
+    for (let i = 0; i < positions.count; i += 3) {
+      const v1 = new THREE.Vector3(
+        positions.getX(i),
+        positions.getY(i),
+        positions.getZ(i)
+      );
+      const v2 = new THREE.Vector3(
+        positions.getX(i + 1),
+        positions.getY(i + 1),
+        positions.getZ(i + 1)
+      );
+      const v3 = new THREE.Vector3(
+        positions.getX(i + 2),
+        positions.getY(i + 2),
+        positions.getZ(i + 2)
+      );
+      
+      volume += v1.dot(v2.cross(v3)) / 6;
+    }
+    
+    return Math.abs(volume);
+  };
+
+  const calculateSurfaceArea = (geometry: THREE.BufferGeometry): number => {
+    const positions = geometry.attributes.position;
+    let area = 0;
+    
+    for (let i = 0; i < positions.count; i += 3) {
+      const v1 = new THREE.Vector3(
+        positions.getX(i),
+        positions.getY(i),
+        positions.getZ(i)
+      );
+      const v2 = new THREE.Vector3(
+        positions.getX(i + 1),
+        positions.getY(i + 1),
+        positions.getZ(i + 1)
+      );
+      const v3 = new THREE.Vector3(
+        positions.getX(i + 2),
+        positions.getY(i + 2),
+        positions.getZ(i + 2)
+      );
+      
+      const edge1 = v2.clone().sub(v1);
+      const edge2 = v3.clone().sub(v1);
+      const cross = edge1.cross(edge2);
+      area += cross.length() / 2;
+    }
+    
+    return area;
+  };
+
+  const calculateComplexity = (geometry: THREE.BufferGeometry): number => {
+    // Complexity score based on vertex count, face count, and geometry variation
+    const positions = geometry.attributes.position;
+    const vertexCount = positions.count;
+    
+    if (vertexCount === 0) return 0;
+    
+    // Calculate variance in vertex positions (higher variance = more complex shape)
+    let sumX = 0, sumY = 0, sumZ = 0;
+    for (let i = 0; i < vertexCount; i++) {
+      sumX += positions.getX(i);
+      sumY += positions.getY(i);
+      sumZ += positions.getZ(i);
+    }
+    const avgX = sumX / vertexCount;
+    const avgY = sumY / vertexCount;
+    const avgZ = sumZ / vertexCount;
+    
+    let varianceSum = 0;
+    for (let i = 0; i < vertexCount; i++) {
+      const dx = positions.getX(i) - avgX;
+      const dy = positions.getY(i) - avgY;
+      const dz = positions.getZ(i) - avgZ;
+      varianceSum += dx * dx + dy * dy + dz * dz;
+    }
+    
+    const variance = varianceSum / vertexCount;
+    const normalizedComplexity = Math.min(1, Math.sqrt(variance) / 10);
+    
+    return normalizedComplexity;
   };
 
   const handleSplitMesh = async () => {
     // Use ref as fallback to ensure we have the latest selected object (especially for Bluetooth triggers)
     const currentObject = selectedObject || selectedObjectRef.current;
-
+    
     if (
       !currentObject ||
       !(currentObject as THREE.Mesh).geometry ||
@@ -1196,7 +1506,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         const mats =
           (mesh as any).userData.mats ||
           createDualMaterials(new THREE.Color(0x00aaff));
-
+        
         // Calculate component centroid and size
         const positions = newGeo.attributes.position;
         let sumX = 0,
@@ -1205,7 +1515,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         let minX = Infinity, maxX = -Infinity;
         let minY = Infinity, maxY = -Infinity;
         let minZ = Infinity, maxZ = -Infinity;
-
+        
         for (let i = 0; i < positions.count; i++) {
           const x = positions.getX(i);
           const y = positions.getY(i);
@@ -1220,19 +1530,19 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
           minZ = Math.min(minZ, z);
           maxZ = Math.max(maxZ, z);
         }
-
+        
         const geometryCenter = new THREE.Vector3(
           sumX / positions.count,
           sumY / positions.count,
           sumZ / positions.count
         );
-
+        
         const componentSize = new THREE.Vector3(
           maxX - minX,
           maxY - minY,
           maxZ - minZ
         );
-
+        
         // Generate smart component name
         const smartName = generateComponentName(
           geometryCenter,
@@ -1241,7 +1551,15 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
           idx,
           components.length
         );
-
+        
+        // Calculate CAD-style measurements
+        const volume = calculateApproximateVolume(newGeo);
+        const surfaceArea = calculateSurfaceArea(newGeo);
+        const partComplexity = calculateComplexity(newGeo);
+        
+        // Detect if this component can be split further
+        const canSplitFurther = faceIndices.length > 50 && partComplexity > 0.3;
+        
         const newMesh = new THREE.Mesh(
           newGeo,
           viewMode === "solid" ? mats.solid : mats.holo
@@ -1251,6 +1569,20 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
           description: "Component awaiting AI identification. Click 'Identify with AI' for detailed analysis.",
           type: "Aircraft Component",
           mats,
+          measurements: {
+            volume: volume.toFixed(3),
+            surfaceArea: surfaceArea.toFixed(2),
+            dimensions: {
+              x: componentSize.x.toFixed(2),
+              y: componentSize.y.toFixed(2),
+              z: componentSize.z.toFixed(2)
+            },
+            complexity: partComplexity.toFixed(2),
+            vertexCount: positions.count,
+            faceCount: faceIndices.length
+          },
+          canSplitFurther: canSplitFurther,
+          hierarchyLevel: ((mesh as any).userData.hierarchyLevel || 0) + 1
         };
         newMesh.castShadow = false;
         newMesh.receiveShadow = false;
@@ -1336,10 +1668,17 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         direction.normalize();
       }
 
+      // Detect if this is an engine component
+      const meshName = data.mesh.name?.toLowerCase() || '';
+      const isEngine = meshName.includes('engine') || meshName.includes('turbine') || meshName.includes('object_'); // Blender engine imports as Object_0-18
+      
+      // Use different explosion distances for engines vs airframe
+      const baseDistance = isEngine ? engineExplosionDistance : explosionDistance;
+
       // Adjust explosion distance by model scale to ensure consistent visual displacement
       // regardless of the model's original size or the applied normalization scale.
       const scale = group.scale.x || 1;
-      const adjustedDistance = explosionDistance / scale;
+      const adjustedDistance = baseDistance / scale;
 
       const offset = direction.multiplyScalar(adjustedDistance);
       data.mesh.position.copy(data.originalLocalPos).add(offset);
@@ -1350,7 +1689,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     explodedGroupsRef.current.forEach((data, group) => {
       applyExplodedView(group, data.components, data.originalCenter);
     });
-  }, [isExploded, explosionDistance]);
+  }, [isExploded, explosionDistance, engineExplosionDistance]);
 
   useEffect(() => {
     if (modelReady && animationFinished) {
@@ -1364,7 +1703,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !sceneRef.current) return;
-
+    
     // Hide onboarding if active
     if (showOnboarding) setShowOnboarding(false);
 
@@ -1447,7 +1786,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   const identifyPart = async () => {
     // Use ref as fallback if state hasn't updated yet (e.g., after auto-selection)
     const currentObject = selectedObject || selectedObjectRef.current;
-
+    
     if (
       !currentObject ||
       !rendererRef.current ||
@@ -1465,18 +1804,18 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     }
 
     const objectName = (currentObject as any).userData?.name || currentObject.name || "Unknown";
-
+    
     if (IS_PRODUCTION_DEMO && currentDemoModelId) {
       console.log("Production Demo: Loading preloaded annotation for", objectName);
-
+      
       // Show loader for 5 seconds to simulate AI processing
       setIsIdentifying(true);
       setShowInferenceLoader(true);
-
+      
       setTimeout(() => {
         // In production demo, we use the single default annotation for the model
         const annotation = getDemoAnnotation(currentDemoModelId);
-
+        
         if (annotation) {
           setInspectorData((prev) => ({
             ...prev,
@@ -1491,7 +1830,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         } else {
           console.warn("No demo annotation found for model:", currentDemoModelId);
           // Fallback
-          setInspectorData((prev) => ({
+           setInspectorData((prev) => ({
             ...prev,
             name: objectName,
             description: "This is a demo part without a specific preloaded annotation.",
@@ -1499,12 +1838,12 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
           }));
           alert("No preloaded annotation for this model in demo mode.");
         }
-
+        
         // Hide loader
         setIsIdentifying(false);
         setShowInferenceLoader(false);
       }, 5000); // 5 second delay
-
+      
       return;
     }
 
@@ -1522,7 +1861,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
       });
     }
     console.log("identifyPart: Object is in current scene:", objectInScene);
-
+    
     if (!objectInScene) {
       console.error("identifyPart: Object is not in current scene - may be from old model, skipping cache check");
     } else {
@@ -1531,7 +1870,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
       const cachedData = annotationsCacheRef.current[currentObject.uuid];
       console.log("identifyPart: Checking central cache for UUID:", currentObject.uuid);
       console.log("identifyPart: Cached data exists:", !!cachedData);
-
+      
       if (cachedData && cachedData.annotatedImage) {
         console.log("identifyPart: Using cached result from central store for", objectName);
         setAnnotatedImage(cachedData.annotatedImage);
@@ -1540,7 +1879,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         return;
       }
     }
-
+    
     console.log("identifyPart: No cache found or object not in scene - will run AI identification for", objectName);
 
     setIsIdentifying(true);
@@ -1566,15 +1905,25 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
       const center = new THREE.Vector3();
       box.getCenter(center);
 
+      // Calculate or retrieve engineering measurements
+      const userData = (mesh as any).userData;
+      const volume = userData?.measurements?.volume || calculateApproximateVolume(geometry);
+      const surfaceArea = userData?.measurements?.surfaceArea || calculateSurfaceArea(geometry);
+      const complexity = userData?.measurements?.complexity || calculateComplexity(geometry);
+      
       const meshAnalysis = {
-        name: (mesh as any).userData.name || "Unknown Part",
+        name: userData.name || "Unknown Part",
         position: mesh.position,
         size: { width: size.x, height: size.y, depth: size.z },
         vertexCount: geometry.attributes.position.count,
         centerPoint: center,
+        volume: parseFloat(volume),
+        surfaceArea: parseFloat(surfaceArea),
+        complexity: parseFloat(complexity),
+        hierarchyLevel: userData.hierarchyLevel || 0,
       };
 
-      console.log("identifyPart: Mesh analysis prepared", meshAnalysis);
+      console.log("identifyPart: Mesh analysis with engineering data prepared", meshAnalysis);
 
       // 3. Call API
       console.log("identifyPart: Calling AI API...");
@@ -1620,14 +1969,14 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
       if (currentObject) {
         const objectName = (currentObject as any).userData?.name || currentObject.name || "Unknown";
         console.log("identifyPart: Caching annotation data to central store for UUID:", currentObject.uuid);
-
+        
         annotationsCacheRef.current[currentObject.uuid] = {
           name: data.name,
           description: data.description,
           type: data.category,
           annotatedImage: data.annotatedImage || null,
         };
-
+        
         // Also update userData for fallback/inspector compatibility
         (currentObject as any).userData = {
           ...(currentObject as any).userData,
@@ -1684,10 +2033,10 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   const handleDemoSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const modelId = e.target.value;
     if (!modelId) return;
-
+    
     // Hide onboarding if active
     if (showOnboarding) setShowOnboarding(false);
-
+    
     const model = DEMO_MODELS.find(m => m.id === modelId);
     if (model) {
       console.log("Loading demo model:", model.name);
@@ -1695,7 +2044,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
       loadModelFromUrl(model.path, false);
     }
   };
-
+  
   // Helper for Onboarding overlay to trigger demo select
   const handleOnboardingDemoSelect = (modelId: string) => {
     if (!modelId) return;
@@ -1724,11 +2073,11 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
             onDismiss={() => setShowOnboarding(false)}
           />
         )}
-
+        
         {/* Top Controls */}
         <div className="absolute top-0 left-0 w-full z-10 p-4 flex justify-between items-center pointer-events-none">
           {/* Back Button */}
-          <Link
+          <Link 
             href="/"
             className="pointer-events-auto h-[32px] px-4 bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-colors flex items-center gap-2 uppercase tracking-wide cursor-pointer shadow-md"
           >
@@ -1740,12 +2089,12 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
               stroke="currentColor"
               strokeWidth="2.5"
             >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
             Back to Home
           </Link>
 
-          <div className={`flex items-center gap-2 pointer-events-auto ${showInferenceLoader ? 'hidden' : ''}`}>
+          <div className="flex items-center gap-2 pointer-events-auto">
             {/* Model Catalog Dropdown */}
             <select
               onChange={(e) => {
@@ -1800,23 +2149,92 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 </option>
               ))}
             </select>
+            
+            {/* Inspection Mode Buttons */}
+            <button
+              onClick={() => {
+                setMeasurementMode(!measurementMode);
+                if (!measurementMode) clearMeasurements();
+              }}
+              className={`h-[32px] px-4 border text-[10px] font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 shadow-md ${
+                measurementMode 
+                  ? 'bg-[#3B82F6] border-[#3B82F6] text-white' 
+                  : 'bg-[#1D1E15] border-[#1D1E15] text-[#E5E6DA] hover:bg-[#3B82F6] hover:border-[#3B82F6]'
+              }`}
+              title="Click two points to measure distance"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M3 3l18 18M8 8l8 8M3 21l18-18"/>
+              </svg>
+              MEASURE
+            </button>
 
+            <button
+              onClick={toggleXRayMode}
+              className={`h-[32px] px-4 border text-[10px] font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 shadow-md ${
+                xrayMode 
+                  ? 'bg-[#3B82F6] border-[#3B82F6] text-white' 
+                  : 'bg-[#1D1E15] border-[#1D1E15] text-[#E5E6DA] hover:bg-[#3B82F6] hover:border-[#3B82F6]'
+              }`}
+              title="See through components"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v12M6 12h12"/>
+              </svg>
+              X-RAY
+            </button>
+
+            <button
+              onClick={toggleCrossSection}
+              className={`h-[32px] px-4 border text-[10px] font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 shadow-md ${
+                crossSectionMode 
+                  ? 'bg-[#3B82F6] border-[#3B82F6] text-white' 
+                  : 'bg-[#1D1E15] border-[#1D1E15] text-[#E5E6DA] hover:bg-[#3B82F6] hover:border-[#3B82F6]'
+              }`}
+              title="Slice through model"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M21 21H3M3 16V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/>
+              </svg>
+              SECTION
+            </button>
+
+            <button
+              onClick={() => {
+                const views: ('perspective' | 'top' | 'front' | 'side')[] = ['perspective', 'top', 'front', 'side'];
+                const currentIndex = views.indexOf(technicalView);
+                const nextView = views[(currentIndex + 1) % views.length];
+                setCameraView(nextView);
+              }}
+              className="h-[32px] px-4 bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold uppercase tracking-wide hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-all duration-200 flex items-center gap-2 shadow-md"
+              title="Cycle camera views"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
+              </svg>
+              {technicalView.toUpperCase()}
+            </button>
+            
             <div className="flex items-center gap-1.5 bg-white border border-[#1D1E15] p-1 backdrop-blur-md h-[32px]">
               <button
                 onClick={() => setViewMode("holo")}
-                className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${viewMode === "holo"
+                className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${
+                  viewMode === "holo"
                     ? "bg-[#3B82F6] text-[#E5E6DA]"
                     : "bg-transparent text-[#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA]"
-                  }`}
+                }`}
               >
                 Wireframe
               </button>
               <button
                 onClick={() => setViewMode("solid")}
-                className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${viewMode === "solid"
+                className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${
+                  viewMode === "solid"
                     ? "bg-[#3B82F6] text-[#E5E6DA]"
                     : "bg-transparent text-[#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA]"
-                  }`}
+                }`}
               >
                 Solid
               </button>
@@ -1828,6 +2246,24 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
               className="hidden"
               onChange={handleFileUpload}
             />
+            <label
+              htmlFor="file-input"
+              className="h-[32px] px-3 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-colors flex items-center gap-1.5 cursor-pointer uppercase tracking-wide"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              Upload
+            </label>
             <button
               onClick={exportGLB}
               className="h-[32px] px-3 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
@@ -1875,156 +2311,156 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
 
         {/* Generate Prompt Bar - Hidden completely since we have catalog dropdown at top */}
         {!showOnboarding && !IS_PRODUCTION_DEMO && (
-          <div className="absolute bottom-0 left-0 w-full z-10 p-4 pointer-events-none">
-            <div className="max-w-2xl mx-auto pointer-events-auto">
-              <div className="bg-white border border-[#1D1E15] backdrop-blur-md p-1.5 flex gap-2 items-center shadow-lg">
-                {false ? (
-                  <div className="flex-1 relative" ref={bottomDropdownRef}>
-                    <button
-                      onClick={() => setIsBottomDropdownOpen(!isBottomDropdownOpen)}
-                      className="w-full bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-mono px-3 py-2 rounded outline-none focus:border-[#3B82F6] transition-colors flex items-center justify-between hover:bg-[#1D1E15]/90"
+        <div className="absolute bottom-0 left-0 w-full z-10 p-4 pointer-events-none">
+          <div className="max-w-2xl mx-auto pointer-events-auto">
+            <div className="bg-white border border-[#1D1E15] backdrop-blur-md p-1.5 flex gap-2 items-center shadow-lg">
+              {false ? (
+                <div className="flex-1 relative" ref={bottomDropdownRef}>
+                  <button
+                    onClick={() => setIsBottomDropdownOpen(!isBottomDropdownOpen)}
+                    className="w-full bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-mono px-3 py-2 rounded outline-none focus:border-[#3B82F6] transition-colors flex items-center justify-between hover:bg-[#1D1E15]/90"
+                  >
+                    <span className={currentDemoModelId ? "text-[#E5E6DA]" : "text-[#E5E6DA]/60"}>
+                      {currentDemoModelId 
+                        ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.name 
+                        : "Select a Demo Model"}
+                    </span>
+                    <svg 
+                      width="12" 
+                      height="12" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2"
+                      className={`transition-transform duration-200 ${isBottomDropdownOpen ? "rotate-180" : ""}`}
                     >
-                      <span className={currentDemoModelId ? "text-[#E5E6DA]" : "text-[#E5E6DA]/60"}>
-                        {currentDemoModelId
-                          ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.name
-                          : "Select a Demo Model"}
-                      </span>
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className={`transition-transform duration-200 ${isBottomDropdownOpen ? "rotate-180" : ""}`}
-                      >
-                        <path d="M6 9l6 6 6-6" />
-                      </svg>
-                    </button>
+                      <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                  </button>
 
-                    {isBottomDropdownOpen && (
-                      <div className="absolute bottom-full left-0 right-0 mb-1 bg-[#1D1E15] border border-[#1D1E15] rounded shadow-lg overflow-hidden z-50 max-h-48 overflow-y-auto">
-                        {DEMO_MODELS.map((model) => (
-                          <button
-                            key={model.id}
-                            onClick={() => {
-                              handleDemoSelect({ target: { value: model.id } } as any);
-                              setIsBottomDropdownOpen(false);
-                            }}
-                            className="w-full text-left px-3 py-2.5 text-[10px] font-mono text-[#E5E6DA] hover:bg-[#3B82F6] hover:text-white transition-colors border-b border-[#E5E6DA]/10 last:border-0"
-                          >
-                            {model.name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    <input
-                      id="prompt-input"
-                      type="text"
-                      placeholder="Generate procedural model"
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") {
-                          generateModel(prompt);
-                        }
-                      }}
-                      className="flex-1 bg-transparent border-none outline-none text-[#1D1E15] placeholder-[#1D1E15]/40 text-[10px] font-mono px-3"
-                    />
-                    <button
-                      onClick={() => generateModel(prompt)}
-                      disabled={!prompt.trim() || loading}
-                      className="px-4 py-2 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#3B82F6] hover:text-white transition-colors flex-shrink-0 uppercase tracking-wide cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Generate
-                    </button>
-                  </>
-                )}
-              </div>
+                  {isBottomDropdownOpen && (
+                    <div className="absolute bottom-full left-0 right-0 mb-1 bg-[#1D1E15] border border-[#1D1E15] rounded shadow-lg overflow-hidden z-50 max-h-48 overflow-y-auto">
+                      {DEMO_MODELS.map((model) => (
+                        <button
+                          key={model.id}
+                          onClick={() => {
+                            handleDemoSelect({ target: { value: model.id } } as any);
+                            setIsBottomDropdownOpen(false);
+                          }}
+                          className="w-full text-left px-3 py-2.5 text-[10px] font-mono text-[#E5E6DA] hover:bg-[#3B82F6] hover:text-white transition-colors border-b border-[#E5E6DA]/10 last:border-0"
+                        >
+                          {model.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <input
+                    id="prompt-input"
+                    type="text"
+                    placeholder="Generate procedural model"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        generateModel(prompt);
+                      }
+                    }}
+                    className="flex-1 bg-transparent border-none outline-none text-[#1D1E15] placeholder-[#1D1E15]/40 text-[10px] font-mono px-3"
+                  />
+                  <button
+                    onClick={() => generateModel(prompt)}
+                    disabled={!prompt.trim() || loading}
+                    className="px-4 py-2 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#3B82F6] hover:text-white transition-colors flex-shrink-0 uppercase tracking-wide cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Generate
+                  </button>
+                </>
+              )}
             </div>
           </div>
+        </div>
         )}
 
         {/* Control Instructions */}
         {!showOnboarding && (
-          <div className="absolute bottom-16 right-4 z-10 pointer-events-none">
-            <div className="text-[9px] font-mono text-[#E5E6DA]/60 space-y-0.5 text-right">
-              <div>Left Click + Drag: Rotate</div>
-              <div>Right Click + Drag: Pan</div>
-              <div>Scroll: Zoom In/Out</div>
-              <div>⌘ + Click + Drag: Pan (Mac)</div>
-            </div>
+        <div className="absolute bottom-16 right-4 z-10 pointer-events-none">
+          <div className="text-[9px] font-mono text-[#E5E6DA]/60 space-y-0.5 text-right">
+            <div>Left Click + Drag: Rotate</div>
+            <div>Right Click + Drag: Pan</div>
+            <div>Scroll: Zoom In/Out</div>
+            <div>⌘ + Click + Drag: Pan (Mac)</div>
           </div>
+        </div>
         )}
 
         {/* Inspector Panel - Always Visible */}
         <div
           className="absolute top-20 left-4 bottom-20 w-64 bg-white border border-[#1D1E15] backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20 translate-x-0"
         >
-          <div className="flex-shrink-0 border-b border-[#1D1E15]/20 pb-3 px-4 pt-4">
-            {/* Component Dropdown */}
-            <div className="mb-3">
-              <label className="text-[9px] text-[#1D1E15]/50 uppercase tracking-wider mb-1 block">
-                Component Selector
-              </label>
-              <select
-                value={selectedObject ? (selectedObject as any).uuid : "overall"}
-                onChange={(e) => {
-                  if (e.target.value === "overall") {
-                    resetView();
-                  } else {
-                    // Find and select the component by UUID
-                    sceneRef.current?.traverse((child) => {
-                      if (child.uuid === e.target.value && (child as THREE.Mesh).isMesh) {
-                        handleObjectClick(child);
+            <div className="flex-shrink-0 border-b border-[#1D1E15]/20 pb-3 px-4 pt-4">
+              {/* Component Dropdown */}
+              <div className="mb-3">
+                <label className="text-[9px] text-[#1D1E15]/50 uppercase tracking-wider mb-1 block">
+                  Component Selector
+                </label>
+                <select
+                  value={selectedObject ? (selectedObject as any).uuid : "overall"}
+                  onChange={(e) => {
+                    if (e.target.value === "overall") {
+                      resetView();
+                    } else {
+                      // Find and select the component by UUID
+                      sceneRef.current?.traverse((child) => {
+                        if (child.uuid === e.target.value && (child as THREE.Mesh).isMesh) {
+                          handleObjectClick(child);
+                        }
+                      });
+                    }
+                  }}
+                  className="w-full px-2 py-1.5 bg-white border border-[#1D1E15] text-[10px] font-mono text-[#1D1E15] cursor-pointer hover:border-[#3B82F6] transition-colors"
+                >
+                  <option value="overall">📊 Overall Model View</option>
+                  {generatedObjectsRef.current.map((group) => {
+                    const components: React.ReactElement[] = [];
+                    group.traverse((child) => {
+                      if ((child as THREE.Mesh).isMesh && (child as any).userData?.name) {
+                        const mesh = child as THREE.Mesh;
+                        components.push(
+                          <option key={mesh.uuid} value={mesh.uuid}>
+                            🔹 {(mesh as any).userData.name}
+                          </option>
+                        );
                       }
                     });
-                  }
-                }}
-                className="w-full px-2 py-1.5 bg-white border border-[#1D1E15] text-[10px] font-mono text-[#1D1E15] cursor-pointer hover:border-[#3B82F6] transition-colors"
-              >
-                <option value="overall">📊 Overall Model View</option>
-                {generatedObjectsRef.current.map((group) => {
-                  const components: React.JSX.Element[] = [];
-                  group.traverse((child) => {
-                    if ((child as THREE.Mesh).isMesh && (child as any).userData?.name) {
-                      const mesh = child as THREE.Mesh;
-                      components.push(
-                        <option key={mesh.uuid} value={mesh.uuid}>
-                          🔹 {(mesh as any).userData.name}
-                        </option>
-                      );
-                    }
-                  });
-                  return components;
-                })}
-              </select>
-            </div>
+                    return components;
+                  })}
+                </select>
+              </div>
 
-            <div className="flex items-start justify-between gap-2 mb-1.5">
-              <h2 className="text-base font-bold text-[#1D1E15] truncate font-sans flex-1">
-                {inspectorData.name || "Component Inspector"}
-              </h2>
-              {showSplitSection && (
-                <div className="flex items-center gap-1 bg-gradient-to-br from-[#3B82F6]/20 to-[#3B82F6]/10 border border-[#3B82F6] rounded px-1.5 py-0.5 shrink-0 animate-pulse">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5">
-                    <path d="M21 8v13H3V8" />
-                    <path d="M1 3h22v5H1z" />
-                    <path d="M10 12h4" />
-                  </svg>
-                  <span className="text-[8px] font-bold text-[#3B82F6] uppercase">Splittable</span>
-                </div>
-              )}
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <h2 className="text-base font-bold text-[#1D1E15] truncate font-sans flex-1">
+                  {inspectorData.name || "Component Inspector"}
+                </h2>
+                {showSplitSection && (
+                  <div className="flex items-center gap-1 bg-gradient-to-br from-[#3B82F6]/20 to-[#3B82F6]/10 border border-[#3B82F6] rounded px-1.5 py-0.5 shrink-0 animate-pulse">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5">
+                      <path d="M21 8v13H3V8" />
+                      <path d="M1 3h22v5H1z" />
+                      <path d="M10 12h4" />
+                    </svg>
+                    <span className="text-[8px] font-bold text-[#3B82F6] uppercase">Splittable</span>
+                  </div>
+                )}
+              </div>
+              <span className="px-1.5 py-0.5 bg-[#3B82F6]/10 border border-[#3B82F6] rounded text-[10px] text-[#3B82F6] font-mono uppercase">
+                {inspectorData.type || "Select a component"}
+              </span>
             </div>
-            <span className="px-1.5 py-0.5 bg-[#3B82F6]/10 border border-[#3B82F6] rounded text-[10px] text-[#3B82F6] font-mono uppercase">
-              {inspectorData.type || "Select a component"}
-            </span>
-          </div>
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 font-mono">
-            {selectedObject ? (
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 font-mono">
+              {selectedObject ? (
               <>
                 <div>
                   <h3 className="text-[10px] text-[#1D1E15]/50 uppercase tracking-wider mb-1.5">
@@ -2033,156 +2469,238 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                   <p className="text-[10px] text-[#1D1E15] leading-relaxed break-words">
                     {inspectorData.description}
                   </p>
-
+                  
+                  {/* CAD-Style Measurements */}
+                  {(selectedObject as any)?.userData?.measurements && (
+                    <div className="mt-4 p-3 bg-gradient-to-br from-[#1D1E15]/5 to-[#1D1E15]/10 border border-[#1D1E15]/20 rounded-lg">
+                      <h3 className="text-[9px] text-[#1D1E15]/50 uppercase tracking-wider mb-2 flex items-center gap-1">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" />
+                          <path d="M9 3v18" />
+                          <path d="M15 3v18" />
+                        </svg>
+                        Engineering Specifications
+                      </h3>
+                      <div className="grid grid-cols-2 gap-2 text-[9px]">
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Dimensions</div>
+                          <div className="text-[#1D1E15] font-bold">
+                            {(selectedObject as any).userData.measurements.dimensions.x} × {(selectedObject as any).userData.measurements.dimensions.y} × {(selectedObject as any).userData.measurements.dimensions.z} units
+                          </div>
+                        </div>
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Volume</div>
+                          <div className="text-[#1D1E15] font-bold">{(selectedObject as any).userData.measurements.volume} cu</div>
+                        </div>
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Surface Area</div>
+                          <div className="text-[#1D1E15] font-bold">{(selectedObject as any).userData.measurements.surfaceArea} sq</div>
+                        </div>
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Complexity</div>
+                          <div className="text-[#1D1E15] font-bold">{((selectedObject as any).userData.measurements.complexity * 100).toFixed(0)}%</div>
+                        </div>
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Vertices</div>
+                          <div className="text-[#1D1E15] font-bold">{(selectedObject as any).userData.measurements.vertexCount.toLocaleString()}</div>
+                        </div>
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Faces</div>
+                          <div className="text-[#1D1E15] font-bold">{(selectedObject as any).userData.measurements.faceCount.toLocaleString()}</div>
+                        </div>
+                        {(selectedObject as any).userData.hierarchyLevel && (
+                          <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10 col-span-2">
+                            <div className="text-[#1D1E15]/50 uppercase">Hierarchy Level</div>
+                            <div className="text-[#1D1E15] font-bold">Level {(selectedObject as any).userData.hierarchyLevel} Component</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Prominent AI Identification Section */}
                   <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-6 h-6 bg-[#3B82F6] rounded flex items-center justify-center shrink-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 h-6 bg-[#3B82F6] rounded flex items-center justify-center shrink-0">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="2.5"
+                      >
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-[10px] font-bold text-[#1D1E15] uppercase tracking-wide">AI Analysis</h4>
+                      <p className="text-[9px] text-[#1D1E15]/60">Get detailed component intel</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={identifyPart}
+                    disabled={isIdentifying}
+                    className="mt-2 w-full px-4 py-3 bg-[#3B82F6] border-2 border-[#1D1E15] text-white text-[11px] font-bold hover:bg-[#1D1E15] hover:border-[#3B82F6] transition-all uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    {isIdentifying ? (
+                      <>
+                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        ANALYZING...
+                      </>
+                    ) : (
+                      <>
                         <svg
                           width="14"
                           height="14"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="white"
+                          stroke="currentColor"
                           strokeWidth="2.5"
                         >
-                          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                          <circle cx="11" cy="11" r="8"/>
+                          <path d="m21 21-4.35-4.35"/>
+                          <path d="M11 8v6"/>
+                          <path d="M8 11h6"/>
                         </svg>
-                      </div>
-                      <div>
-                        <h4 className="text-[10px] font-bold text-[#1D1E15] uppercase tracking-wide">AI Analysis</h4>
-                        <p className="text-[9px] text-[#1D1E15]/60">Get detailed component intel</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={identifyPart}
-                      disabled={isIdentifying}
-                      className="mt-2 w-full px-4 py-3 bg-[#3B82F6] border-2 border-[#1D1E15] text-white text-[11px] font-bold hover:bg-[#1D1E15] hover:border-[#3B82F6] transition-all uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      {isIdentifying ? (
-                        <>
-                          <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                          ANALYZING...
-                        </>
-                      ) : (
-                        <>
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                          >
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="m21 21-4.35-4.35" />
-                            <path d="M11 8v6" />
-                            <path d="M8 11h6" />
-                          </svg>
-                          IDENTIFY COMPONENT
-                        </>
-                      )}
-                    </button>
-                  </div>
+                        IDENTIFY COMPONENT
+                      </>
+                    )}
+                  </button>
+                </div>
                 </div>
                 {showSplitSection && (
-                  <div className="mt-2 p-3 bg-[#1D1E15]/5 border border-[#1D1E15]/10 rounded-xl">
-                    <div className="text-[10px] text-[#1D1E15]/70 mb-2 font-bold uppercase tracking-wider">
-                      Actions
-                    </div>
-                    <button
-                      onClick={handleSplitMesh}
-                      className="w-full px-3 py-2 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold flex items-center justify-center gap-1.5 mb-2 hover:bg-[#3B82F6] hover:text-white transition-colors uppercase tracking-wide cursor-pointer"
+                <div className="mt-2 p-3 bg-[#1D1E15]/5 border border-[#1D1E15]/10 rounded-xl">
+                  <div className="text-[10px] text-[#1D1E15]/70 mb-2 font-bold uppercase tracking-wider">
+                    Actions
+                  </div>
+                  <button
+                    onClick={handleSplitMesh}
+                    className="w-full px-3 py-2 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold flex items-center justify-center gap-1.5 mb-2 hover:bg-[#3B82F6] hover:text-white transition-colors uppercase tracking-wide cursor-pointer"
+                  >
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
                     >
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M21 8v13H3V8" />
-                        <path d="M1 3h22v5H1z" />
-                        <path d="M10 12h4" />
-                      </svg>
-                      Split Mesh
-                    </button>
-                    <p className="text-[10px] text-[#1D1E15]/60 mb-2 leading-relaxed break-words">
-                      Separates disconnected geometry into distinct parts.
-                    </p>
-                    {showExplodedControls && (
-                      <div className="mt-2 pt-2 border-t border-[#1D1E15]/10">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <label className="text-[10px] text-[#1D1E15] font-bold uppercase">
-                            Exploded View
-                          </label>
-                          <button
-                            onClick={() => {
-                              setIsExploded(!isExploded);
-                            }}
-                            className={`px-2 py-1 text-[10px] font-bold uppercase border transition-colors cursor-pointer ${isExploded
-                                ? "bg-[#3B82F6] text-[#E5E6DA] border-[#3B82F6]"
-                                : "bg-transparent text-[#1D1E15] border-[#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA]"
-                              }`}
-                          >
-                            {isExploded ? "On" : "Off"}
-                          </button>
-                        </div>
-                        <div className="mt-1.5">
-                          <label className="text-[10px] text-[#1D1E15]/60 block mb-1">
-                            Distance: {explosionDistance.toFixed(1)}
-                          </label>
-                          <input
-                            type="range"
-                            min="0"
-                            max="3"
-                            step="0.1"
-                            value={explosionDistance}
-                            onChange={(e) =>
-                              setExplosionDistance(parseFloat(e.target.value))
-                            }
-                            className="w-full h-1 bg-[#1D1E15]/20 rounded-lg appearance-none cursor-pointer"
-                          />
-                        </div>
+                      <path d="M21 8v13H3V8" />
+                      <path d="M1 3h22v5H1z" />
+                      <path d="M10 12h4" />
+                    </svg>
+                    Split Mesh
+                  </button>
+                  <p className="text-[10px] text-[#1D1E15]/60 mb-2 leading-relaxed break-words">
+                    Separates disconnected geometry into distinct parts.
+                  </p>
+                  {showExplodedControls && (
+                    <div className="mt-2 pt-2 border-t border-[#1D1E15]/10">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-[10px] text-[#1D1E15] font-bold uppercase">
+                          Exploded View
+                        </label>
+                        <button
+                          onClick={() => {
+                            setIsExploded(!isExploded);
+                          }}
+                          className={`px-2 py-1 text-[10px] font-bold uppercase border transition-colors cursor-pointer ${
+                            isExploded
+                              ? "bg-[#3B82F6] text-[#E5E6DA] border-[#3B82F6]"
+                              : "bg-transparent text-[#1D1E15] border-[#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA]"
+                          }`}
+                        >
+                          {isExploded ? "On" : "Off"}
+                        </button>
                       </div>
-                    )}
+                      
+                      {/* PRIMARY COMPONENTS SLIDER (Context-Aware) */}
+                      <div className="mt-2.5">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                          </svg>
+                          <label className="text-[10px] text-[#1D1E15] font-bold uppercase">
+                            {getExplosionLabels().primary}: {explosionDistance.toFixed(1)}
+                          </label>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="3"
+                          step="0.1"
+                          value={explosionDistance}
+                          onChange={(e) =>
+                            setExplosionDistance(parseFloat(e.target.value))
+                          }
+                          className="w-full h-1 bg-[#3B82F6]/20 rounded-lg appearance-none cursor-pointer"
+                        />
+                      </div>
+
+                      {/* SECONDARY COMPONENTS SLIDER (Context-Aware, Bigger Range) */}
+                      <div className="mt-2.5 p-2 bg-gradient-to-r from-[#3B82F6]/5 to-[#1D1E15]/5 border border-[#3B82F6]/20 rounded">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v12M6 12h12"/>
+                          </svg>
+                          <label className="text-[10px] text-[#EF4444] font-bold uppercase">
+                            {getExplosionLabels().secondary}: {engineExplosionDistance.toFixed(1)}
+                          </label>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="8"
+                          step="0.2"
+                          value={engineExplosionDistance}
+                          onChange={(e) =>
+                            setEngineExplosionDistance(parseFloat(e.target.value))
+                          }
+                          className="w-full h-2 bg-[#EF4444]/20 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <p className="text-[9px] text-[#1D1E15]/50 mt-1">{getExplosionLabels().secondaryDesc}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10">
+                  <div className="text-[10px] text-[#1D1E15]/50 mb-1 uppercase">
+                    Geometry
                   </div>
-                )}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10">
-                    <div className="text-[10px] text-[#1D1E15]/50 mb-1 uppercase">
-                      Geometry
-                    </div>
-                    <div className="text-[#1D1E15] font-bold text-[10px]">
-                      High Poly
-                    </div>
-                  </div>
-                  <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10">
-                    <div className="text-[10px] text-[#1D1E15]/50 mb-1 uppercase">
-                      Status
-                    </div>
-                    <div className="text-[#1D1E15] font-bold text-[10px]">
-                      Active
-                    </div>
+                  <div className="text-[#1D1E15] font-bold text-[10px]">
+                    High Poly
                   </div>
                 </div>
+                <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10">
+                  <div className="text-[10px] text-[#1D1E15]/50 mb-1 uppercase">
+                    Status
+                  </div>
+                  <div className="text-[#1D1E15] font-bold text-[10px]">
+                    Active
+                  </div>
+                </div>
+              </div>
               </>
-            ) : (
+              ) : (
               <div className="space-y-4">
                 <div className="flex flex-col items-center text-center px-6 py-4">
                   <div className="w-16 h-16 bg-[#3B82F6]/10 rounded-full flex items-center justify-center mb-3">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
-                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                      <path d="M2 17l10 5 10-5" />
-                      <path d="M2 12l10 5 10-5" />
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                      <path d="M2 17l10 5 10-5"/>
+                      <path d="M2 12l10 5 10-5"/>
                     </svg>
                   </div>
                   <h3 className="text-sm font-bold text-[#1D1E15] mb-2 uppercase tracking-wide">
                     {currentDemoModelId ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.name : "Overall Model View"}
                   </h3>
                   <p className="text-[10px] text-[#1D1E15]/60 leading-relaxed mb-4">
-                    {currentDemoModelId
+                    {currentDemoModelId 
                       ? "Select a component from the dropdown above or click on the 3D model to inspect individual parts."
                       : "Load a model from the dropdown at the top to begin analysis."}
                   </p>
@@ -2221,9 +2739,9 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                   </div>
                 )}
               </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
         {/* Tooltip */}
         <div
@@ -2246,15 +2764,15 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
             <div className="relative">
               {/* Pointer Arrow - pointing left now */}
               <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-r-[12px] border-r-[#3B82F6]" />
-
+              
               {/* Hint Box */}
               <div className="bg-[#3B82F6] border-2 border-[#1D1E15] px-4 py-3 shadow-2xl max-w-[240px]">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-[#1D1E15] rounded flex items-center justify-center shrink-0 mt-0.5">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                      <path d="M2 17l10 5 10-5" />
-                      <path d="M2 12l10 5 10-5" />
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                      <path d="M2 17l10 5 10-5"/>
+                      <path d="M2 12l10 5 10-5"/>
                     </svg>
                   </div>
                   <div className="flex-1">
@@ -2266,19 +2784,138 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                     </p>
                   </div>
                 </div>
-
+                
                 {/* Dismiss Button */}
                 <button
                   onClick={() => setShowInteractionHint(false)}
                   className="absolute -top-2 -right-2 w-6 h-6 bg-[#1D1E15] text-white rounded-full flex items-center justify-center hover:bg-[#1D1E15]/80 transition-colors cursor-pointer border-2 border-[#3B82F6]"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
                   </svg>
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Cross-Section Controls */}
+        {crossSectionMode && (
+          <div className="absolute bottom-24 right-4 z-20 w-80 bg-white border-2 border-[#3B82F6] backdrop-blur-md p-4 shadow-xl">
+            <h3 className="text-sm font-bold text-[#1D1E15] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5">
+                <path d="M21 21H3M3 16V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/>
+              </svg>
+              Cross-Section Cutter
+            </h3>
+            
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-[#1D1E15]/70 uppercase tracking-wider mb-1 block">Axis</label>
+                <div className="flex gap-2">
+                  {(['x', 'y', 'z'] as const).map((axis) => (
+                    <button
+                      key={axis}
+                      onClick={() => {
+                        setCrossSectionAxis(axis);
+                        updateCrossSection(crossSectionPosition, axis);
+                      }}
+                      className={`flex-1 px-3 py-2 text-xs font-bold uppercase transition-all ${
+                        crossSectionAxis === axis
+                          ? 'bg-[#3B82F6] text-white'
+                          : 'bg-[#1D1E15]/10 text-[#1D1E15] hover:bg-[#1D1E15] hover:text-white'
+                      }`}
+                    >
+                      {axis.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-xs text-[#1D1E15]/70 uppercase tracking-wider mb-1 block">
+                  Position: {crossSectionPosition.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="-10"
+                  max="10"
+                  step="0.1"
+                  value={crossSectionPosition}
+                  onChange={(e) => {
+                    const pos = parseFloat(e.target.value);
+                    setCrossSectionPosition(pos);
+                    updateCrossSection(pos, crossSectionAxis);
+                  }}
+                  className="w-full h-2 bg-[#1D1E15]/20 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* X-Ray Mode Controls */}
+        {xrayMode && (
+          <div className="absolute bottom-24 left-72 z-20 w-64 bg-white border-2 border-[#3B82F6] backdrop-blur-md p-4 shadow-xl">
+            <h3 className="text-sm font-bold text-[#1D1E15] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v12M6 12h12"/>
+              </svg>
+              X-Ray Transparency
+            </h3>
+            
+            <div>
+              <label className="text-xs text-[#1D1E15]/70 uppercase tracking-wider mb-1 block">
+                Opacity: {(xrayOpacity * 100).toFixed(0)}%
+              </label>
+              <input
+                type="range"
+                min="0.1"
+                max="0.9"
+                step="0.05"
+                value={xrayOpacity}
+                onChange={(e) => {
+                  const opacity = parseFloat(e.target.value);
+                  setXrayOpacity(opacity);
+                  
+                  // Update all meshes
+                  if (sceneRef.current) {
+                    sceneRef.current.traverse((child) => {
+                      if ((child as THREE.Mesh).isMesh && child !== shadowPlaneRef.current) {
+                        const mesh = child as THREE.Mesh;
+                        const material = mesh.material as THREE.Material;
+                        material.opacity = opacity;
+                      }
+                    });
+                  }
+                }}
+                className="w-full h-2 bg-[#1D1E15]/20 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Measurement Mode Indicator */}
+        {measurementMode && (
+          <div className="absolute top-24 left-1/2 transform -translate-x-1/2 z-20 bg-[#3B82F6] text-white px-6 py-3 rounded-lg shadow-xl flex items-center gap-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M3 3l18 18M8 8l8 8M3 21l18-18"/>
+            </svg>
+            <div>
+              <div className="text-sm font-bold uppercase">Measurement Mode Active</div>
+              <div className="text-xs opacity-80">Click two points on the model to measure</div>
+            </div>
+            <button
+              onClick={() => {
+                clearMeasurements();
+                setMeasurementMode(false);
+              }}
+              className="ml-4 px-3 py-1 bg-white text-[#3B82F6] text-xs font-bold uppercase rounded hover:bg-[#1D1E15] hover:text-white transition-all"
+            >
+              Exit
+            </button>
           </div>
         )}
 
@@ -2339,7 +2976,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                     </div>
                   )}
                 </div>
-
+                
                 <p className="text-xs text-[#1D1E15]/80 leading-relaxed font-mono mb-3">
                   {inspectorData.description}
                 </p>

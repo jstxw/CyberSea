@@ -1889,32 +1889,57 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 <p className="text-[10px] text-[#1D1E15] leading-relaxed break-words">
                   {inspectorData.description}
                 </p>
-                <button
-                  onClick={identifyPart}
-                  disabled={isIdentifying}
-                  className="mt-3 w-full px-3 py-2 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-colors uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isIdentifying ? (
-                    <>
-                      <div className="w-2 h-2 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      Identifying...
-                    </>
-                  ) : (
-                    <>
+                
+                {/* Prominent AI Identification Section */}
+                <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 h-6 bg-[#3B82F6] rounded flex items-center justify-center shrink-0">
                       <svg
-                        width="12"
-                        height="12"
+                        width="14"
+                        height="14"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
+                        stroke="white"
+                        strokeWidth="2.5"
                       >
                         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
                       </svg>
-                      Identify with AI
-                    </>
-                  )}
-                </button>
+                    </div>
+                    <div>
+                      <h4 className="text-[10px] font-bold text-[#1D1E15] uppercase tracking-wide">AI Analysis</h4>
+                      <p className="text-[9px] text-[#1D1E15]/60">Get detailed component intel</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={identifyPart}
+                    disabled={isIdentifying}
+                    className="mt-2 w-full px-4 py-3 bg-[#3B82F6] border-2 border-[#1D1E15] text-white text-[11px] font-bold hover:bg-[#1D1E15] hover:border-[#3B82F6] transition-all uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    {isIdentifying ? (
+                      <>
+                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        ANALYZING...
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                        >
+                          <circle cx="11" cy="11" r="8"/>
+                          <path d="m21 21-4.35-4.35"/>
+                          <path d="M11 8v6"/>
+                          <path d="M8 11h6"/>
+                        </svg>
+                        IDENTIFY COMPONENT
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
               {showSplitSection && (
                 <div className="mt-2 p-3 bg-[#1D1E15]/5 border border-[#1D1E15]/10 rounded-xl">

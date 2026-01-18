@@ -215,6 +215,13 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     accentLight.lookAt(0, 0, 0);
     scene.add(accentLight);
 
+    // Grid Helper - White grid on black background
+    const gridHelper = new THREE.GridHelper(50, 50, 0xffffff, 0xffffff);
+    gridHelper.position.y = -4;
+    gridHelper.material.opacity = 0.2;
+    gridHelper.material.transparent = true;
+    scene.add(gridHelper);
+
     // Shadow plane
     /*
     const planeGeo = new THREE.PlaneGeometry(50, 50);
@@ -1697,10 +1704,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   };
 
   return (
-    <div className="absolute inset-0 bg-black z-0" style={{
-      backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
-      backgroundSize: '30px 30px'
-    }}>
+    <div className="absolute inset-0 bg-black z-0">
       <div className="w-full h-full relative">
         {/* Onboarding Overlay */}
         {showOnboarding && (

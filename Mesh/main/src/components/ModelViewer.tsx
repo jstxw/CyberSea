@@ -1975,16 +1975,17 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 font-mono">
               {selectedObject ? (
-              <div>
-                <h3 className="text-[10px] text-[#1D1E15]/50 uppercase tracking-wider mb-1.5">
-                  Description
-                </h3>
-                <p className="text-[10px] text-[#1D1E15] leading-relaxed break-words">
-                  {inspectorData.description}
-                </p>
-                
-                {/* Prominent AI Identification Section */}
-                <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">
+              <>
+                <div>
+                  <h3 className="text-[10px] text-[#1D1E15]/50 uppercase tracking-wider mb-1.5">
+                    Description
+                  </h3>
+                  <p className="text-[10px] text-[#1D1E15] leading-relaxed break-words">
+                    {inspectorData.description}
+                  </p>
+                  
+                  {/* Prominent AI Identification Section */}
+                  <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-6 h-6 bg-[#3B82F6] rounded flex items-center justify-center shrink-0">
                       <svg
@@ -2033,8 +2034,8 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                     )}
                   </button>
                 </div>
-              </div>
-              {showSplitSection && (
+                </div>
+                {showSplitSection && (
                 <div className="mt-2 p-3 bg-[#1D1E15]/5 border border-[#1D1E15]/10 rounded-xl">
                   <div className="text-[10px] text-[#1D1E15]/70 mb-2 font-bold uppercase tracking-wider">
                     Actions
@@ -2117,7 +2118,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                   </div>
                 </div>
               </div>
-            </div>
+              </>
               ) : (
               <div className="flex flex-col items-center justify-center h-full text-center px-6">
                 <div className="w-16 h-16 bg-[#3B82F6]/10 rounded-full flex items-center justify-center mb-4">

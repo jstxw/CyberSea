@@ -2499,7 +2499,6 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
             controls={controlsRef.current}
           />
         )}
-<<<<<<< Updated upstream
 
         {/* AI Inference Loader */}
         <AnimatePresence>
@@ -2518,8 +2517,6 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
             />
           )}
         </AnimatePresence>
-=======
->>>>>>> Stashed changes
       </div>
     </div>
   );

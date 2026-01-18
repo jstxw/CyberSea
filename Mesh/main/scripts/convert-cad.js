@@ -27,18 +27,32 @@ function ensureDirectories() {
 }
 
 function checkBlenderInstalled() {
-  try {
-    execSync('blender --version', { stdio: 'ignore' });
-    console.log('✅ Blender is installed');
-    return true;
-  } catch (e) {
-    console.log('❌ Blender is not installed or not in PATH');
-    console.log('\n📥 INSTALL BLENDER:');
-    console.log('   Windows: https://www.blender.org/download/');
-    console.log('   Or: winget install BlenderFoundation.Blender');
-    console.log('\n   After installing, add Blender to your PATH\n');
-    return false;
+  // Try common Blender paths on Windows
+  const possiblePaths = [
+    'blender', // If in PATH
+    'C:\\Program Files\\Blender Foundation\\Blender 5.0\\blender.exe',
+    'C:\\Program Files\\Blender Foundation\\Blender 4.2\\blender.exe',
+    'C:\\Program Files\\Blender Foundation\\Blender 4.1\\blender.exe',
+    'C:\\Program Files\\Blender Foundation\\Blender\\blender.exe',
+  ];
+  
+  for (const blenderPath of possiblePaths) {
+    try {
+      execSync(`"${blenderPath}" --version`, { stdio: 'ignore' });
+      console.log(`✅ Blender found at: ${blenderPath}`);
+      global.BLENDER_PATH = blenderPath;
+      return true;
+    } catch (e) {
+      // Try next path
+    }
   }
+  
+  console.log('❌ Blender is not installed or not found');
+  console.log('\n📥 INSTALL BLENDER:');
+  console.log('   Windows: https://www.blender.org/download/');
+  console.log('   Or: winget install BlenderFoundation.Blender');
+  console.log('\n   After installing, restart PowerShell\n');
+  return false;
 }
 
 function checkFreeCADInstalled() {
@@ -157,7 +171,8 @@ function convertFile(inputFile, outputBaseName) {
     
     // Run Blender conversion
     try {
-      execSync(`blender --background --python "${scriptFile}"`, {
+      const blenderCmd = global.BLENDER_PATH || 'blender';
+      execSync(`"${blenderCmd}" --background --python "${scriptFile}"`, {
         stdio: 'pipe',
         timeout: 300000 // 5 minutes timeout
       });

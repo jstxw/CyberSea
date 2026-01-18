@@ -30,9 +30,11 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
       0.1,
       1000
     );
-    // Position camera to focus on Arctic (North Pole view, tilted)
-    camera.position.set(0, 3, 2.5);
-    camera.lookAt(0, 0.8, 0);
+    // Position camera to focus on Canadian Arctic (zoomed in, centered on Northwest Passage)
+    // Canadian Arctic center is roughly lat 72°, lng -95° (Resolute Bay area)
+    const [targetX, targetY, targetZ] = latLongToVector3(72, -95, 1);
+    camera.position.set(targetX * 2.2, targetY * 2.2 + 0.3, targetZ * 2.2);
+    camera.lookAt(targetX, targetY, targetZ);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
@@ -123,10 +125,7 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
     const animate = () => {
       animationId = requestAnimationFrame(animate);
 
-      // Slow rotation
-      globe.rotation.y += 0.001;
-      innerGlobe.rotation.y += 0.001;
-
+      // No rotation - keep focused on Canadian Arctic
       renderer.render(scene, camera);
     };
     animate();

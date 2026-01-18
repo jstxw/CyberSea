@@ -858,7 +858,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     setShowAnnotatedModal(false);
   };
 
-  // Smart component naming based on position and size
+  // Enhanced military-specific component naming based on position, size, and geometry
   const generateComponentName = (
     centroid: THREE.Vector3,
     size: THREE.Vector3,
@@ -867,79 +867,144 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     totalComponents: number
   ): string => {
     const relativePos = centroid.clone().sub(modelCenter);
+    const normalized = relativePos.clone().normalize();
     
-    // Determine position descriptors
-    const isForward = relativePos.z > 0.5;
-    const isRear = relativePos.z < -0.5;
-    const isTop = relativePos.y > 0.5;
-    const isBottom = relativePos.y < -0.5;
-    const isLeft = relativePos.x < -0.5;
-    const isRight = relativePos.x > 0.5;
+    // Position descriptors (normalized coordinates)
+    const isForward = relativePos.z > 0.3;
+    const isRear = relativePos.z < -0.3;
+    const isTop = relativePos.y > 0.3;
+    const isBottom = relativePos.y < -0.3;
+    const isLeft = relativePos.x < -0.3;
+    const isRight = relativePos.x > 0.3;
+    const isCentral = Math.abs(relativePos.x) < 0.3 && Math.abs(relativePos.z) < 0.3;
     
-    // Determine size descriptors
+    // Size and shape descriptors
     const volume = size.x * size.y * size.z;
-    const isLarge = volume > 2.0;
-    const isSmall = volume < 0.3;
+    const isLarge = volume > 1.5;
+    const isMedium = volume > 0.5 && volume <= 1.5;
+    const isSmall = volume <= 0.5;
+    const isTiny = volume < 0.1;
     
     const aspectRatio = Math.max(size.x, size.y, size.z) / Math.min(size.x, size.y, size.z);
-    const isElongated = aspectRatio > 3;
-    const isFlatHorizontal = size.y < Math.min(size.x, size.z) * 0.3;
-    const isFlatVertical = size.x < Math.min(size.y, size.z) * 0.3 || size.z < Math.min(size.x, size.y) * 0.3;
+    const isElongated = aspectRatio > 4;
+    const isFlatHorizontal = size.y < Math.min(size.x, size.z) * 0.4;
+    const isFlatVertical = (size.x < Math.min(size.y, size.z) * 0.4) || (size.z < Math.min(size.x, size.y) * 0.4);
+    const isCylindrical = aspectRatio > 2.5 && !isFlatHorizontal && !isFlatVertical;
     
-    // Generate descriptive names
-    if (isLarge && Math.abs(relativePos.length()) < 0.5) {
-      return "Main Fuselage";
+    // Identify specific military components
+    
+    // ENGINE COMPONENTS
+    if (isRear && isCylindrical && isMedium) {
+      return isLeft ? "Port Engine Nacelle" : isRight ? "Starboard Engine Nacelle" : "Engine Assembly";
+    }
+    if (isRear && isCylindrical && isSmall) {
+      return "Exhaust Nozzle";
     }
     
-    if (isForward && isSmall) {
-      return "Nose Section";
+    // COCKPIT / CANOPY
+    if (isForward && isTop && isSmall && !isFlatHorizontal) {
+      return "Cockpit Canopy";
+    }
+    if (isForward && isTop && isTiny) {
+      return "Windscreen";
     }
     
-    if (isForward && !isSmall) {
-      return isTop ? "Forward Upper Body" : "Forward Section";
+    // NOSE / RADOME
+    if (isForward && isCentral && isElongated) {
+      return "Nose Cone (Radome)";
+    }
+    if (isForward && isSmall && !isTop && !isBottom) {
+      return "Forward Avionics Bay";
     }
     
-    if (isRear && isSmall) {
-      return "Tail Section";
-    }
-    
-    if (isRear) {
-      return isTop ? "Tail Assembly" : "Rear Section";
-    }
-    
+    // WING COMPONENTS
     if ((isLeft || isRight) && isFlatHorizontal && isElongated) {
-      return isLeft ? "Left Wing" : "Right Wing";
+      const side = isLeft ? "Port" : "Starboard";
+      if (isLarge) return `${side} Wing Assembly`;
+      if (isMedium) return `${side} Wing`;
+      return `${side} Wing Tip`;
+    }
+    if ((isLeft || isRight) && isFlatHorizontal && !isElongated) {
+      return isLeft ? "Port Flap" : "Starboard Aileron";
     }
     
-    if ((isLeft || isRight) && !isFlatHorizontal) {
-      return isLeft ? "Left Component" : "Right Component";
+    // TAIL ASSEMBLY
+    if (isRear && isTop && isFlatVertical && isElongated) {
+      return "Vertical Stabilizer";
+    }
+    if (isRear && isFlatHorizontal && !isCentral) {
+      return isLeft ? "Port Horizontal Stabilizer" : "Starboard Horizontal Stabilizer";
+    }
+    if (isRear && isTop && isSmall) {
+      return "Rudder Assembly";
     }
     
+    // FUSELAGE SECTIONS
+    if (isLarge && isCentral) {
+      if (isForward) return "Forward Fuselage";
+      if (isRear) return "Aft Fuselage";
+      return "Center Fuselage Section";
+    }
+    if (isMedium && isCentral) {
+      if (isForward) return "Nose Section";
+      if (isRear) return "Tail Boom";
+      return "Mid-Fuselage";
+    }
+    
+    // WEAPONS & HARDPOINTS
+    if (isBottom && isTiny && (isLeft || isRight)) {
+      return isLeft ? "Port Wing Pylon" : "Starboard Wing Pylon";
+    }
+    if (isBottom && isSmall && isCentral) {
+      return "Weapons Bay Door";
+    }
+    
+    // LANDING GEAR
+    if (isBottom && isSmall) {
+      if (isForward) return "Nose Landing Gear Bay";
+      if (isRear || isLeft || isRight) return "Main Landing Gear Well";
+      return "Landing Gear Strut";
+    }
+    
+    // AIR INTAKES
+    if (!isTop && !isBottom && (isLeft || isRight) && isCylindrical) {
+      return isLeft ? "Port Air Intake" : "Starboard Air Intake";
+    }
+    
+    // AVIONICS & SENSORS
+    if (isTop && isTiny) {
+      return "Antenna Mount";
+    }
+    if (isTop && isSmall && isCentral) {
+      return "Avionics Hump";
+    }
+    
+    // STRUCTURAL PANELS
+    if (isFlatVertical && !isElongated) {
+      if (isLeft) return "Port Side Panel";
+      if (isRight) return "Starboard Side Panel";
+      if (isRear) return "Rear Bulkhead";
+      return "Access Panel";
+    }
+    
+    // GENERIC DESCRIPTIVE FALLBACKS
     if (isTop && isFlatHorizontal) {
-      return "Top Panel";
+      return "Upper Skin Panel";
     }
-    
     if (isBottom && isFlatHorizontal) {
-      return "Undercarriage";
+      return "Lower Belly Panel";
     }
-    
-    if (isTop) {
-      return "Upper Structure";
+    if (isForward) {
+      return isTop ? "Forward Upper Assembly" : "Forward Lower Structure";
     }
-    
-    if (isBottom) {
-      return "Lower Structure";
+    if (isRear) {
+      return isTop ? "Tail Section" : "Rear Lower Structure";
     }
-    
-    if (isFlatVertical && isElongated) {
-      return "Stabilizer";
-    }
-    
     if (isSmall) {
       return `Detail Component ${componentIndex + 1}`;
     }
     
-    return `Section ${componentIndex + 1}`;
+    return `Sub-Assembly ${componentIndex + 1}`;
   };
 
   const handleSplitMesh = async () => {

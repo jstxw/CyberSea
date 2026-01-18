@@ -1036,6 +1036,97 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     return `Sub-Assembly ${componentIndex + 1}`;
   };
 
+  // CAD-style measurement functions
+  const calculateApproximateVolume = (geometry: THREE.BufferGeometry): number => {
+    // Calculate volume using divergence theorem approximation
+    const positions = geometry.attributes.position;
+    let volume = 0;
+    
+    for (let i = 0; i < positions.count; i += 3) {
+      const v1 = new THREE.Vector3(
+        positions.getX(i),
+        positions.getY(i),
+        positions.getZ(i)
+      );
+      const v2 = new THREE.Vector3(
+        positions.getX(i + 1),
+        positions.getY(i + 1),
+        positions.getZ(i + 1)
+      );
+      const v3 = new THREE.Vector3(
+        positions.getX(i + 2),
+        positions.getY(i + 2),
+        positions.getZ(i + 2)
+      );
+      
+      volume += v1.dot(v2.cross(v3)) / 6;
+    }
+    
+    return Math.abs(volume);
+  };
+
+  const calculateSurfaceArea = (geometry: THREE.BufferGeometry): number => {
+    const positions = geometry.attributes.position;
+    let area = 0;
+    
+    for (let i = 0; i < positions.count; i += 3) {
+      const v1 = new THREE.Vector3(
+        positions.getX(i),
+        positions.getY(i),
+        positions.getZ(i)
+      );
+      const v2 = new THREE.Vector3(
+        positions.getX(i + 1),
+        positions.getY(i + 1),
+        positions.getZ(i + 1)
+      );
+      const v3 = new THREE.Vector3(
+        positions.getX(i + 2),
+        positions.getY(i + 2),
+        positions.getZ(i + 2)
+      );
+      
+      const edge1 = v2.clone().sub(v1);
+      const edge2 = v3.clone().sub(v1);
+      const cross = edge1.cross(edge2);
+      area += cross.length() / 2;
+    }
+    
+    return area;
+  };
+
+  const calculateComplexity = (geometry: THREE.BufferGeometry): number => {
+    // Complexity score based on vertex count, face count, and geometry variation
+    const positions = geometry.attributes.position;
+    const vertexCount = positions.count;
+    
+    if (vertexCount === 0) return 0;
+    
+    // Calculate variance in vertex positions (higher variance = more complex shape)
+    let sumX = 0, sumY = 0, sumZ = 0;
+    for (let i = 0; i < vertexCount; i++) {
+      sumX += positions.getX(i);
+      sumY += positions.getY(i);
+      sumZ += positions.getZ(i);
+    }
+    const avgX = sumX / vertexCount;
+    const avgY = sumY / vertexCount;
+    const avgZ = sumZ / vertexCount;
+    
+    let varianceSum = 0;
+    for (let i = 0; i < vertexCount; i++) {
+      const dx = positions.getX(i) - avgX;
+      const dy = positions.getY(i) - avgY;
+      const dz = positions.getZ(i) - avgZ;
+      varianceSum += dx * dx + dy * dy + dz * dz;
+    }
+    
+    const variance = varianceSum / vertexCount;
+    const normalizedComplexity = Math.min(1, Math.sqrt(variance) / 10);
+    
+    return normalizedComplexity;
+  };
+
   const handleSplitMesh = async () => {
     // Use ref as fallback to ensure we have the latest selected object (especially for Bluetooth triggers)
     const currentObject = selectedObject || selectedObjectRef.current;
@@ -1237,6 +1328,14 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
           components.length
         );
         
+        // Calculate CAD-style measurements
+        const volume = calculateApproximateVolume(newGeo);
+        const surfaceArea = calculateSurfaceArea(newGeo);
+        const partComplexity = calculateComplexity(newGeo);
+        
+        // Detect if this component can be split further
+        const canSplitFurther = faceIndices.length > 50 && partComplexity > 0.3;
+        
         const newMesh = new THREE.Mesh(
           newGeo,
           viewMode === "solid" ? mats.solid : mats.holo
@@ -1246,6 +1345,20 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
           description: "Component awaiting AI identification. Click 'Identify with AI' for detailed analysis.",
           type: "Aircraft Component",
           mats,
+          measurements: {
+            volume: volume.toFixed(3),
+            surfaceArea: surfaceArea.toFixed(2),
+            dimensions: {
+              x: componentSize.x.toFixed(2),
+              y: componentSize.y.toFixed(2),
+              z: componentSize.z.toFixed(2)
+            },
+            complexity: partComplexity.toFixed(2),
+            vertexCount: positions.count,
+            faceCount: faceIndices.length
+          },
+          canSplitFurther: canSplitFurther,
+          hierarchyLevel: ((mesh as any).userData.hierarchyLevel || 0) + 1
         };
         newMesh.castShadow = false;
         newMesh.receiveShadow = false;
@@ -2003,7 +2116,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 >
                   <option value="overall">📊 Overall Model View</option>
                   {generatedObjectsRef.current.map((group) => {
-                    const components: JSX.Element[] = [];
+                    const components: React.ReactElement[] = [];
                     group.traverse((child) => {
                       if ((child as THREE.Mesh).isMesh && (child as any).userData?.name) {
                         const mesh = child as THREE.Mesh;
@@ -2048,6 +2161,54 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                   <p className="text-[10px] text-[#1D1E15] leading-relaxed break-words">
                     {inspectorData.description}
                   </p>
+                  
+                  {/* CAD-Style Measurements */}
+                  {(selectedObject as any)?.userData?.measurements && (
+                    <div className="mt-4 p-3 bg-gradient-to-br from-[#1D1E15]/5 to-[#1D1E15]/10 border border-[#1D1E15]/20 rounded-lg">
+                      <h3 className="text-[9px] text-[#1D1E15]/50 uppercase tracking-wider mb-2 flex items-center gap-1">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" />
+                          <path d="M9 3v18" />
+                          <path d="M15 3v18" />
+                        </svg>
+                        Engineering Specifications
+                      </h3>
+                      <div className="grid grid-cols-2 gap-2 text-[9px]">
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Dimensions</div>
+                          <div className="text-[#1D1E15] font-bold">
+                            {(selectedObject as any).userData.measurements.dimensions.x} × {(selectedObject as any).userData.measurements.dimensions.y} × {(selectedObject as any).userData.measurements.dimensions.z} units
+                          </div>
+                        </div>
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Volume</div>
+                          <div className="text-[#1D1E15] font-bold">{(selectedObject as any).userData.measurements.volume} cu</div>
+                        </div>
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Surface Area</div>
+                          <div className="text-[#1D1E15] font-bold">{(selectedObject as any).userData.measurements.surfaceArea} sq</div>
+                        </div>
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Complexity</div>
+                          <div className="text-[#1D1E15] font-bold">{((selectedObject as any).userData.measurements.complexity * 100).toFixed(0)}%</div>
+                        </div>
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Vertices</div>
+                          <div className="text-[#1D1E15] font-bold">{(selectedObject as any).userData.measurements.vertexCount.toLocaleString()}</div>
+                        </div>
+                        <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10">
+                          <div className="text-[#1D1E15]/50 uppercase">Faces</div>
+                          <div className="text-[#1D1E15] font-bold">{(selectedObject as any).userData.measurements.faceCount.toLocaleString()}</div>
+                        </div>
+                        {(selectedObject as any).userData.hierarchyLevel && (
+                          <div className="bg-white p-1.5 rounded border border-[#1D1E15]/10 col-span-2">
+                            <div className="text-[#1D1E15]/50 uppercase">Hierarchy Level</div>
+                            <div className="text-[#1D1E15] font-bold">Level {(selectedObject as any).userData.hierarchyLevel} Component</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Prominent AI Identification Section */}
                   <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">

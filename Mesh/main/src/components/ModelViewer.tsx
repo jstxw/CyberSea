@@ -1674,15 +1674,25 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
       const center = new THREE.Vector3();
       box.getCenter(center);
 
+      // Calculate or retrieve engineering measurements
+      const userData = (mesh as any).userData;
+      const volume = userData?.measurements?.volume || calculateApproximateVolume(geometry);
+      const surfaceArea = userData?.measurements?.surfaceArea || calculateSurfaceArea(geometry);
+      const complexity = userData?.measurements?.complexity || calculateComplexity(geometry);
+      
       const meshAnalysis = {
-        name: (mesh as any).userData.name || "Unknown Part",
+        name: userData.name || "Unknown Part",
         position: mesh.position,
         size: { width: size.x, height: size.y, depth: size.z },
         vertexCount: geometry.attributes.position.count,
         centerPoint: center,
+        volume: parseFloat(volume),
+        surfaceArea: parseFloat(surfaceArea),
+        complexity: parseFloat(complexity),
+        hierarchyLevel: userData.hierarchyLevel || 0,
       };
 
-      console.log("identifyPart: Mesh analysis prepared", meshAnalysis);
+      console.log("identifyPart: Mesh analysis with engineering data prepared", meshAnalysis);
 
       // 3. Call API
       console.log("identifyPart: Calling AI API...");

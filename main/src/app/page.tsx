@@ -94,72 +94,72 @@ export default function Home() {
         <nav className="px-0 h-8 flex justify-between items-center relative z-20">
         </nav>
 
-      {/* Main Content Grid */}
-      <main className="flex-1 grid grid-cols-12 min-h-[70vh] relative z-10">
+        {/* Main Content Grid */}
+        <main className="flex-1 grid grid-cols-12 min-h-[70vh] relative z-10">
 
-        {/* Left Sidebar (Empty/Decor) */}
-        <div className="hidden lg:block col-span-5 relative">
-        </div>
+          {/* Left Sidebar (Empty/Decor) */}
+          <div className="hidden lg:block col-span-5 relative">
+          </div>
 
-        {/* Main Hero Content */}
-        <div className="col-span-12 lg:col-span-7 flex flex-col">
+          {/* Main Hero Content */}
+          <div className="col-span-12 lg:col-span-7 flex flex-col">
 
-          {/* Hero Section */}
-          <motion.div
-            className="px-4 lg:px-4 flex flex-col justify-center items-end text-right gap-4 lg:gap-6 flex-1"
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-          >
-
-            <motion.h2
-              className="text-5xl lg:text-7xl mr-36 font-medium leading-none tracking-tight text-[#E5E6DA]"
-              style={{ fontFamily: "'Orbitron', sans-serif" }}
-              variants={staggerItem}
-            >
-              Cybersea
-            </motion.h2>
-
-            <motion.p
-              className="text-xs lg:text-sm font-latos mr-36 opacity-70 max-w-lg lg:max-w-xl leading-relaxed"
-              variants={staggerItem}
-            >
-              Real-time 3D wireframe analysis for rapid identification of enemy vehicles, aircraft,<br/>and weapon systems using AI-driven component recognition.
-            </motion.p>
-
-            {/* Mobile 3D Visualization Box */}
+            {/* Hero Section */}
             <motion.div
-              className="lg:hidden h-64 border border-[#E5E6DA] relative overflow-hidden shrink-0 my-4"
-              variants={staggerItem}
-            >
-              <div className="absolute inset-0 flex items-center justify-center">
-                <CubeViewer />
-              </div>
-              {/* Overlay UI Elements */}
-              <div className="absolute top-4 left-4 text-[10px] uppercase opacity-50">Rendering...</div>
-            </motion.div>
-
-            <motion.div
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 pt-2 mb-16"
-              variants={staggerItem}
+              className="px-4 lg:px-4 flex flex-col justify-center items-end text-right gap-4 lg:gap-6 flex-1"
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
             >
 
-              <div className="corner-arrows-wrapper w-full sm:w-auto mb-2 sm:mb-0">
-                <Link
-                  href="/dashboard"
-                  className="corner-arrows-button w-full sm:w-auto px-10 mr-36 py-3 bg-transparent text-[#E5E6DA] text-[12px] uppercase font-bold hover:text-white transition-colors text-center sm:text-left block"
-                  onClick={handleLaunchDemoClick}
-                >
-                  <span className="corner-arrows-top-right"></span>
-                  <span className="corner-arrows-bottom-left"></span>
-                  <span className="relative z-10">Access Training Platform</span>
-                </Link>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
+              <motion.h2
+                className="text-5xl lg:text-7xl mr-36 font-medium leading-none tracking-tight text-[#E5E6DA]"
+                style={{ fontFamily: "'Orbitron', sans-serif" }}
+                variants={staggerItem}
+              >
+                Cybersea
+              </motion.h2>
 
-      </main>
+              <motion.p
+                className="text-xs lg:text-sm font-latos mr-36 opacity-70 max-w-lg lg:max-w-xl leading-relaxed"
+                variants={staggerItem}
+              >
+                Real-time 3D wireframe analysis for rapid identification of enemy vehicles, aircraft,<br />and weapon systems using AI-driven component recognition.
+              </motion.p>
+
+              {/* Mobile 3D Visualization Box */}
+              <motion.div
+                className="lg:hidden h-64 border border-[#E5E6DA] relative overflow-hidden shrink-0 my-4"
+                variants={staggerItem}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <CubeViewer />
+                </div>
+                {/* Overlay UI Elements */}
+                <div className="absolute top-4 left-4 text-[10px] uppercase opacity-50">Rendering...</div>
+              </motion.div>
+
+              <motion.div
+                className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 pt-2 mb-16"
+                variants={staggerItem}
+              >
+
+                <div className="corner-arrows-wrapper w-full sm:w-auto mb-2 sm:mb-0">
+                  <Link
+                    href="/dashboard"
+                    className="corner-arrows-button w-full sm:w-auto px-10 mr-36 py-3 bg-transparent text-[#E5E6DA] text-[12px] uppercase font-bold hover:text-white transition-colors text-center sm:text-left block"
+                    onClick={handleLaunchDemoClick}
+                  >
+                    <span className="corner-arrows-top-right"></span>
+                    <span className="corner-arrows-bottom-left"></span>
+                    <span className="relative z-10">Access Training Platform</span>
+                  </Link>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+
+        </main>
 
         {/* Animated Wave Divider */}
         <AnimatedWave />
@@ -184,18 +184,20 @@ export default function Home() {
 
               {/* Video Section */}
               <motion.div
-                className="max-w-5xl mx-auto overflow-hidden mb-12"
+                className="flex justify-center mb-12"
                 variants={fadeInUp}
               >
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-auto object-cover"
-                >
-                  <source src="/cybersea.mp4" type="video/mp4" />
-                </video>
+                <div className="max-w-5xl w-full mr-32 overflow-hidden">
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-auto object-cover"
+                  >
+                    <source src="/cybersea.mp4" type="video/mp4" />
+                  </video>
+                </div>
               </motion.div>
 
               <motion.h3
@@ -268,13 +270,7 @@ export default function Home() {
               viewport={{ once: true, amount: 0.2 }}
               variants={staggerContainer}
             >
-              <motion.div
-                className="inline-flex items-center gap-2 px-2 py-0.5 border border-[#E5E6DA] text-[10px] uppercase tracking-wider w-fit mb-8"
-                variants={fadeInDown}
-              >
-                <div className="w-1.5 h-1.5 bg-[#3B82F6]"></div>
-                SYSTEMS
-              </motion.div>
+
 
               <motion.h3
                 className="text-4xl font-sans font-medium leading-none tracking-tight text-[#E5E6DA] mb-12"
@@ -292,9 +288,6 @@ export default function Home() {
                   className="p-8 border-r border-b border-[#E5E6DA] lg:border-b-0 hover:bg-[#1e3a5f] hover:text-white transition-colors flex flex-col h-full"
                   variants={staggerItem}
                 >
-                  <div className="flex items-center gap-4 mb-6">
-                    <img src="/gemini-pro.png" alt="Gemini Pro" className="h-8 w-auto object-contain filter brightness-0 opacity-60" />
-                  </div>
                   <p className="text-sm opacity-70 leading-relaxed mb-6 flex-1">
                     Integrated AI vision system for real-time military equipment identification. When trainees highlight wireframe components, our intelligence engine analyzes mesh geometry and visual data, providing structured tactical assessments with component names, threat classifications, vulnerability ratings, and confidence scores. Generates annotated tactical overlays with labeled components for operational briefings.
                   </p>
@@ -315,9 +308,6 @@ export default function Home() {
                   className="p-8 hover:bg-[#1e3a5f] hover:text-white transition-colors flex flex-col h-full"
                   variants={staggerItem}
                 >
-                  <div className="flex items-center gap-4 mb-6">
-                    <img src="/openai.png" alt="OpenAI" className="h-8 w-auto object-contain filter brightness-0 opacity-60" />
-                  </div>
                   <p className="text-sm opacity-70 leading-relaxed mb-6 flex-1">
                     Processes identified components to generate detailed tactical intelligence reports on military equipment. After component recognition, our analysis engine evaluates mesh geometry, positioning, and tactical context to provide comprehensive threat assessments, capability analysis, and operational intelligence on each component's role in the weapons system.
                   </p>
@@ -353,13 +343,7 @@ export default function Home() {
               viewport={{ once: true, amount: 0.2 }}
               variants={staggerContainer}
             >
-              <motion.div
-                className="inline-flex items-center gap-2 px-2 py-0.5 border border-[#E5E6DA] text-[10px] uppercase tracking-wider w-fit mb-8"
-                variants={fadeInDown}
-              >
-                <div className="w-1.5 h-1.5 bg-[#3B82F6]"></div>
-                OPERATIONS
-              </motion.div>
+
 
               <motion.h3
                 className="text-4xl font-sans font-medium leading-none tracking-tight text-[#E5E6DA] mb-12"

@@ -1203,6 +1203,109 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     }, 100);
   };
 
+  const identifyPart = async () => {
+    if (!selectedObject || !rendererRef.current || !sceneRef.current || !cameraRef.current) return;
+
+    setIsIdentifying(true);
+    setShowInferenceLoader(true);
+    setInferenceLoaderReady(false);
+
+    try {
+      const mesh = selectedObject as THREE.Mesh;
+      const userData = (mesh as any).userData;
+
+      // Capture screenshot
+      rendererRef.current.render(sceneRef.current, cameraRef.current);
+      const screenshot = rendererRef.current.domElement.toDataURL("image/jpeg", 0.9);
+
+      // Get mesh analysis data
+      const geometry = mesh.geometry;
+      geometry.computeBoundingBox();
+      const bbox = geometry.boundingBox!;
+      const size = new THREE.Vector3();
+      bbox.getSize(size);
+      const center = new THREE.Vector3();
+      bbox.getCenter(center);
+      mesh.localToWorld(center);
+
+      const meshAnalysis = {
+        name: userData.name || "Unknown Part",
+        position: mesh.position,
+        size: { width: size.x, height: size.y, depth: size.z },
+        vertexCount: geometry.attributes.position.count,
+        centerPoint: center,
+      };
+
+      // Get model type from current demo model or search query
+      const modelType = currentDemoModelId 
+        ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.name || "Military Equipment"
+        : "Military Equipment";
+
+      console.log("Calling AI analysis API...");
+
+      // Call AI analysis API
+      const response = await fetch("/api/ai-explain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          meshAnalysis,
+          modelType,
+          meshImage: screenshot,
+          searchQuery: prompt || "",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`AI analysis failed: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("AI Analysis Result:", data);
+
+      // Store AI analysis in mesh userData
+      (mesh as any).userData.aiAnalysis = {
+        name: data.analysis.name,
+        description: data.analysis.description,
+        category: data.analysis.category,
+        confidence: data.analysis.confidence,
+        reasoning: data.analysis.reasoning,
+        hasSubComponents: data.analysis.hasSubComponents || false,
+        specifications: data.analysis.specifications || null,
+      };
+
+      // Update inspector with AI results
+      setInspectorData({
+        name: data.analysis.name,
+        description: data.analysis.description,
+        type: data.analysis.category || "component",
+      });
+
+      // Store and show annotated image
+      if (data.annotatedImage) {
+        (mesh as any).userData.annotatedImage = data.annotatedImage;
+        setAnnotatedImage(data.annotatedImage);
+        setInferenceLoaderReady(true);
+        
+        setTimeout(() => {
+          setShowInferenceLoader(false);
+          setShowAnnotatedModal(true);
+        }, 500);
+      } else {
+        setInferenceLoaderReady(true);
+        setTimeout(() => {
+          setShowInferenceLoader(false);
+        }, 500);
+      }
+
+    } catch (error) {
+      console.error("Error identifying part:", error);
+      alert("Failed to identify part. Please try again.");
+      setShowInferenceLoader(false);
+    } finally {
+      setIsIdentifying(false);
+    }
+  };
+
   const applyExplodedView = (
     group: THREE.Group,
     componentData: ComponentData[],
@@ -2122,14 +2225,76 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 />
               </div>
 
-              {/* Caption */}
+              {/* Enhanced Caption with Specifications */}
               <div className="px-6 py-4 border-t border-[#1D1E15]/20">
-                <h3 className="text-sm font-bold text-[#1D1E15] mb-2 font-sans">
-                  {inspectorData.name}
-                </h3>
-                <p className="text-xs text-[#1D1E15]/80 leading-relaxed font-mono">
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div className="flex-1">
+                    <h3 className="text-sm font-bold text-[#1D1E15] mb-1 font-sans">
+                      {inspectorData.name}
+                    </h3>
+                    <span className="px-2 py-0.5 bg-[#3B82F6]/10 border border-[#3B82F6] rounded text-[9px] text-[#3B82F6] font-mono uppercase">
+                      {inspectorData.type}
+                    </span>
+                  </div>
+                  {(selectedObject as any)?.userData?.aiAnalysis?.confidence && (
+                    <div className="text-right">
+                      <div className="text-[9px] text-[#1D1E15]/50 uppercase mb-0.5">Confidence</div>
+                      <div className="text-sm font-bold text-[#3B82F6]">
+                        {(selectedObject as any).userData.aiAnalysis.confidence}%
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <p className="text-xs text-[#1D1E15]/80 leading-relaxed font-mono mb-3">
                   {inspectorData.description}
                 </p>
+
+                {/* Specifications Section */}
+                {(selectedObject as any)?.userData?.aiAnalysis?.specifications && (
+                  <div className="mb-3 p-3 bg-[#1D1E15]/5 border border-[#1D1E15]/10 rounded">
+                    <h4 className="text-[9px] font-bold text-[#1D1E15]/60 uppercase tracking-wider mb-1.5">
+                      Technical Specifications
+                    </h4>
+                    <p className="text-[10px] text-[#1D1E15] leading-relaxed font-mono">
+                      {(selectedObject as any).userData.aiAnalysis.specifications}
+                    </p>
+                  </div>
+                )}
+
+                {/* Secondary Split Button */}
+                {(selectedObject as any)?.userData?.aiAnalysis?.hasSubComponents && (
+                  <div className="mt-3 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+                        <path d="M21 8v13H3V8" />
+                        <path d="M1 3h22v5H1z" />
+                        <path d="M10 12h4" />
+                      </svg>
+                      <span className="text-[9px] font-bold text-[#1D1E15] uppercase">Sub-Components Detected</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setShowAnnotatedModal(false);
+                        // Trigger split on the currently selected object
+                        if (selectedObject && (selectedObject as any).isMesh) {
+                          handleSplitMesh();
+                        }
+                      }}
+                      className="w-full px-3 py-2.5 bg-[#3B82F6] border-2 border-[#1D1E15] text-white text-[10px] font-bold hover:bg-[#1D1E15] hover:border-[#3B82F6] transition-all uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M21 8v13H3V8" />
+                        <path d="M1 3h22v5H1z" />
+                        <path d="M10 12h4" />
+                      </svg>
+                      EXPLODE INTO SUB-ASSEMBLIES
+                    </button>
+                    <p className="text-[9px] text-[#1D1E15]/60 mt-2 text-center">
+                      Break down this component into its internal parts
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

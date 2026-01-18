@@ -54,7 +54,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     description: "",
     type: "",
   });
-  const [showInspector, setShowInspector] = useState(false);
+  const [showInspector, setShowInspector] = useState(true);
   const [annotationOverlay, setAnnotationOverlay] = useState<string | null>(
     null
   );
@@ -1695,7 +1695,25 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         )}
         
         {/* Top Controls */}
-        <div className="absolute top-0 left-0 w-full z-10 p-4 flex justify-end items-center pointer-events-none">
+        <div className="absolute top-0 left-0 w-full z-10 p-4 flex justify-between items-center pointer-events-none">
+          {/* Back Button */}
+          <Link 
+            href="/"
+            className="pointer-events-auto h-[32px] px-4 bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-colors flex items-center gap-2 uppercase tracking-wide cursor-pointer shadow-md"
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Home
+          </Link>
+
           <div className="flex items-center gap-2 pointer-events-auto">
             {/* Model Catalog Dropdown */}
             <select
@@ -1931,17 +1949,14 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         </div>
         )}
 
-        {/* Inspector Panel */}
-        {showInspector && (
-          <div
-            className={`absolute top-20 left-4 bottom-20 w-64 bg-white border border-[#1D1E15] backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20 ${
-              showInspector ? "translate-x-0" : "-translate-x-full"
-            }`}
-          >
+        {/* Inspector Panel - Always Visible */}
+        <div
+          className="absolute top-20 left-4 bottom-20 w-64 bg-white border border-[#1D1E15] backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20 translate-x-0"
+        >
             <div className="flex-shrink-0 border-b border-[#1D1E15]/20 pb-3 px-4 pt-4">
               <div className="flex items-start justify-between gap-2 mb-1.5">
                 <h2 className="text-base font-bold text-[#1D1E15] truncate font-sans flex-1">
-                  {inspectorData.name}
+                  {inspectorData.name || "Component Inspector"}
                 </h2>
                 {showSplitSection && (
                   <div className="flex items-center gap-1 bg-gradient-to-br from-[#3B82F6]/20 to-[#3B82F6]/10 border border-[#3B82F6] rounded px-1.5 py-0.5 shrink-0 animate-pulse">
@@ -1955,10 +1970,11 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 )}
               </div>
               <span className="px-1.5 py-0.5 bg-[#3B82F6]/10 border border-[#3B82F6] rounded text-[10px] text-[#3B82F6] font-mono uppercase">
-                {inspectorData.type}
+                {inspectorData.type || "Select a component"}
               </span>
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 font-mono">
+              {selectedObject ? (
               <div>
                 <h3 className="text-[10px] text-[#1D1E15]/50 uppercase tracking-wider mb-1.5">
                   Description
@@ -2102,8 +2118,23 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 </div>
               </div>
             </div>
+              ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center px-6">
+                <div className="w-16 h-16 bg-[#3B82F6]/10 rounded-full flex items-center justify-center mb-4">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                  </svg>
+                </div>
+                <h3 className="text-sm font-bold text-[#1D1E15] mb-2 uppercase tracking-wide">No Component Selected</h3>
+                <p className="text-[10px] text-[#1D1E15]/60 leading-relaxed">
+                  Click on any component in the 3D view to inspect its properties and use AI identification.
+                </p>
+              </div>
+              )}
+            </div>
           </div>
-        )}
 
         {/* Tooltip */}
         <div

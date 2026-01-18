@@ -3,14 +3,20 @@
 import React from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 const CubeViewer = dynamic(() => import('@/components/CubeViewer'), { ssr: false });
-const WaterRipple = dynamic(() => import('@/components/WaterRipple'), { ssr: false });
 
 export default function Home() {
   const [showMobileModal, setShowMobileModal] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [showCursor, setShowCursor] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    setCursorPos({ x: e.clientX, y: e.clientY });
+  };
 
   const handleLaunchDemoClick = (
     e?: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>
@@ -72,6 +78,28 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen bg-[#0a0a0a] text-[#E5E6DA] font-mono flex flex-col">
+      {/* Custom Target Cursor */}
+      <div
+        className="fixed pointer-events-none transition-opacity duration-150"
+        style={{
+          left: cursorPos.x - 32,
+          top: cursorPos.y - 32,
+          zIndex: 9999,
+          opacity: showCursor ? 1 : 0,
+        }}
+      >
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <path d="M2 16 L2 2 L16 2" stroke="white" strokeWidth="1" fill="none" />
+          <path d="M48 2 L62 2 L62 16" stroke="white" strokeWidth="1" fill="none" />
+          <path d="M2 48 L2 62 L16 62" stroke="white" strokeWidth="1" fill="none" />
+          <path d="M48 62 L62 62 L62 48" stroke="white" strokeWidth="1" fill="none" />
+        </svg>
+        <div
+          className="absolute top-1/2 left-1/2 w-4 h-4 rounded-full bg-red-500 target-blink"
+          style={{ boxShadow: '0 0 8px 2px rgba(239, 68, 68, 0.6)', transform: 'translate(-50%, -50%)' }}
+        />
+      </div>
+
       {/* Global Grid Overlay */}
       <div className="fixed inset-0 pointer-events-none z-50" style={{
         backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)',
@@ -80,15 +108,16 @@ export default function Home() {
 
       {/* Hero Section with Blue Gradient */}
       <div
-        className="relative z-10"
+        ref={heroRef}
+        className="relative z-10 hero-cursor-none"
         style={{
           backgroundImage: 'radial-gradient(ellipse at 70% 40%, #11648d 0%, #061f3d 100%)',
           backgroundColor: '#061f3d'
         }}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setShowCursor(true)}
+        onMouseLeave={() => setShowCursor(false)}
       >
-        {/* Water Ripple Effect */}
-        <WaterRipple />
-
         {/* Main Content Grid */}
         <main className="flex-1 grid grid-cols-12">
 

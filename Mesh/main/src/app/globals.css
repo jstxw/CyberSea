@@ -283,3 +283,28 @@ input[type="range"]::-moz-range-track {
   border-bottom-left-radius: 2px;
 }
 
+/* Target cursor blinking animation */
+@keyframes target-blink {
+  0%, 100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+}
+
+.target-blink {
+  animation: target-blink 0.8s ease-in-out infinite;
+}
+
+/* Hide cursor in hero section */
+.hero-cursor-none,
+.hero-cursor-none *,
+.hero-cursor-none a,
+.hero-cursor-none button,
+.hero-cursor-none [class*="corner-brackets"] {
+  cursor: none !important;
+}
+

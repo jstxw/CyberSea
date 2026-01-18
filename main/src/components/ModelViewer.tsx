@@ -1711,7 +1711,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     if (showOnboarding) setShowOnboarding(false);
 
     // Try to use model registry first, fallback to DEMO_MODELS for compatibility
-    let model = getModelById(modelId);
+    let model: { path: string; name?: string; displayName?: string } | undefined = getModelById(modelId);
     if (!model) {
       model = DEMO_MODELS.find(m => m.id === modelId);
     }
@@ -1731,7 +1731,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
     setShowOnboarding(false);
 
     // Try to use model registry first, fallback to DEMO_MODELS for compatibility
-    let model = getModelById(modelId);
+    let model: { path: string; name?: string; displayName?: string } | undefined = getModelById(modelId);
     if (!model) {
       model = DEMO_MODELS.find(m => m.id === modelId);
     }
@@ -1816,7 +1816,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                         className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider cursor-pointer ${currentDemoModelId === model.id ? 'bg-[#3B82F6] text-white' : 'text-[#E5E6DA] hover:bg-[#3a3b32]'}`}
                         onClick={() => {
                           if (showOnboarding) setShowOnboarding(false);
-                          let modelData = getModelById(model.id);
+                          let modelData: { path: string } | undefined = getModelById(model.id);
                           if (!modelData) {
                             modelData = DEMO_MODELS.find(m => m.id === model.id);
                           }
@@ -2068,7 +2068,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
         <div
           className="absolute top-20 left-4 bottom-20 w-64 bg-[#1D1E15]/90 border border-white/20 backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20 translate-x-0"
         >
-          <div className="flex-shrink-0 border-b border-white/10 pb-3 px-4 pt-4">
+          <div className="shrink-0 border-b border-white/10 pb-3 px-4 pt-4">
             {/* Component Dropdown */}
             <div className="mb-3">
               <label className="text-[9px] text-white/50 uppercase tracking-wider mb-1 block">

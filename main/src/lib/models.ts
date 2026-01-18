@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Centralized Model Registry
  * Maps model IDs to their file paths and metadata
  */
@@ -132,66 +132,6 @@ export const MODEL_REGISTRY: Record<string, ModelDefinition> = {
     name: 'M1025 HMMWV',
     path: '/models/hmmwv_m998a1_soft_top/scene.gltf',
     displayName: 'M1025 HMMWV (Humvee)',
-  },
-  'demo-11': {
-    id: 'demo-11',
-    name: 'A-10 Thunderbolt II (Ultra Quality)',
-    path: '/models/a10-war-thunder-330k.glb',
-    displayName: 'A-10 Thunderbolt II (Ultra Quality)',
-  },
-  'a10-ultra': {
-    id: 'demo-11',
-    name: 'A-10 Thunderbolt II (Ultra Quality)',
-    path: '/models/a10-war-thunder-330k.glb',
-    displayName: 'A-10 Thunderbolt II (Ultra Quality)',
-  },
-  'demo-12': {
-    id: 'demo-12',
-    name: 'Challenger II Main Battle Tank',
-    path: '/models/challenger_ii.glb',
-    displayName: 'Challenger II Main Battle Tank',
-  },
-  'challenger': {
-    id: 'demo-12',
-    name: 'Challenger II Main Battle Tank',
-    path: '/models/challenger_ii.glb',
-    displayName: 'Challenger II Main Battle Tank',
-  },
-  'demo-13': {
-    id: 'demo-13',
-    name: 'F-35A Lightning II (Ultra Quality)',
-    path: '/models/f-35a_lightning_ii.glb',
-    displayName: 'F-35A Lightning II (Ultra Quality)',
-  },
-  'f35a-ultra': {
-    id: 'demo-13',
-    name: 'F-35A Lightning II (Ultra Quality)',
-    path: '/models/f-35a_lightning_ii.glb',
-    displayName: 'F-35A Lightning II (Ultra Quality)',
-  },
-  'demo-14': {
-    id: 'demo-14',
-    name: 'Cold War Era Tank',
-    path: '/models/fictional_cold_war_tank.glb',
-    displayName: 'Cold War Era Tank',
-  },
-  'coldwar-tank': {
-    id: 'demo-14',
-    name: 'Cold War Era Tank',
-    path: '/models/fictional_cold_war_tank.glb',
-    displayName: 'Cold War Era Tank',
-  },
-  'demo-15': {
-    id: 'demo-15',
-    name: 'Turbofan Jet Engine',
-    path: '/models/turbine__turbofan_engine__jet_engine.glb',
-    displayName: 'Turbofan Jet Engine',
-  },
-  'jet-engine': {
-    id: 'demo-15',
-    name: 'Turbofan Jet Engine',
-    path: '/models/turbine__turbofan_engine__jet_engine.glb',
-    displayName: 'Turbofan Jet Engine',
   },
 };
 

@@ -180,11 +180,27 @@ export default function AIInferenceLoader({
       });
     }, 50);
 
+    // Auto-complete timeout (8 seconds max)
+    const autoCompleteTimeout = setTimeout(() => {
+      setProgress(100);
+      setCurrentStage(STAGES.length - 1);
+      allMeshes.forEach((mesh) => {
+        const original = originalMaterialsRef.current.get(mesh);
+        if (original) {
+          mesh.material = original;
+        }
+      });
+      setTimeout(() => {
+        if (onFinished) onFinished();
+      }, 600);
+    }, 8000);
+
     return () => {
       clearInterval(stageInterval);
       clearInterval(progressInterval);
+      clearTimeout(autoCompleteTimeout);
     };
-  }, []);
+  }, [allMeshes, onFinished]);
 
   // Completion
   useEffect(() => {

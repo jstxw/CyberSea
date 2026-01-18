@@ -16,6 +16,7 @@ import AIInferenceLoader from "./AIInferenceLoader";
 import OnboardingOverlay from "./OnboardingOverlay";
 import { DEMO_MODELS, getDemoAnnotation, DemoModel } from "@/lib/demo-config";
 import { MODEL_REGISTRY, getModelById, hasModel } from "@/lib/models";
+import { AnimatePresence } from "framer-motion";
 
 const IS_PRODUCTION_DEMO = true; // Always show model catalog
 

@@ -39,3 +39,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# CAD source files (too large for GitHub)
+downloads/cad/
+downloads/temp/
+*.step
+*.stp
+*.iges
+*.igs
+*.stl
+*.CATPart
+*.CATProduct
+
+# 3D model files (too large for GitHub - keep locally only)
+*.glb
+*.obj
+*.fbx
+public/models/

@@ -182,6 +182,22 @@ export default function Home() {
             >
 
 
+              {/* Video Section */}
+              <motion.div
+                className="max-w-5xl mx-auto overflow-hidden mb-12"
+                variants={fadeInUp}
+              >
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-auto object-cover"
+                >
+                  <source src="/cybersea.mp4" type="video/mp4" />
+                </video>
+              </motion.div>
+
               <motion.h3
                 className="text-4xl font-sans font-medium leading-none tracking-tight text-[#E5E6DA] mb-12"
                 variants={fadeInUp}

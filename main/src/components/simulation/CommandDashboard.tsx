@@ -163,10 +163,10 @@ export default function CommandDashboard({
         </div>
       </div>
 
-      {/* Event Log */}
-      <div className="flex-1 p-3 overflow-hidden flex flex-col min-h-0">
+      {/* Event Log - Fixed height with scroll */}
+      <div className="p-3 border-t border-white/10">
         <div className="text-[9px] uppercase tracking-wider opacity-50 mb-2">Event Log</div>
-        <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
+        <div className="h-[140px] overflow-y-auto space-y-1.5 pr-1 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
           {events.slice(0, currentEventIndex + 1).reverse().map((event, idx) => (
             <div
               key={`${event.time}-${event.type}-${idx}`}

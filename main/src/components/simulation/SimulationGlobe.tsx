@@ -143,6 +143,25 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
     return () => {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationId);
+
+      // Dispose all geometries and materials
+      scene.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry?.dispose();
+          if (Array.isArray(child.material)) {
+            child.material.forEach((mat) => mat.dispose());
+          } else if (child.material) {
+            child.material.dispose();
+          }
+        }
+        if (child instanceof THREE.Line) {
+          child.geometry?.dispose();
+          if (child.material instanceof THREE.Material) {
+            child.material.dispose();
+          }
+        }
+      });
+
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }

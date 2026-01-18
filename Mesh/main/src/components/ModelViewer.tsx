@@ -726,9 +726,9 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     // Always disable bloom to maintain exact background color #E5E6DA
     bloomPassRef.current.enabled = false;
 
-    sceneRef.current.background = new THREE.Color(0xe5e6da);
-    (sceneRef.current.fog as THREE.FogExp2).color.setHex(0xe5e6da);
-    rendererRef.current.setClearColor(0xe5e6da, 1);
+    sceneRef.current.background = new THREE.Color(0x0a0a0a);
+    // No fog in dark mode
+    rendererRef.current.setClearColor(0x0a0a0a, 1);
 
     // Shadows only in solid mode
     if (shadowPlaneRef.current) {

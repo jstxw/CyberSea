@@ -42,26 +42,37 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
     renderer.setClearColor(0x0a0a0a, 1);
     container.appendChild(renderer.domElement);
 
-    // Globe
-    const globeGeo = new THREE.SphereGeometry(1, 64, 64);
-    const globeMat = new THREE.MeshStandardMaterial({
-      color: 0x1a3a5c,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.3,
-    });
-    const globe = new THREE.Mesh(globeGeo, globeMat);
-    scene.add(globe);
+    // Load earth textures
+    const textureLoader = new THREE.TextureLoader();
+    const earthColorMap = textureLoader.load('/00_earthmap1k.jpg');
+    const earthBumpMap = textureLoader.load('/01_earthbump1k.jpg');
+    const earthSpecMap = textureLoader.load('/02_earthspec1k.jpg');
 
-    // Solid inner globe for land/water effect
-    const innerGlobeGeo = new THREE.SphereGeometry(0.99, 64, 64);
-    const innerGlobeMat = new THREE.MeshStandardMaterial({
-      color: 0x0a1a2e,
+    // Earth globe with texture (continents visible)
+    const earthGeo = new THREE.SphereGeometry(1, 64, 64);
+    const earthMat = new THREE.MeshStandardMaterial({
+      map: earthColorMap,
+      bumpMap: earthBumpMap,
+      bumpScale: 0.05,
+      specularMap: earthSpecMap,
       transparent: true,
       opacity: 0.9,
+      metalness: 0.1,
+      roughness: 0.8,
     });
-    const innerGlobe = new THREE.Mesh(innerGlobeGeo, innerGlobeMat);
-    scene.add(innerGlobe);
+    const earth = new THREE.Mesh(earthGeo, earthMat);
+    scene.add(earth);
+
+    // Wireframe overlay for tactical look
+    const wireframeGeo = new THREE.SphereGeometry(1.01, 48, 48);
+    const wireframeMat = new THREE.MeshBasicMaterial({
+      color: 0x3B82F6,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.15,
+    });
+    const wireframe = new THREE.Mesh(wireframeGeo, wireframeMat);
+    scene.add(wireframe);
 
     // Trade routes
     TRADE_ROUTES.forEach((route) => {
@@ -112,13 +123,18 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
     scene.add(trail);
     trailRef.current = trail;
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    // Lighting - enhanced to show earth texture
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
     directionalLight.position.set(5, 3, 5);
     scene.add(directionalLight);
+
+    // Add a secondary light from opposite side for better coverage
+    const fillLight = new THREE.DirectionalLight(0x4488ff, 0.4);
+    fillLight.position.set(-3, 2, -3);
+    scene.add(fillLight);
 
     // Animation
     let animationId: number;
@@ -142,6 +158,11 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
     return () => {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationId);
+
+      // Dispose textures
+      earthColorMap.dispose();
+      earthBumpMap.dispose();
+      earthSpecMap.dispose();
 
       // Dispose all geometries and materials
       scene.traverse((child) => {

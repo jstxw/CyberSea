@@ -36,9 +36,10 @@ type ViewMode = "holo" | "solid";
 interface ModelViewerProps {
   onClose?: () => void;
   selectedModelId?: string | null; // Optional prop to control which model is loaded
+  skipOnboarding?: boolean; // Skip showing the built-in onboarding overlay
 }
 
-export default function ModelViewer({ onClose, selectedModelId: externalSelectedModelId }: ModelViewerProps) {
+export default function ModelViewer({ onClose, selectedModelId: externalSelectedModelId, skipOnboarding = false }: ModelViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("holo");
   const [prompt, setPrompt] = useState("");
@@ -70,7 +71,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
   useEffect(() => { showAnnotatedModalRef.current = showAnnotatedModal; }, [showAnnotatedModal]);
   const [annotatedImage, setAnnotatedImage] = useState<string | null>(null);
   const [showInferenceLoader, setShowInferenceLoader] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(!skipOnboarding);
   const showInferenceLoaderRef = useRef(false);
   useEffect(() => { showInferenceLoaderRef.current = showInferenceLoader; }, [showInferenceLoader]);
   const aiIdentifyActiveRef = useRef(false);

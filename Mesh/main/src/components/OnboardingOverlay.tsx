@@ -69,7 +69,7 @@ export default function OnboardingOverlay({
                 {/* Custom Dropdown Trigger */}
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="w-full bg-[#1D1E15] border border-[#1D1E15] text-[#000000] text-xs font-mono p-3  outline-none focus:border-[#3B82F6] transition-colors flex items-center justify-between hover:bg-[#1D1E15]/90"
+                  className="w-full bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-xs font-mono p-3 outline-none focus:border-[#3B82F6] transition-colors flex items-center justify-between hover:bg-[#1D1E15]/90"
                 >
                   <span className={selectedDemo ? "text-[#E5E6DA]" : "text-[#E5E6DA]/60"}>
                     {selectedDemo || "Choose a model to inspect..."}
@@ -79,7 +79,7 @@ export default function OnboardingOverlay({
                     height="12"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="currentColor"
+                    stroke="#E5E6DA"
                     strokeWidth="2"
                     className={`transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
                   >
@@ -140,18 +140,18 @@ export default function OnboardingOverlay({
 
           <button
             onClick={onImport}
-            className="w-full group flex items-center justify-center gap-3 p-4 bg-[#3B82F6] border border-[#1D1E15]  shadow-[0_8px_0_0_#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-all cursor-pointer mb-3"
+            className="w-full group flex items-center justify-center gap-2 p-2 bg-[#3B82F6] border border-[#1D1E15] shadow-[0_4px_0_0_#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-all cursor-pointer mb-2"
           >
-            <div className="w-8 h-8 bg-[#E5E6DA]  flex items-center justify-center group-hover:bg-[#E5E6DA]/90 group-hover:text-[#1D1E15] transition-colors text-[#1D1E15]">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className="w-6 h-6 bg-[#E5E6DA] flex items-center justify-center group-hover:bg-[#E5E6DA]/90 group-hover:text-[#1D1E15] transition-colors text-[#1D1E15]">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
             </div>
             <div className="text-left">
-              <div className="text-xs font-bold text-[#E5E6DA] uppercase tracking-wide group-hover:text-[#3B82F6]">Import Local File</div>
-              <div className="text-[10px] text-[#E5E6DA]/80 font-mono">Supported formats: .GLB, .GLTF</div>
+              <div className="text-[10px] font-bold text-[#E5E6DA] uppercase tracking-wide group-hover:text-[#3B82F6]">Import Local File</div>
+              <div className="text-[8px] text-[#E5E6DA]/80 font-mono">.GLB, .GLTF</div>
             </div>
           </button>
         </div>

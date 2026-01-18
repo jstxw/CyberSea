@@ -7,6 +7,9 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const CubeViewer = dynamic(() => import('@/components/CubeViewer'), { ssr: false });
+const AnimatedWave = dynamic(() => import('@/components/AnimatedWave'), { ssr: false });
+const Globe = dynamic(() => import('@/components/Globe'), { ssr: false });
+const WireframeShip = dynamic(() => import('@/components/WireframeShip'), { ssr: false });
 
 export default function Home() {
   const [showMobileModal, setShowMobileModal] = useState(false);
@@ -70,7 +73,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0a0a0a] text-[#E5E6DA] font-mono flex flex-col">
+    <div className="relative min-h-screen bg-[#0a0a0a] text-[#E5E6DA] font-mono flex flex-col overflow-x-hidden">
       {/* Global Grid Overlay */}
       <div className="fixed inset-0 pointer-events-none z-50" style={{
         backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)',
@@ -82,65 +85,20 @@ export default function Home() {
         backgroundImage: 'linear-gradient(to bottom, #3a6ea5 0%, #2a5080 30%, #1a3a5c 60%, #0a1a2e 100%)',
         backgroundColor: '#3a6ea5'
       }}>
-        {/* Navigation Header */}
-        <nav className="px-0 h-16 flex justify-between items-center relative z-20">
-        <div className="flex items-center h-full flex-1">
-          {/* Nav Items */}
-          <div className="hidden md:flex h-full items-center px-6 gap-8 text-sm font-medium uppercase tracking-wide flex-1">
-            {[
-              { name: 'Protocol', href: '#process' },
-              { name: 'Intelligence', href: '#metrics' },
-              { name: 'Systems', href: '#integrations' },
-              { name: 'Simulator', href: '#mesh-viewer' },
-              { name: 'Operations', href: '#visualize' }
-            ].map((item) => (
-              <div key={item.name} className="flex items-center gap-8 group">
-                <a
-                  href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const element = document.querySelector(item.href);
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                  }}
-                  className="hover:text-[#3B82F6] transition-colors cursor-pointer"
-                >
-                  {item.name}
-                </a>
-                <span className="text-[#E5E6DA]/20 group-last:hidden">/</span>
-              </div>
-            ))}
-          </div>
+        {/* Ship - Absolute positioned on its own layer */}
+        <div className="hidden lg:block absolute top-0 left-0 w-[90vw] h-[180%] -translate-x-[40%] -translate-y-[30%] z-30 pointer-events-none">
+          <WireframeShip className="w-full h-full" />
         </div>
 
-        <div className="flex items-center gap-4 px-6">
-          <Link
-            href="/dashboard"
-            className="px-5 py-1.5 bg-transparent corner-brackets text-[#E5E6DA] text-[12px] uppercase font-bold hover:bg-white/20 transition-colors duration-300"
-            onClick={handleLaunchDemoClick}
-          >
-            Access Platform
-          </Link>
-        </div>
-      </nav>
+        {/* Navigation Header */}
+        <nav className="px-0 h-8 flex justify-between items-center relative z-20">
+        </nav>
 
       {/* Main Content Grid */}
-      <main className="flex-1 grid grid-cols-12">
+      <main className="flex-1 grid grid-cols-12 min-h-[70vh] relative z-10">
 
         {/* Left Sidebar (Empty/Decor) */}
-        <div className="hidden lg:block col-span-1 relative overflow-hidden">
-        </div>
-
-        {/* Left Visualization Column */}
-        <div className="hidden lg:flex lg:col-span-4 flex-col items-center justify-center">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="w-full h-full flex items-center justify-center"
-          >
-          </motion.div>
+        <div className="hidden lg:block col-span-5 relative">
         </div>
 
         {/* Main Hero Content */}
@@ -155,17 +113,18 @@ export default function Home() {
           >
 
             <motion.h2
-              className="text-3xl lg:text-5xl mt-24 mr-36 font-latos font-medium leading-none tracking-tight text-[#E5E6DA]"
+              className="text-5xl lg:text-7xl mr-36 font-medium leading-none tracking-tight text-[#E5E6DA]"
+              style={{ fontFamily: "'Orbitron', sans-serif" }}
               variants={staggerItem}
             >
-              Military Design Lab
+              Cybersea
             </motion.h2>
 
             <motion.p
               className="text-xs lg:text-sm font-latos mr-36 opacity-70 max-w-lg lg:max-w-xl leading-relaxed"
               variants={staggerItem}
             >
-              Accelerate combat readiness with real-time 3D wireframe analysis of military equipment. Our platform combines advanced geometric processing with AI-powered component recognition to train personnel on identifying enemy vehicles, aircraft, and weapon systems. Master threat assessment through interactive visualization — built for speed, accuracy, and mission success.
+              Real-time 3D wireframe analysis for rapid identification of enemy vehicles, aircraft,<br/>and weapon systems using AI-driven component recognition.
             </motion.p>
 
             {/* Mobile 3D Visualization Box */}
@@ -181,7 +140,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 pt-2 mb-40"
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 pt-2 mb-16"
               variants={staggerItem}
             >
 
@@ -202,16 +161,12 @@ export default function Home() {
 
       </main>
 
-        {/* Wave Divider */}
-        <div className="relative w-full overflow-hidden" style={{ lineHeight: 0 }}>
-          <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-16 md:h-24">
-            <path d="M0,0 C150,60 350,0 600,40 C850,80 1050,20 1200,60 L1200,120 L0,120 Z" fill="#0a0a0a" />
-          </svg>
-        </div>
+        {/* Animated Wave Divider */}
+        <AnimatedWave />
       </div>
 
       {/* How It Works Section */}
-      <section id="process" className="relative z-10">
+      <section id="process" className="relative z-10 pt-8">
         <div className="grid grid-cols-12">
           {/* Left Sidebar Spacer */}
           <div className="hidden lg:block col-span-1"></div>
@@ -262,7 +217,7 @@ export default function Home() {
                 ].map((item, idx) => (
                   <motion.div
                     key={idx}
-                    className={`p-8 hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors group`}
+                    className={`p-8 hover:bg-[#1e3a5f] hover:text-white transition-colors group`}
                     variants={staggerItem}
                   >
                     <div className="text-[10px] uppercase opacity-50 mb-4 font-mono">{item.step}</div>
@@ -276,182 +231,6 @@ export default function Home() {
                     )}
                   </motion.div>
                 ))}
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Metrics Section */}
-      <section id="metrics" className="relative z-10">
-        <div className="grid grid-cols-12">
-          {/* Left Sidebar Spacer */}
-          <div className="hidden lg:block col-span-1"></div>
-
-          {/* Main Content */}
-          <div className="col-span-12 lg:col-span-11">
-            <motion.div
-              className="px-10 py-16"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={staggerContainer}
-            >
-              <motion.div
-                className="inline-flex items-center gap-2 px-2 py-0.5 border border-[#E5E6DA] text-[10px] uppercase tracking-wider w-fit mb-8"
-                variants={fadeInDown}
-              >
-                <div className="w-1.5 h-1.5 bg-[#3B82F6]"></div>
-                INTELLIGENCE
-              </motion.div>
-
-              <motion.h3
-                className="text-4xl font-sans font-medium leading-none tracking-tight text-[#E5E6DA] mb-12"
-                variants={fadeInUp}
-              >
-                Mission Performance Metrics
-              </motion.h3>
-
-              {/* Combined Bar Graph - Sketchfab Import vs SAM3D META Model */}
-              <motion.div
-                className="border border-[#E5E6DA] mb-8 overflow-hidden"
-                variants={fadeInUp}
-              >
-                <div className="p-8">
-                  {/* Explanation Section */}
-                  <div className="mb-8 pb-6 border-b border-[#E5E6DA]">
-                    <div className="text-[10px] uppercase opacity-50 mb-4">Training Analysis Methods</div>
-                    <div className="space-y-4 text-sm opacity-70 leading-relaxed">
-                      <p>
-                        <span className="font-bold text-[#E5E6DA]">AI-Assisted Analysis</span> leverages our custom-trained threat recognition model powered by SAM3D architecture. The system performs automated component extraction and tactical assessment directly from 3D wireframes, identifying weapons systems, vulnerabilities, and critical components in seconds.
-                      </p>
-                      <p>
-                        <span className="font-bold text-[#E5E6DA]">Manual Analysis</span> refers to traditional training methods where personnel manually inspect wireframes and documentation to identify components — the baseline approach used in conventional military training programs.
-                      </p>
-                      <p className="text-xs opacity-60 italic">
-                        The chart below compares average identification times across different equipment complexities. Our AI-assisted platform reduces analysis time by 60-70%, enabling rapid threat assessment in time-critical scenarios. While both methods achieve high accuracy, AI assistance dramatically accelerates the learning curve for trainees and provides consistent, reliable component identification across all equipment types.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    <div className="text-[10px] uppercase opacity-50 mb-2">Threat Identification Speed: Manual vs AI-Assisted</div>
-                    <p className="text-xs opacity-60 italic">
-                      This chart shows the average time to identify and analyze military equipment components across different complexities. Lower times indicate faster threat assessment capability.
-                    </p>
-                  </div>
-                  <div className="flex flex-col md:flex-row gap-4 mb-6">
-                    {/* Y-Axis */}
-                    <div className="flex flex-row md:flex-col justify-between md:h-80 text-[8px] uppercase opacity-40 pt-1 pb-2 md:pb-8 md:pr-2 gap-2 md:gap-0">
-                      <span>5.0s</span>
-                      <span>4.0s</span>
-                      <span>3.0s</span>
-                      <span>2.0s</span>
-                      <span>1.0s</span>
-                      <span>0s</span>
-                    </div>
-
-                    {/* Chart Bars */}
-                    <div className="flex-1 h-80 flex flex-wrap md:flex-nowrap items-end gap-4 relative">
-                      {[
-                        { label: 'Light Vehicles (Jeeps, Light Armor)', sketchfab: 1.3, meta: 2.2 },
-                        { label: 'Medium Assets (IFVs, Helicopters)', sketchfab: 2.0, meta: 2.9 },
-                        { label: 'Heavy Equipment (Tanks, Aircraft)', sketchfab: 3.5, meta: 3.3 },
-                        { label: 'Complex Systems (Naval Vessels)', sketchfab: 4.4, meta: 3.8 },
-                      ].map((item, idx) => {
-                        const maxTime = 5.0; // Maximum time on y-axis
-                        const chartHeight = 320; // h-80 = 320px
-                        const sketchfabHeight = (item.sketchfab / maxTime) * chartHeight;
-                        const metaHeight = (item.meta / maxTime) * chartHeight;
-
-                        return (
-                          <div
-                            key={idx}
-                            className="flex-1 flex flex-col items-center justify-end gap-2 h-full relative"
-                          >
-                            <div className="flex items-end gap-2 w-full justify-center relative" style={{ height: '320px' }}>
-                              {/* Sketchfab Import Bar */}
-                              <div className="flex flex-col items-center justify-end relative" style={{ height: '320px' }}>
-                                {/* Logo above bar */}
-                                <div
-                                  className="absolute flex items-center justify-center"
-                                  style={{
-                                    bottom: `${sketchfabHeight + 12}px`,
-                                    left: '50%',
-                                    transform: 'translateX(-50%)'
-                                  }}
-                                >
-                                  <img
-                                    src="/sketch.png"
-                                    alt="Sketchfab"
-                                    className="w-8 h-8 object-contain filter brightness-0 opacity-60"
-                                  />
-                                </div>
-                                <div
-                                  className="bg-[#1D1E15] hover:bg-[#E5E6DA]/80 transition-colors relative"
-                                  style={{
-                                    height: `${sketchfabHeight}px`,
-                                    width: 'calc(45% - 4px)',
-                                    minWidth: '40px'
-                                  }}
-                                />
-                              </div>
-                              {/* SAM3D META Model Bar */}
-                              <div className="flex flex-col items-center justify-end relative" style={{ height: '320px' }}>
-                                {/* Logo above bar */}
-                                <div
-                                  className="absolute flex items-center justify-center"
-                                  style={{
-                                    bottom: `${metaHeight + 12}px`,
-                                    left: '50%',
-                                    transform: 'translateX(-50%)'
-                                  }}
-                                >
-                                  <img
-                                    src="/meta-logo.png"
-                                    alt="Meta"
-                                    className="w-8 h-8 object-contain opacity-60"
-                                  />
-                                </div>
-                                <div
-                                  className="bg-[#3B82F6] hover:bg-[#3B82F6]/80 transition-colors relative"
-                                  style={{
-                                    height: `${metaHeight}px`,
-                                    width: 'calc(45% - 4px)',
-                                    minWidth: '40px'
-                                  }}
-                                />
-                              </div>
-                            </div>
-                            <div className="text-[8px] uppercase opacity-40 mt-2 text-center px-1">{item.label}</div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="pt-4 border-t border-[#E5E6DA]">
-                    <div className="flex items-center justify-center gap-8 mb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-[#1D1E15]"></div>
-                        <div className="text-[10px] uppercase opacity-70">Manual Analysis</div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-[#3B82F6]"></div>
-                        <div className="text-[10px] uppercase opacity-70">AI-Assisted Analysis</div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 text-center">
-                      <div>
-                        <div className="text-2xl font-bold mb-1">3.2min</div>
-                        <div className="text-[10px] uppercase opacity-50">Avg Manual</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold mb-1">1.1min</div>
-                        <div className="text-[10px] uppercase opacity-50">Avg AI-Assisted</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </motion.div>
             </motion.div>
           </div>
@@ -494,7 +273,7 @@ export default function Home() {
               >
                 {/* Gemini Pro */}
                 <motion.div
-                  className="p-8 border-r border-b border-[#E5E6DA] lg:border-b-0 hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors flex flex-col h-full"
+                  className="p-8 border-r border-b border-[#E5E6DA] lg:border-b-0 hover:bg-[#1e3a5f] hover:text-white transition-colors flex flex-col h-full"
                   variants={staggerItem}
                 >
                   <div className="flex items-center gap-4 mb-6">
@@ -517,7 +296,7 @@ export default function Home() {
 
                 {/* OpenAI */}
                 <motion.div
-                  className="p-8 hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors flex flex-col h-full"
+                  className="p-8 hover:bg-[#1e3a5f] hover:text-white transition-colors flex flex-col h-full"
                   variants={staggerItem}
                 >
                   <div className="flex items-center gap-4 mb-6">

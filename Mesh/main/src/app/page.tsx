@@ -252,7 +252,7 @@ export default function Home() {
                 ].map((item, idx) => (
                   <motion.div
                     key={idx}
-                    className={`p-8 hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors group`}
+                    className={`p-8 hover:bg-[#3B82F6]/20 transition-colors group`}
                     variants={staggerItem}
                   >
                     <div className="text-[10px] uppercase opacity-50 mb-4 font-mono">{item.step}</div>
@@ -484,7 +484,7 @@ export default function Home() {
               >
                 {/* Gemini Pro */}
                 <motion.div
-                  className="p-8 border-r border-b border-[#E5E6DA] lg:border-b-0 hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors flex flex-col h-full"
+                  className="p-8 border-r border-b border-[#E5E6DA] lg:border-b-0 hover:bg-[#3B82F6]/20 transition-colors flex flex-col h-full"
                   variants={staggerItem}
                 >
                   <div className="flex items-center gap-4 mb-6">
@@ -507,7 +507,7 @@ export default function Home() {
 
                 {/* OpenAI */}
                 <motion.div
-                  className="p-8 hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors flex flex-col h-full"
+                  className="p-8 hover:bg-[#3B82F6]/20 transition-colors flex flex-col h-full"
                   variants={staggerItem}
                 >
                   <div className="flex items-center gap-4 mb-6">
@@ -569,7 +569,7 @@ export default function Home() {
               >
                 {/* Upload */}
                 <motion.div
-                  className="p-8 border-r border-b border-[#E5E6DA] lg:border-b-0 hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors flex flex-col h-full"
+                  className="p-8 border-r border-b border-[#E5E6DA] lg:border-b-0 hover:bg-[#3B82F6]/20 transition-colors flex flex-col h-full"
                   variants={staggerItem}
                 >
                   <div className="flex items-center gap-4 mb-6">
@@ -596,7 +596,7 @@ export default function Home() {
 
                 {/* Export */}
                 <motion.div
-                  className="p-8 hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors flex flex-col h-full"
+                  className="p-8 hover:bg-[#3B82F6]/20 transition-colors flex flex-col h-full"
                   variants={staggerItem}
                 >
                   <div className="flex items-center gap-4 mb-6">

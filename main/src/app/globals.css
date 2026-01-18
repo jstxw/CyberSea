@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Orbitron:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @custom-variant dark (&:is(.dark *));
@@ -116,10 +116,17 @@
   * {
     @apply border-border outline-ring/50;
     font-family: 'Lato', sans-serif;
+    cursor: none !important;
+  }
+  html {
+    background-color: #0a0a0a;
+    overflow-x: hidden;
   }
   body {
     @apply bg-background text-foreground;
-    background: radial-gradient(ellipse at center, #0e477a 0%, #0b3b6d 100%);
+    background-color: #0a0a0a;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 }
 
@@ -152,22 +159,14 @@
   z-index: 2;
 }
 
-/* Custom scrollbar for Linear style */
+/* Hide scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  display: none;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 135, 0.3);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 135, 0.5);
+html, body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 /* Range slider styling */
@@ -218,67 +217,11 @@ input[type="range"]::-moz-range-track {
 .corner-arrows-button {
   position: relative;
   display: block;
-  transition: background-color 0.3s ease;
-}
-
-.corner-arrows-button::before,
-.corner-arrows-button::after {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  opacity: 1;
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* Top-left corner */
-.corner-arrows-button::before {
-  top: 0;
-  left: 0;
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-top-left-radius: 2px;
-}
-
-/* Bottom-right corner */
-.corner-arrows-button::after {
-  bottom: 0;
-  right: 0;
-  border-bottom: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom-right-radius: 2px;
-}
-
-/* White background with 20% opacity on hover */
-.corner-arrows-wrapper:hover .corner-arrows-button {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Top-right and bottom-left corners using additional elements - always visible */
 .corner-arrows-top-right,
 .corner-arrows-bottom-left {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  opacity: 1;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.corner-arrows-top-right {
-  top: 0;
-  right: 0;
-  border-top: 1px solid white;
-  border-right: 1px solid white;
-  border-top-right-radius: 2px;
-}
-
-.corner-arrows-bottom-left {
-  bottom: 0;
-  left: 0;
-  border-bottom: 1px solid white;
-  border-left: 1px solid white;
-  border-bottom-left-radius: 2px;
+  display: none;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { DEMO_MODELS } from '@/lib/demo-config';
 
 interface OnboardingOverlayProps {
@@ -18,18 +18,6 @@ export default function OnboardingOverlay({
 }: OnboardingOverlayProps) {
   const [prompt, setPrompt] = useState("");
   const [selectedDemo, setSelectedDemo] = useState("");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const handleGenerateSubmit = () => {
     if (prompt.trim()) {
@@ -39,7 +27,6 @@ export default function OnboardingOverlay({
 
   const handleDemoSelect = (id: string, name: string) => {
     setSelectedDemo(name);
-    setIsDropdownOpen(false);
     if (id) {
       onSelectDemo(id);
     }
@@ -57,114 +44,115 @@ export default function OnboardingOverlay({
         <span>MODE: <span className="text-[#E5E6DA]/60">INSPECTION</span></span>
       </div>
 
-      <div className="flex h-[calc(100vh-40px)]">
-        {/* Left Command Panel */}
-        <div className="w-80 border-r border-[#E5E6DA]/20 bg-[#0a0a0a] p-6 space-y-6 overflow-y-auto">
-
-          {/* Demo Mode: Custom Dropdown */}
+      <div className="flex flex-col h-[calc(100vh-40px)] items-center justify-center p-8">
+        {/* Center Content */}
+        <div className="w-full max-w-5xl space-y-8">
+          {/* Demo Mode: Holographic Cards Grid */}
           {isDemoMode ? (
-            <div className="space-y-4">
-              <div className="space-y-2 relative" ref={dropdownRef}>
-                <label className="text-[9px] font-mono uppercase text-[#E5E6DA]/60 tracking-wider block">
-                  SELECT PRELOADED PLATFORM
+            <div className="space-y-6">
+              <div className="text-center">
+                <label className="text-[11px] font-mono uppercase text-[#E5E6DA]/60 tracking-widest block">
+                  SELECT PLATFORM
                 </label>
+              </div>
 
-                {/* Custom Dropdown Trigger */}
-                <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="w-full bg-[#1D1E15] border border-[#E5E6DA]/20 text-[#E5E6DA] text-[10px] font-mono p-3 uppercase tracking-wide outline-none focus:border-[#E5E6DA]/40 transition-colors flex items-center justify-between hover:bg-[#1D1E15]/80"
-                >
-                  <span className={selectedDemo ? "text-[#E5E6DA]" : "text-[#E5E6DA]/40"}>
-                    {selectedDemo || "SELECT PLATFORM"}
-                  </span>
-                  <svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className={`transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
+              {/* Cards Grid - 3 columns */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {DEMO_MODELS.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => handleDemoSelect(m.id, m.name)}
+                    className={`text-left p-6 rounded-xl backdrop-blur-md transition-all duration-300 border h-40 flex flex-col justify-between ${
+                      selectedDemo === m.name
+                        ? "bg-white/15 border-[#3B82F6]/60 shadow-[0_0_30px_rgba(59,130,246,0.4)]"
+                        : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02]"
+                    }`}
                   >
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </button>
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-2">
+                        <div className="text-[14px] font-mono uppercase tracking-wide text-[#E5E6DA] font-medium">
+                          {m.name}
+                        </div>
+                        <div className="text-[10px] font-mono text-[#E5E6DA]/40 uppercase">
+                          Military Platform
+                        </div>
+                      </div>
+                      <div className={`w-3 h-3 rounded-full ${
+                        selectedDemo === m.name ? "bg-[#00ff00] shadow-[0_0_10px_#00ff00]" : "bg-[#E5E6DA]/30"
+                      }`}></div>
+                    </div>
+                    {/* Holographic line effect */}
+                    <div className="h-px w-full bg-gradient-to-r from-transparent via-[#3B82F6]/40 to-transparent"></div>
+                  </button>
+                ))}
+              </div>
 
-                {/* Dropdown Menu */}
-                {isDropdownOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-[#1D1E15] border border-[#E5E6DA]/20 shadow-lg overflow-hidden z-50 max-h-48 overflow-y-auto">
-                    {DEMO_MODELS.map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => handleDemoSelect(m.id, m.name)}
-                        className="w-full text-left px-3 py-2.5 text-[10px] font-mono uppercase tracking-wide text-[#E5E6DA] hover:bg-[#E5E6DA]/10 transition-colors border-b border-[#E5E6DA]/10 last:border-0"
-                      >
-                        {m.name}
-                      </button>
-                    ))}
+              {/* Import Button - Centered below */}
+              <div className="flex justify-center pt-4">
+                <button
+                  onClick={onImport}
+                  className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 rounded-xl"
+                >
+                  <div className="w-8 h-8 bg-[#E5E6DA]/10 flex items-center justify-center border border-[#E5E6DA]/20 rounded-lg">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#E5E6DA]/60">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
                   </div>
-                )}
+                  <div className="text-left">
+                    <div className="text-[12px] font-mono uppercase tracking-wide text-[#E5E6DA]">IMPORT CUSTOM ASSET</div>
+                    <div className="text-[10px] text-[#E5E6DA]/50 font-mono uppercase">GLB / GLTF FORMAT</div>
+                  </div>
+                </button>
               </div>
             </div>
           ) : (
-            /* Normal Mode: Generate Input */
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-[9px] font-mono uppercase text-[#E5E6DA]/60 tracking-wider block">
-                  GENERATE VEHICLE MODEL
+            /* Normal Mode: Model Selection */
+            <div className="space-y-6 max-w-md mx-auto">
+              <div className="space-y-3">
+                <label className="text-[11px] font-mono uppercase text-[#E5E6DA]/60 tracking-widest block text-center">
+                  SELECT VEHICLE MODEL
                 </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="ENTER MODEL NAME"
-                    className="flex-1 bg-[#1D1E15] border border-[#E5E6DA]/20 text-[#E5E6DA] text-[10px] font-mono p-3 uppercase tracking-wide outline-none focus:border-[#E5E6DA]/40 transition-colors placeholder:text-[#E5E6DA]/30"
-                    onKeyDown={(e) => e.key === "Enter" && handleGenerateSubmit()}
-                  />
-                  <button
-                    onClick={handleGenerateSubmit}
-                    disabled={!prompt.trim()}
-                    className="px-4 bg-[#1D1E15] border border-[#E5E6DA]/20 text-[#E5E6DA] text-[10px] font-mono uppercase tracking-wide hover:bg-[#1D1E15]/80 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                <div className="flex gap-3">
+                  <select
+                    value={selectedDemo}
+                    onChange={(e) => {
+                      const selected = DEMO_MODELS.find(m => m.name === e.target.value);
+                      if (selected) {
+                        handleDemoSelect(selected.id, selected.name);
+                      }
+                    }}
+                    className="flex-1 bg-white/5 border border-white/10 text-[#E5E6DA] text-[12px] font-mono p-4 uppercase tracking-wide outline-none focus:border-white/30 transition-colors rounded-xl appearance-none cursor-pointer"
                   >
-                    LOAD
-                  </button>
+                    <option value="" className="bg-[#0a0a0a]">SELECT A MODEL</option>
+                    {DEMO_MODELS.map((m) => (
+                      <option key={m.id} value={m.name} className="bg-[#0a0a0a]">
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* Divider */}
-          <div className="border-t border-[#E5E6DA]/10"></div>
-
-          {/* Import Button */}
-          <button
-            onClick={onImport}
-            className="w-full flex items-center gap-3 p-4 bg-[#1D1E15] border border-[#E5E6DA]/20 hover:bg-[#1D1E15]/80 transition-colors cursor-pointer"
-          >
-            <div className="w-6 h-6 bg-[#E5E6DA]/10 flex items-center justify-center border border-[#E5E6DA]/20">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#E5E6DA]/60">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" />
-                <line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
-            </div>
-            <div className="text-left flex-1">
-              <div className="text-[10px] font-mono uppercase tracking-wide text-[#E5E6DA]">IMPORT ASSET</div>
-              <div className="text-[9px] text-[#E5E6DA]/50 font-mono uppercase">GLB / GLTF</div>
-            </div>
-          </button>
-        </div>
-
-        {/* Center Operational Space */}
-        <div className="flex-1 flex items-center justify-center relative">
-          {!selectedDemo && prompt.trim() === "" && (
-            <div className="text-center space-y-2">
-              <div className="text-[12px] font-mono uppercase tracking-widest text-[#E5E6DA]/20">
-                NO VEHICLE LOADED
-              </div>
-              <div className="text-[10px] font-mono uppercase tracking-wide text-[#E5E6DA]/15">
-                LOAD A PLATFORM TO BEGIN ANALYSIS
+              {/* Import Button */}
+              <div className="flex justify-center pt-4">
+                <button
+                  onClick={onImport}
+                  className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 rounded-xl"
+                >
+                  <div className="w-8 h-8 bg-[#E5E6DA]/10 flex items-center justify-center border border-[#E5E6DA]/20 rounded-lg">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#E5E6DA]/60">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <div className="text-[12px] font-mono uppercase tracking-wide text-[#E5E6DA]">IMPORT CUSTOM ASSET</div>
+                    <div className="text-[10px] text-[#E5E6DA]/50 font-mono uppercase">GLB / GLTF FORMAT</div>
+                  </div>
+                </button>
               </div>
             </div>
           )}

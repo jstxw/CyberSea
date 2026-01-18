@@ -3,18 +3,13 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useState } from 'react';
+import OnboardingOverlay from '@/components/OnboardingOverlay';
+import { DEMO_MODELS } from '@/lib/demo-config';
 
 // Dynamically import ModelViewer to prevent SSR issues and multiple Three.js instances
 const ModelViewer = dynamic(() => import('@/components/ModelViewer'), {
   ssr: false,
-  loading: () => (
-    <div className="min-h-screen bg-[#0e477a] flex items-center justify-center" style={{
-      backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
-      backgroundSize: '30px 30px'
-    }}>
-      <div className="text-[#E5E6DA]/60 font-mono text-xs uppercase tracking-wider">Loading 3D Viewer...</div>
-    </div>
-  ),
+  loading: () => null,
 });
 
 const IS_PRODUCTION_DEMO = process.env.NEXT_PUBLIC_PRODUCTION_DEMO === "true";
@@ -22,12 +17,32 @@ const IS_PRODUCTION_DEMO = process.env.NEXT_PUBLIC_PRODUCTION_DEMO === "true";
 export default function DashboardPage() {
   const [showBanner, setShowBanner] = useState(IS_PRODUCTION_DEMO);
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(true);
+
+  const handleSelectDemo = (id: string) => {
+    setSelectedModelId(id);
+    setShowOnboarding(false);
+  };
 
   return (
-    <div className="min-h-screen bg-[#0e477a] font-mono flex flex-col overflow-hidden" style={{
+    <div className="min-h-screen bg-black font-mono flex flex-col overflow-hidden" style={{
       backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
       backgroundSize: '30px 30px'
     }}>
+      {/* Onboarding Overlay - Show immediately */}
+      {showOnboarding && (
+        <OnboardingOverlay
+          isDemoMode={IS_PRODUCTION_DEMO}
+          onGenerate={(prompt) => {
+            setShowOnboarding(false);
+          }}
+          onSelectDemo={handleSelectDemo}
+          onImport={() => {
+            setShowOnboarding(false);
+          }}
+          onDismiss={() => setShowOnboarding(false)}
+        />
+      )}
 
       {/* Demo Banner */}
       {showBanner && (
@@ -80,7 +95,7 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="flex-1 relative">
-        <ModelViewer selectedModelId={selectedModelId} />
+        <ModelViewer selectedModelId={selectedModelId} skipOnboarding={true} />
       </div>
     </div>
   );

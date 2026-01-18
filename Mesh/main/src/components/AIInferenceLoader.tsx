@@ -71,9 +71,9 @@ export default function AIInferenceLoader({
     
     if (!ghostMaterialRef.current) {
       ghostMaterialRef.current = new THREE.MeshStandardMaterial({
-        color: 0x1D1E15,
+        color: 0x3B82F6,
         transparent: true,
-        opacity: 0.1,
+        opacity: 0.7,
         wireframe: true,
         wireframeLinewidth: 1,
         depthTest: true,

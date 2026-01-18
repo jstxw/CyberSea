@@ -159,8 +159,8 @@ switch ($choice) {
         # Step 2: Wait for downloads
         Write-Host "`nStep 2: Please download the models..." -ForegroundColor Yellow
         Write-Host "   1. Sign up/login to GrabCAD (free)" -ForegroundColor Gray
-        Write-Host "   2. Click 'Download' on each page" -ForegroundColor Gray
-        Write-Host "   3. Select 'STEP' format" -ForegroundColor Gray
+        Write-Host "   2. Click Download on each page" -ForegroundColor Gray
+        Write-Host "   3. Select STEP format" -ForegroundColor Gray
         Write-Host "   4. Save to: $downloadDir" -ForegroundColor Gray
         Write-Host "`nPress any key when downloads are complete..." -ForegroundColor Cyan
         $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")

@@ -9,7 +9,7 @@ export function latLongToVector3(lat: number, long: number, radius: number): [nu
   return [x, y, z];
 }
 
-// Interpolate between two coordinates along a great circle path
+// Linear interpolation between two coordinates (good enough for short distances)
 export function interpolateCoordinates(
   start: { lat: number; lng: number },
   end: { lat: number; lng: number },
@@ -27,6 +27,9 @@ export function getPositionOnPath(
   path: { lat: number; lng: number }[],
   progress: number // 0 to 1
 ): { lat: number; lng: number; segmentIndex: number } {
+  if (path.length === 0) {
+    throw new Error('Path cannot be empty');
+  }
   if (path.length < 2) return { ...path[0], segmentIndex: 0 };
 
   const totalSegments = path.length - 1;

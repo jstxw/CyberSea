@@ -192,13 +192,17 @@ export default function Home() {
               variants={staggerItem}
             >
 
-              <Link
-                href="/dashboard"
-                className="w-full sm:w-auto px-6 mr-36 py-3 bg-[#3B82F6] text-[#E5E6DA] text-[10px] uppercase font-bold hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors text-center sm:text-left mb-2 sm:mb-0"
-                onClick={handleLaunchDemoClick}
-              >
-                Access Training Platform
-              </Link>
+              <div className="corner-arrows-wrapper w-full sm:w-auto mb-2 sm:mb-0">
+                <Link
+                  href="/dashboard"
+                  className="corner-arrows-button w-full sm:w-auto px-10 mr-36 py-3 bg-transparent text-[#E5E6DA] text-[10px] uppercase font-bold hover:text-white transition-colors text-center sm:text-left block"
+                  onClick={handleLaunchDemoClick}
+                >
+                  <span className="corner-arrows-top-right"></span>
+                  <span className="corner-arrows-bottom-left"></span>
+                  <span className="relative z-10">Access Training Platform</span>
+                </Link>
+              </div>
             </motion.div>
           </motion.div>
         </div>
@@ -697,7 +701,7 @@ export default function Home() {
                     <a href="#" className="text-xs opacity-70 hover:text-[#3B82F6] hover:opacity-100 transition-colors">
                       Documentation
                     </a>
-                    <a href="https://github.com/devp19/Mesh" target="_blank" rel="noopener noreferrer" className="text-xs opacity-70 hover:text-[#3B82F6] hover:opacity-100 transition-colors">
+                    <a href="https://github.com/jstxw/Mesh" target="_blank" rel="noopener noreferrer" className="text-xs opacity-70 hover:text-[#3B82F6] hover:opacity-100 transition-colors">
                       GitHub
                     </a>
                   </div>

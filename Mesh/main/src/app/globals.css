@@ -178,3 +178,78 @@ input[type="range"]::-moz-range-track {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
+
+/* Corner arrows button effect */
+.corner-arrows-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* All corners positioned relative to the button itself - always visible */
+.corner-arrows-button {
+  position: relative;
+  display: block;
+  transition: background-color 0.3s ease;
+}
+
+.corner-arrows-button::before,
+.corner-arrows-button::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Top-left corner */
+.corner-arrows-button::before {
+  top: 0;
+  left: 0;
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-top-left-radius: 2px;
+}
+
+/* Bottom-right corner */
+.corner-arrows-button::after {
+  bottom: 0;
+  right: 0;
+  border-bottom: 1px solid white;
+  border-right: 1px solid white;
+  border-bottom-right-radius: 2px;
+}
+
+/* White background with 20% opacity on hover */
+.corner-arrows-wrapper:hover .corner-arrows-button {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Top-right and bottom-left corners using additional elements - always visible */
+.corner-arrows-top-right,
+.corner-arrows-bottom-left {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.corner-arrows-top-right {
+  top: 0;
+  right: 0;
+  border-top: 1px solid white;
+  border-right: 1px solid white;
+  border-top-right-radius: 2px;
+}
+
+.corner-arrows-bottom-left {
+  bottom: 0;
+  left: 0;
+  border-bottom: 1px solid white;
+  border-left: 1px solid white;
+  border-bottom-left-radius: 2px;
+}

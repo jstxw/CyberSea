@@ -89,7 +89,7 @@ export default function OnboardingOverlay({
 
                 {/* Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-[#FFFFFF] border border-[#1D1E15]  shadow-lg overflow-hidden z-50 max-h-48 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-[#1D1E15] border border-[#1D1E15] shadow-lg overflow-hidden z-50 max-h-48 overflow-y-auto">
                     {DEMO_MODELS.map((m) => (
                       <button
                         key={m.id}

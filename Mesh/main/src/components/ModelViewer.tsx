@@ -1980,6 +1980,45 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
           className="absolute top-20 left-4 bottom-20 w-64 bg-white border border-[#1D1E15] backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20 translate-x-0"
         >
             <div className="flex-shrink-0 border-b border-[#1D1E15]/20 pb-3 px-4 pt-4">
+              {/* Component Dropdown */}
+              <div className="mb-3">
+                <label className="text-[9px] text-[#1D1E15]/50 uppercase tracking-wider mb-1 block">
+                  Component Selector
+                </label>
+                <select
+                  value={selectedObject ? (selectedObject as any).uuid : "overall"}
+                  onChange={(e) => {
+                    if (e.target.value === "overall") {
+                      resetView();
+                    } else {
+                      // Find and select the component by UUID
+                      sceneRef.current?.traverse((child) => {
+                        if (child.uuid === e.target.value && (child as THREE.Mesh).isMesh) {
+                          handleObjectClick(child);
+                        }
+                      });
+                    }
+                  }}
+                  className="w-full px-2 py-1.5 bg-white border border-[#1D1E15] text-[10px] font-mono text-[#1D1E15] cursor-pointer hover:border-[#3B82F6] transition-colors"
+                >
+                  <option value="overall">📊 Overall Model View</option>
+                  {generatedObjectsRef.current.map((group) => {
+                    const components: JSX.Element[] = [];
+                    group.traverse((child) => {
+                      if ((child as THREE.Mesh).isMesh && (child as any).userData?.name) {
+                        const mesh = child as THREE.Mesh;
+                        components.push(
+                          <option key={mesh.uuid} value={mesh.uuid}>
+                            🔹 {(mesh as any).userData.name}
+                          </option>
+                        );
+                      }
+                    });
+                    return components;
+                  })}
+                </select>
+              </div>
+
               <div className="flex items-start justify-between gap-2 mb-1.5">
                 <h2 className="text-base font-bold text-[#1D1E15] truncate font-sans flex-1">
                   {inspectorData.name || "Component Inspector"}
@@ -2146,18 +2185,57 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
               </div>
               </>
               ) : (
-              <div className="flex flex-col items-center justify-center h-full text-center px-6">
-                <div className="w-16 h-16 bg-[#3B82F6]/10 rounded-full flex items-center justify-center mb-4">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5"/>
-                    <path d="M2 12l10 5 10-5"/>
-                  </svg>
+              <div className="space-y-4">
+                <div className="flex flex-col items-center text-center px-6 py-4">
+                  <div className="w-16 h-16 bg-[#3B82F6]/10 rounded-full flex items-center justify-center mb-3">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                      <path d="M2 17l10 5 10-5"/>
+                      <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                  </div>
+                  <h3 className="text-sm font-bold text-[#1D1E15] mb-2 uppercase tracking-wide">
+                    {currentDemoModelId ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.name : "Overall Model View"}
+                  </h3>
+                  <p className="text-[10px] text-[#1D1E15]/60 leading-relaxed mb-4">
+                    {currentDemoModelId 
+                      ? "Select a component from the dropdown above or click on the 3D model to inspect individual parts."
+                      : "Load a model from the dropdown at the top to begin analysis."}
+                  </p>
                 </div>
-                <h3 className="text-sm font-bold text-[#1D1E15] mb-2 uppercase tracking-wide">No Component Selected</h3>
-                <p className="text-[10px] text-[#1D1E15]/60 leading-relaxed">
-                  Click on any component in the 3D view to inspect its properties and use AI identification.
-                </p>
+
+                {/* Model Statistics */}
+                {generatedObjectsRef.current.length > 0 && (
+                  <div className="px-4">
+                    <h4 className="text-[10px] font-bold text-[#1D1E15] uppercase tracking-wider mb-2">Model Statistics</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10 rounded">
+                        <div className="text-[9px] text-[#1D1E15]/50 mb-1 uppercase">Components</div>
+                        <div className="text-[#1D1E15] font-bold text-sm">
+                          {(() => {
+                            let count = 0;
+                            generatedObjectsRef.current.forEach(group => {
+                              group.traverse(child => {
+                                if ((child as THREE.Mesh).isMesh) count++;
+                              });
+                            });
+                            return count;
+                          })()}
+                        </div>
+                      </div>
+                      <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10 rounded">
+                        <div className="text-[9px] text-[#1D1E15]/50 mb-1 uppercase">View Mode</div>
+                        <div className="text-[#1D1E15] font-bold text-sm capitalize">{viewMode}</div>
+                      </div>
+                      <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10 rounded col-span-2">
+                        <div className="text-[9px] text-[#1D1E15]/50 mb-1 uppercase">Model Type</div>
+                        <div className="text-[#1D1E15] font-bold text-[10px]">
+                          {currentDemoModelId ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.annotation.category : "No Model Loaded"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               )}
             </div>

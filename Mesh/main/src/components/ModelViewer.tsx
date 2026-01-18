@@ -560,6 +560,28 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         flatGroup.position.copy(center).multiplyScalar(-scale);
         flatGroup.updateMatrixWorld(true);
 
+        // Apply smart names to initial meshes
+        meshes.forEach((mesh, idx) => {
+          const geom = mesh.geometry;
+          geom.computeBoundingBox();
+          const bbox = geom.boundingBox!;
+          const meshSize = new THREE.Vector3();
+          bbox.getSize(meshSize);
+          const meshCenter = new THREE.Vector3();
+          bbox.getCenter(meshCenter);
+          mesh.localToWorld(meshCenter);
+
+          const smartName = generateComponentName(
+            meshCenter,
+            meshSize,
+            center,
+            idx,
+            meshes.length
+          );
+
+          (mesh as any).userData.name = smartName;
+        });
+
         sceneRef.current!.add(flatGroup);
         generatedObjectsRef.current.push(flatGroup);
 

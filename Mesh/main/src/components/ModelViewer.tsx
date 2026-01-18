@@ -182,7 +182,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
-      alpha: true,
+      alpha: false,
       preserveDrawingBuffer: true,
     });
     renderer.setPixelRatio(window.devicePixelRatio);

@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Large 3D model files (keep local only)
+public/models/*.glb
+public/models/**/*.glb
+!public/models/hmmwv_m998a1_soft_top/**/*.glb

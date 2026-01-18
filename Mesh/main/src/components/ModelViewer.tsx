@@ -157,8 +157,8 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
 
     // Initialize Three.js scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000); // Black background
-    scene.fog = new THREE.FogExp2(0x000000, 0.02);
+    scene.background = new THREE.Color(0x0a0a0a); // Very dark grey background
+    scene.fog = null; // Remove fog for clearer view
     sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(
@@ -189,7 +189,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.shadowMap.enabled = false; // Disable shadows
-    renderer.setClearColor(0x000000, 1);
+    renderer.setClearColor(0x0a0a0a, 1); // Very dark grey
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -215,10 +215,10 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     accentLight.lookAt(0, 0, 0);
     scene.add(accentLight);
 
-    // Grid Helper - White grid on black background
-    const gridHelper = new THREE.GridHelper(50, 50, 0xffffff, 0xffffff);
+    // Grid Helper - White grid on dark background
+    const gridHelper = new THREE.GridHelper(50, 50, 0xffffff, 0x666666);
     gridHelper.position.y = -4;
-    gridHelper.material.opacity = 0.2;
+    gridHelper.material.opacity = 0.4;
     gridHelper.material.transparent = true;
     scene.add(gridHelper);
 

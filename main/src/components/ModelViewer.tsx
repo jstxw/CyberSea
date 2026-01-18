@@ -1854,6 +1854,21 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                   Solid
                 </button>
               </div>
+              <Link
+                href={`/simulation?asset=${currentDemoModelId || 'demo-2'}`}
+                className="h-[32px] px-3 bg-[#3B82F6] border border-[#3B82F6] text-white text-[10px] font-bold hover:bg-[#2563EB] transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="none"
+                >
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+                Simulate
+              </Link>
               <button
                 onClick={exportGLB}
                 className="h-[32px] px-3 bg-[#2a2b22] border border-white/20 text-white text-[10px] font-bold hover:bg-white/10 transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"

@@ -48,6 +48,10 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
     const earthBumpMap = textureLoader.load('/01_earthbump1k.jpg');
     const earthSpecMap = textureLoader.load('/02_earthspec1k.jpg');
 
+    // Create a group to hold earth and wireframe (for synchronized rotation)
+    const globeGroup = new THREE.Group();
+    scene.add(globeGroup);
+
     // Earth globe with texture (continents visible)
     const earthGeo = new THREE.SphereGeometry(1, 64, 64);
     const earthMat = new THREE.MeshStandardMaterial({
@@ -61,7 +65,7 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
       roughness: 0.8,
     });
     const earth = new THREE.Mesh(earthGeo, earthMat);
-    scene.add(earth);
+    globeGroup.add(earth);
 
     // Wireframe overlay for tactical look
     const wireframeGeo = new THREE.SphereGeometry(1.01, 48, 48);
@@ -72,9 +76,13 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
       opacity: 0.15,
     });
     const wireframe = new THREE.Mesh(wireframeGeo, wireframeMat);
-    scene.add(wireframe);
+    globeGroup.add(wireframe);
 
-    // Trade routes
+    // Rotate globe to show Canadian Arctic (longitude -95° to face camera)
+    // The texture has 0° longitude at center, so rotate by ~95° to bring Canada forward
+    globeGroup.rotation.y = Math.PI * 0.53; // ~95° rotation
+
+    // Trade routes (add to globeGroup so they rotate with earth)
     TRADE_ROUTES.forEach((route) => {
       const points = route.points.map((coord) => {
         const [x, y, z] = latLongToVector3(coord.lat, coord.lng, 1.02);
@@ -88,10 +96,10 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
         opacity: 0.6,
       });
       const tube = new THREE.Mesh(tubeGeo, tubeMat);
-      scene.add(tube);
+      globeGroup.add(tube);
     });
 
-    // Points of interest
+    // Points of interest (add to globeGroup)
     POINTS_OF_INTEREST.forEach((poi) => {
       const [x, y, z] = latLongToVector3(poi.coordinates.lat, poi.coordinates.lng, 1.02);
 
@@ -101,18 +109,18 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
       const markerMat = new THREE.MeshBasicMaterial({ color: markerColor });
       const marker = new THREE.Mesh(markerGeo, markerMat);
       marker.position.set(x, y, z);
-      scene.add(marker);
+      globeGroup.add(marker);
     });
 
-    // Asset marker (patrol aircraft)
+    // Asset marker (patrol aircraft) - add to globeGroup
     const assetGeo = new THREE.ConeGeometry(0.02, 0.04, 4);
     const assetMat = new THREE.MeshBasicMaterial({ color: 0xff4444 });
     const assetMarker = new THREE.Mesh(assetGeo, assetMat);
     assetMarker.rotation.x = Math.PI / 2;
-    scene.add(assetMarker);
+    globeGroup.add(assetMarker);
     assetMarkerRef.current = assetMarker;
 
-    // Trail line
+    // Trail line (add to globeGroup)
     const trailGeo = new THREE.BufferGeometry();
     const trailMat = new THREE.LineBasicMaterial({
       color: 0xff4444,
@@ -120,7 +128,7 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
       opacity: 0.5,
     });
     const trail = new THREE.Line(trailGeo, trailMat);
-    scene.add(trail);
+    globeGroup.add(trail);
     trailRef.current = trail;
 
     // Lighting - enhanced to show earth texture

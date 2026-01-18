@@ -2042,9 +2042,21 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
             }`}
           >
             <div className="flex-shrink-0 border-b border-[#1D1E15]/20 pb-3 px-4 pt-4">
-              <h2 className="text-base font-bold text-[#1D1E15] mb-1.5 truncate font-sans">
-                {inspectorData.name}
-              </h2>
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <h2 className="text-base font-bold text-[#1D1E15] truncate font-sans flex-1">
+                  {inspectorData.name}
+                </h2>
+                {showSplitSection && (
+                  <div className="flex items-center gap-1 bg-gradient-to-br from-[#3B82F6]/20 to-[#3B82F6]/10 border border-[#3B82F6] rounded px-1.5 py-0.5 shrink-0 animate-pulse">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5">
+                      <path d="M21 8v13H3V8" />
+                      <path d="M1 3h22v5H1z" />
+                      <path d="M10 12h4" />
+                    </svg>
+                    <span className="text-[8px] font-bold text-[#3B82F6] uppercase">Splittable</span>
+                  </div>
+                )}
+              </div>
               <span className="px-1.5 py-0.5 bg-[#3B82F6]/10 border border-[#3B82F6] rounded text-[10px] text-[#3B82F6] font-mono uppercase">
                 {inspectorData.type}
               </span>

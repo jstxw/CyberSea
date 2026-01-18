@@ -27,21 +27,21 @@ export default function DashboardPage() {
       backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
       backgroundSize: '30px 30px'
     }}>
-      
+
       {/* Demo Banner */}
       {showBanner && (
         <div className="bg-[#3B82F6] border-b border-[#1D1E15] px-4 py-2 flex items-center justify-between z-50">
           <div className="flex items-center gap-3 flex-1">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="shrink-0">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
             <p className="text-white text-[10px] md:text-xs font-medium">
               <span className="font-bold">Demo Mode:</span> This version uses preloaded models. To use your own API keys and custom models, visit our{' '}
-              <a 
-                href="https://github.com/devp19/Mesh" 
-                target="_blank" 
+              <a
+                href="https://github.com/devp19/Mesh"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:text-[#E5E6DA] transition-colors font-bold"
               >
@@ -56,13 +56,13 @@ export default function DashboardPage() {
             aria-label="Close banner"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </div>
       )}
-      
+
       {/* Header */}
       <nav className="border-b border-[#E5E6DA] px-0 h-12 flex justify-between items-center bg-black z-50">
         <div className="flex items-center h-full flex-1">

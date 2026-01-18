@@ -5,7 +5,6 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import ship from '../../public/ship.png';
 
 const CubeViewer = dynamic(() => import('@/components/CubeViewer'), { ssr: false });
 
@@ -135,9 +134,6 @@ export default function Home() {
             variants={staggerContainer}
             className="w-full h-full flex items-center justify-center"
           >
-            <motion.div variants={staggerItem} className="scale-300">
-              <img src={ship.src} alt="Military ship wireframe" className="w-full h-auto" />
-            </motion.div>
           </motion.div>
         </div>
 
@@ -160,7 +156,7 @@ export default function Home() {
             </motion.h2>
 
             <motion.p
-              className="text-xs lg:text-sm mr-36 opacity-70 max-w-lg lg:max-w-xl leading-relaxed"
+              className="text-xs lg:text-sm font-latos mr-36 opacity-70 max-w-lg lg:max-w-xl leading-relaxed"
               variants={staggerItem}
             >
               Accelerate combat readiness with real-time 3D wireframe analysis of military equipment. Our platform combines advanced geometric processing with AI-powered component recognition to train personnel on identifying enemy vehicles, aircraft, and weapon systems. Master threat assessment through interactive visualization — built for speed, accuracy, and mission success.
@@ -189,7 +185,7 @@ export default function Home() {
 
               <Link
                 href="/dashboard"
-                className="w-full sm:w-auto px-6 mr-36 py-3 bg-[#3B82¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸¸F6] text-[#E5E6DA] text-[10px] uppercase font-bold hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors text-center sm:text-left mb-2 sm:mb-0"
+                className="w-full sm:w-auto px-6 mr-36 py-3 bg-[#3B82F6] text-[#E5E6DA] text-[10px] uppercase font-bold hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors text-center sm:text-left mb-2 sm:mb-0"
                 onClick={handleLaunchDemoClick}
               >
                 Access Training Platform

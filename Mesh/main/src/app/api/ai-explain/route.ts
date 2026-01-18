@@ -35,39 +35,70 @@ export async function POST(request: NextRequest) {
 
     // First, get the text description
     const analysisPrompt = `
-You are a military equipment analyst examining a 3D wireframe of military vehicles/aircraft. Identify the specific component shown based on position, geometry, and visual features.
+You are a senior military intelligence analyst with expertise in equipment identification. Examine this 3D wireframe component and provide HIGHLY SPECIFIC identification, going beyond basic parts to identify exact sub-assemblies, systems, and technical components.
 
 EQUIPMENT TYPE: "${modelType}"
-COMPONENT NAME: "${meshAnalysis.name}"
-${searchQuery ? `ORIGINAL SEARCH: "${searchQuery}"` : ""}
+CURRENT COMPONENT: "${meshAnalysis.name}"
+${searchQuery ? `SEARCH QUERY: "${searchQuery}"` : ""}
 
-GEOMETRIC DATA:
+GEOMETRIC ANALYSIS:
 - Position: (${meshAnalysis.position.x.toFixed(2)}, ${meshAnalysis.position.y.toFixed(2)}, ${meshAnalysis.position.z.toFixed(2)})
-- Size: ${meshAnalysis.size.width.toFixed(2)} × ${meshAnalysis.size.height.toFixed(2)} × ${meshAnalysis.size.depth.toFixed(2)}
+- Dimensions: ${meshAnalysis.size.width.toFixed(2)} × ${meshAnalysis.size.height.toFixed(2)} × ${meshAnalysis.size.depth.toFixed(2)}
 - Complexity: ${meshAnalysis.vertexCount} vertices
-- Center: (${meshAnalysis.centerPoint.x.toFixed(2)}, ${meshAnalysis.centerPoint.y.toFixed(2)}, ${meshAnalysis.centerPoint.z.toFixed(2)})
+- Center Point: (${meshAnalysis.centerPoint.x.toFixed(2)}, ${meshAnalysis.centerPoint.y.toFixed(2)}, ${meshAnalysis.centerPoint.z.toFixed(2)})
 
-IDENTIFICATION GUIDE:
-For Aircraft: cockpit, fuselage (forward/aft/center), wings (left/right), tail assembly, vertical/horizontal stabilizers, engine nacelles, landing gear, weapon hardpoints
-For Helicopters: main rotor assembly, tail rotor, fuselage, cockpit, engine cowling, landing skids/gear
-For Tanks: turret, hull (glacis/side/rear), tracks, road wheels, drive sprockets, gun barrel, cupola
-For Ships: bow, stern, superstructure, hull sections, radar mast, weapons systems, flight deck
-For Vehicles: chassis, cab, engine compartment, cargo bed, axles, suspension
+DETAILED IDENTIFICATION CRITERIA:
 
-Use technical military terminology. Consider:
-- Forward position = nose/bow/front
-- Rear position = tail/stern/rear
-- Top position = dorsal/upper/canopy
-- Side projections = wings/stabilizers/sponsons
-- Central mass = fuselage/hull/main body
+AIRCRAFT COMPONENTS (be specific):
+- Propulsion: Engine intake, turbofan housing, exhaust nozzle, afterburner section, engine pylon mount
+- Fuselage: Nose cone (radome), forward fuselage, center fuselage, aft fuselage, weapons bay door
+- Wings: Wing root, leading edge, trailing edge, aileron, flap, slat, wing tip
+- Tail: Vertical stabilizer, rudder, horizontal stabilizer, elevator, tail cone
+- Landing Gear: Main gear well, nose gear door, strut assembly, wheel bay
+- Cockpit: Canopy frame, windscreen, instrument panel housing, ejection seat
+- Weapons: Missile rail, bomb rack, gun bay, external fuel tank pylon
 
-Return JSON:
+HELICOPTER COMPONENTS:
+- Rotor System: Main rotor hub, blade attachment, swashplate housing, rotor mast
+- Tail: Tail boom, tail rotor gearbox, vertical stabilizer, anti-torque rotor
+- Powerplant: Engine cowling, transmission housing, exhaust stack, air intake
+- Fuselage: Cockpit bubble, cabin section, cargo door, skid attachment
+
+TANK/ARMORED VEHICLE COMPONENTS:
+- Turret Assembly: Gun mantlet, turret ring, commander's cupola, gunner's sight housing
+- Hull: Glacis plate, side skirt armor, rear engine deck, driver's hatch
+- Propulsion: Track links, road wheel, drive sprocket, idler wheel, suspension arm
+- Weapons: Main gun barrel, coaxial MG mount, smoke grenade launcher, reactive armor blocks
+- Systems: Engine air intake, exhaust port, fuel tank housing, ammunition storage
+
+NAVAL VESSEL COMPONENTS:
+- Superstructure: Bridge windows, radar mast, communication array, sensor suite
+- Weapons: VLS cell cover, CIWS mount, torpedo tube, missile launcher
+- Hull: Bow bulbous section, hull plating, propeller shaft, rudder assembly
+- Flight Deck: Landing pad markings, hangar door, refueling station
+
+GROUND VEHICLE COMPONENTS:
+- Chassis: Frame rail, cross member, suspension mount, differential housing
+- Cab: Windshield frame, door assembly, roof hatch, armor plating
+- Engine: Engine block housing, radiator mount, air filter housing, exhaust manifold
+- Drivetrain: Transmission housing, transfer case, axle assembly, wheel hub
+
+ANALYSIS REQUIREMENTS:
+1. DO NOT use generic terms like "fuselage" or "hull" - be specific (e.g., "Forward Avionics Bay" not "nose")
+2. Identify SYSTEMS not just shapes (e.g., "APU Housing" not "rear compartment")
+3. Include weapons/avionics/propulsion details when applicable
+4. Reference actual military equipment nomenclature
+5. Mention if this component can be further broken down into sub-assemblies
+
+Return JSON with this exact structure:
 {
-  "name": "Specific military component name (e.g., 'Forward Fuselage Section', 'Port Wing', 'Main Turret')",
-  "description": "Technical explanation of this component's military function and tactical significance (2-3 sentences)",
-  "category": "structural|propulsion|weapons|avionics|armor|landing gear|control surface",
+  "name": "HIGHLY SPECIFIC component name (e.g., 'Turbofan Engine Intake', 'Turret Ring Assembly', 'Main Rotor Hub')",
+  "description": "Detailed technical description including: (1) Primary military function, (2) Key features/sub-components, (3) Tactical/operational significance. Be specific about what's inside this assembly.",
+  "category": "propulsion|weapons|avionics|armor|structural|landing gear|control surface|sensor|communications",
   "confidence": confidence percentage (0-100),
-  "reasoning": "Why this identification based on position, shape, size, and military equipment design principles"
+  "reasoning": "Detailed explanation of identification based on geometric properties, position in vehicle, typical military equipment design patterns, and visible structural features",
+  "hasSubComponents": true or false - whether this part likely contains multiple sub-assemblies that could be split further,
+  "specifications": "Technical specs if identifiable (e.g., 'Houses twin turbofan engines, ~40,000 lbf thrust each' or 'Composite armor, ~600mm RHA equivalent')"
 }
 `;
 

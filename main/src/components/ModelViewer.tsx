@@ -1856,7 +1856,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
               </div>
               <Link
                 href={`/simulation?asset=${currentDemoModelId || 'demo-2'}`}
-                className="h-[32px] px-3 bg-[#3B82F6] border border-[#3B82F6] text-white text-[10px] font-bold hover:bg-[#2563EB] transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
+                className="pointer-events-auto h-[32px] px-3 bg-[#3B82F6] border border-[#3B82F6] text-white text-[10px] font-bold hover:bg-[#2563EB] transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
               >
                 <svg
                   width="12"
@@ -1864,6 +1864,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                   viewBox="0 0 24 24"
                   fill="currentColor"
                   stroke="none"
+                  aria-hidden="true"
                 >
                   <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>

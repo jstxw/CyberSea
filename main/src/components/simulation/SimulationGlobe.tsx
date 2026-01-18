@@ -46,7 +46,6 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
     const textureLoader = new THREE.TextureLoader();
     const earthColorMap = textureLoader.load('/00_earthmap1k.jpg');
     const earthBumpMap = textureLoader.load('/01_earthbump1k.jpg');
-    const earthSpecMap = textureLoader.load('/02_earthspec1k.jpg');
 
     // Earth globe with texture (continents visible)
     const earthGeo = new THREE.SphereGeometry(1, 64, 64);
@@ -54,7 +53,6 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
       map: earthColorMap,
       bumpMap: earthBumpMap,
       bumpScale: 0.05,
-      specularMap: earthSpecMap,
       transparent: true,
       opacity: 0.9,
       metalness: 0.1,
@@ -168,7 +166,6 @@ export default function SimulationGlobe({ progress, isPlaying }: SimulationGlobe
       // Dispose textures
       earthColorMap.dispose();
       earthBumpMap.dispose();
-      earthSpecMap.dispose();
 
       // Dispose all geometries and materials
       scene.traverse((child) => {

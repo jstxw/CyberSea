@@ -358,7 +358,7 @@ export default function Home() {
               >
                 {/* Upload */}
                 <motion.div
-                  className="p-8 border-r border-b border-[#E5E6DA] lg:border-b-0 hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors flex flex-col h-full"
+                  className="p-8 border-r border-b border-[#E5E6DA] lg:border-b-0 hover:bg-[#1e3a5f] hover:text-white transition-colors flex flex-col h-full"
                   variants={staggerItem}
                 >
                   <div className="flex items-center gap-4 mb-6">
@@ -385,7 +385,7 @@ export default function Home() {
 
                 {/* Export */}
                 <motion.div
-                  className="p-8 hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors flex flex-col h-full"
+                  className="p-8 hover:bg-[#1e3a5f] hover:text-white transition-colors flex flex-col h-full"
                   variants={staggerItem}
                 >
                   <div className="flex items-center gap-4 mb-6">

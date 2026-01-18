@@ -1,36 +1,153 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mesh - Arctic Maritime Domain Awareness Platform
+
+An AI-powered 3D visualization platform for Canadian Arctic maritime surveillance and real-time situational awareness.
+
+## Overview
+
+Mesh is a defense technology demonstration built for the CyberSea Hackathon, showcasing how AI-assisted 3D visualization can enhance Arctic sovereignty monitoring. The platform combines interactive 3D model analysis with real-time simulation of maritime patrol operations across the Northwest Passage.
+
+## Features
+
+### 3D Asset Intelligence
+- **Interactive Model Viewer**: Explore military and naval assets in detailed 3D
+- **AI-Powered Analysis**: Gemini AI identifies components, systems, and capabilities
+- **Component Annotation**: Click any part to get instant technical documentation
+- **Sketchfab Integration**: Access thousands of 3D models from the Sketchfab library
+
+### Arctic Patrol Simulation
+- **Real-Time Globe Visualization**: 3D Earth with Canadian Arctic focus
+- **Maritime Trade Routes**: Northwest Passage shipping lanes and Arctic corridors
+- **Points of Interest**: Military bases, ports, radar stations, and resource sites
+- **Mission Playback**: Pre-scripted patrol scenarios with event timeline
+- **Command Dashboard**: Weather conditions, threat levels, mission metrics
+
+### Demo Assets
+- Tactical UAV Drone
+- A-10 Thunderbolt II
+- F/A-18F Super Hornet
+- F-35 Lightning II
+- F-15E Strike Eagle
+- MQ-9 Reaper
+- SH-60B Seahawk
+- T-90 Main Battle Tank
+- Arleigh Burke-class Destroyer
+- M1025 HMMWV (Humvee)
+
+## Tech Stack
+
+- **Framework**: Next.js 14 (App Router)
+- **3D Engine**: Three.js / React Three Fiber
+- **AI**: Google Gemini (via OpenRouter)
+- **3D Models**: Sketchfab API
+- **Styling**: Tailwind CSS
+- **Language**: TypeScript
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/mesh.git
+cd mesh/main
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+```
+
+### Environment Variables
+
+Create a `.env.local` file with:
+
+```env
+NEXT_PUBLIC_SKETCHFAB_API_TOKEN=your_sketchfab_token
+NEXT_PUBLIC_OPENROUTER_API_KEY=your_openrouter_key
+```
+
+### Running the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+main/
+├── public/
+│   ├── models/          # GLB/GLTF 3D model files
+│   ├── annotations/     # Annotated reference images
+│   └── *.jpg            # Earth textures for globe
+├── src/
+│   ├── app/             # Next.js App Router pages
+│   │   ├── page.tsx     # Landing page
+│   │   ├── viewer/      # 3D model viewer
+│   │   └── simulation/  # Arctic patrol simulation
+│   ├── components/
+│   │   ├── ModelViewer.tsx      # Main 3D viewer component
+│   │   └── simulation/          # Simulation components
+│   │       ├── SimulationGlobe.tsx
+│   │       ├── CommandDashboard.tsx
+│   │       ├── PlaybackControls.tsx
+│   │       └── SimulationContent.tsx
+│   ├── lib/
+│   │   ├── models.ts            # Model registry
+│   │   ├── demo-config.ts       # Demo model configurations
+│   │   └── simulation-data.ts   # Arctic simulation data
+│   └── utils/
+│       └── coordinates.ts       # Lat/long conversion utilities
+```
 
-## Learn More
+## Usage
 
-To learn more about Next.js, take a look at the following resources:
+### Model Viewer
+1. Navigate to `/viewer`
+2. Select a demo model or search Sketchfab
+3. Click on model components for AI analysis
+4. View technical specifications and annotations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Arctic Simulation
+1. Navigate to `/simulation`
+2. Use playback controls to start the patrol
+3. Monitor the command dashboard for events
+4. Track asset movement across trade routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## API Integrations
 
-## Deploy on Vercel
+### Sketchfab
+- Model search and discovery
+- 3D model downloads (GLB format)
+- Thumbnail previews
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### OpenRouter (Gemini)
+- Component identification from screenshots
+- Technical analysis and documentation
+- Natural language descriptions
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Hackathon Context
+
+Built for the **CyberSea Hackathon** focusing on:
+- Canadian Arctic sovereignty
+- Maritime domain awareness
+- Defense technology innovation
+- AI-assisted intelligence gathering
+
+## License
+
+MIT License - See [LICENSE](LICENSE) for details.
+
+## Acknowledgments
+
+- Sketchfab for 3D model hosting
+- Google Gemini for AI capabilities
+- Three.js community for 3D rendering tools
+- CyberSea Hackathon organizers

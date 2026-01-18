@@ -212,6 +212,101 @@
         maxSpeed: "70 mph",
         range: "350 mi"
         }
+    },
+    {
+        id: "demo-11",
+        name: "A-10 Thunderbolt II (Ultra Quality)",
+        path: "/models/a10-war-thunder-330k.glb",
+        annotation: {
+        name: "A-10 Thunderbolt II - War Thunder Quality",
+        description: "Ultra-high quality A-10 Warthog model with 330,000 polygons. Production-grade detail from War Thunder game assets. Twin-engine close air support aircraft with GAU-8/A Avenger 30mm cannon. Designed for tank-killing missions with titanium armor bathtub protecting pilot. Capable of carrying 16,000 pounds of ordnance including AGM-65 Mavericks and Mk 82 bombs.",
+        category: "Close Air Support Aircraft - Ultra Quality",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        },
+        stats: {
+        crew: "1 Pilot",
+        fuelCapacity: "10,700 lbs",
+        unitCost: "$18.8M",
+        maintenanceCost: "$5.9M/yr",
+        maxSpeed: "439 mph",
+        range: "800 nm"
+        }
+    },
+    {
+        id: "demo-12",
+        name: "Challenger II Main Battle Tank",
+        path: "/models/challenger_ii.glb",
+        annotation: {
+        name: "Challenger II British Main Battle Tank",
+        description: "Third-generation British main battle tank, one of the most heavily armored MBTs in service. Powered by Perkins CV12 diesel engine producing 1,200 horsepower. Armed with L30A1 120mm rifled gun (unique among modern MBTs), 7.62mm chain gun, and 7.62mm coaxial machine gun. Protected by Chobham armor (classified composition). Advanced fire control system with laser rangefinder and thermal imaging. Combat weight: 75 tons. Crew protection rated as best-in-class.",
+        category: "Main Battle Tank",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        },
+        stats: {
+        crew: "4",
+        fuelCapacity: "1,592 L",
+        unitCost: "$6.2M",
+        maintenanceCost: "$320K/yr",
+        maxSpeed: "37 mph",
+        range: "340 mi"
+        }
+    },
+    {
+        id: "demo-13",
+        name: "F-35A Lightning II (Ultra Quality)",
+        path: "/models/f-35a_lightning_ii.glb",
+        annotation: {
+        name: "F-35A Lightning II - Ultra High Detail",
+        description: "Ultra-high quality F-35A stealth fighter with production-grade detail. Single-seat, single-engine fifth-generation multirole combat aircraft. Features advanced sensor fusion, stealth capabilities, and network-centric warfare. Powered by Pratt & Whitney F135 afterburning turbofan (43,000 lbf thrust). Internal weapons bay with AIM-120 AMRAAM and GBU-31 JDAM. Equipped with AN/APG-81 AESA radar, Distributed Aperture System (DAS), and Electro-Optical Targeting System (EOTS). Capable of air-to-air, air-to-ground, and intelligence/surveillance/reconnaissance missions.",
+        category: "Fifth-Generation Stealth Fighter - Ultra Quality",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        },
+        stats: {
+        crew: "1 Pilot",
+        fuelCapacity: "18,250 lbs",
+        unitCost: "$89.2M",
+        maintenanceCost: "$7.8M/yr",
+        maxSpeed: "Mach 1.6",
+        range: "1,200 nm"
+        }
+    },
+    {
+        id: "demo-14",
+        name: "Cold War Era Tank",
+        path: "/models/fictional_cold_war_tank.glb",
+        annotation: {
+        name: "Fictional Cold War Main Battle Tank",
+        description: "Fictional Cold War era main battle tank design featuring classic Soviet-inspired aesthetics. Representative of mid-20th century armor development with sloped armor, low profile turret, and powerful main gun. Typical Cold War tank characteristics include diesel engine, manual loading system, reactive armor capabilities, and NBC (Nuclear, Biological, Chemical) protection. Design philosophy emphasized survivability through armor thickness and angles rather than active protection systems.",
+        category: "Main Battle Tank - Historical",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        },
+        stats: {
+        crew: "3-4",
+        fuelCapacity: "1,200 L",
+        unitCost: "N/A (Fictional)",
+        maintenanceCost: "N/A",
+        maxSpeed: "35 mph",
+        range: "300 mi"
+        }
+    },
+    {
+        id: "demo-15",
+        name: "Turbofan Jet Engine",
+        path: "/models/turbine__turbofan_engine__jet_engine.glb",
+        annotation: {
+        name: "High-Bypass Turbofan Engine Cutaway",
+        description: "Detailed turbofan jet engine model showing internal components and engineering. High-bypass turbofan design with visible fan blades, compressor stages, combustion chamber, turbine sections, and exhaust nozzle. This type of engine provides thrust through both the core exhaust and bypass air. Commonly used in modern fighter aircraft and commercial jets. Features include multi-stage axial compressor, annular combustion chamber, and afterburner section. Thrust-to-weight ratio optimized for supersonic flight.",
+        category: "Aircraft Propulsion System",
+        annotatedImage: "/annotations/drone-annotate.jpeg"
+        },
+        stats: {
+        crew: "N/A",
+        fuelCapacity: "N/A",
+        unitCost: "$2-10M",
+        maintenanceCost: "$500K/yr",
+        maxSpeed: "N/A",
+        range: "N/A"
+        }
     }
     ];
 

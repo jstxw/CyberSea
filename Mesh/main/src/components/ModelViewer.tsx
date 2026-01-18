@@ -79,6 +79,16 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   const [isBottomDropdownOpen, setIsBottomDropdownOpen] = useState(false);
   const bottomDropdownRef = useRef<HTMLDivElement>(null);
   const [showInteractionHint, setShowInteractionHint] = useState(false);
+  
+  // Advanced inspection modes
+  const [measurementMode, setMeasurementMode] = useState(false);
+  const [measurementPoints, setMeasurementPoints] = useState<THREE.Vector3[]>([]);
+  const [xrayMode, setXrayMode] = useState(false);
+  const [xrayOpacity, setXrayOpacity] = useState(0.3);
+  const [crossSectionMode, setCrossSectionMode] = useState(false);
+  const [crossSectionPosition, setCrossSectionPosition] = useState(0);
+  const [crossSectionAxis, setCrossSectionAxis] = useState<'x' | 'y' | 'z'>('y');
+  const [technicalView, setTechnicalView] = useState<'perspective' | 'top' | 'front' | 'side'>('perspective');
 
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -87,6 +97,9 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   const composerRef = useRef<EffectComposer | null>(null);
   const bloomPassRef = useRef<UnrealBloomPass | null>(null);
   const shadowPlaneRef = useRef<THREE.Mesh | null>(null);
+  const measurementLinesRef = useRef<THREE.Line[]>([]);
+  const measurementLabelsRef = useRef<HTMLDivElement[]>([]);
+  const clippingPlaneRef = useRef<THREE.Plane | null>(null);
   const generatedObjectsRef = useRef<THREE.Object3D[]>([]);
   const hoveredObjectRef = useRef<THREE.Object3D | null>(null);
   const placeholderRef = useRef<THREE.Mesh | null>(null);
@@ -400,6 +413,152 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     }
   };
 
+  // Measurement tool functions
+  const createMeasurementLine = (start: THREE.Vector3, end: THREE.Vector3) => {
+    if (!sceneRef.current) return;
+    
+    const distance = start.distanceTo(end);
+    
+    // Create line geometry
+    const points = [start, end];
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({ 
+      color: 0x00ff00, 
+      linewidth: 3,
+      depthTest: false,
+      depthWrite: false
+    });
+    const line = new THREE.Line(geometry, material);
+    line.renderOrder = 999; // Render on top
+    
+    sceneRef.current.add(line);
+    measurementLinesRef.current.push(line);
+    
+    // Create sphere markers at endpoints
+    const sphereGeometry = new THREE.SphereGeometry(0.05, 16, 16);
+    const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    
+    const startSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    startSphere.position.copy(start);
+    sceneRef.current.add(startSphere);
+    measurementLinesRef.current.push(startSphere as any);
+    
+    const endSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    endSphere.position.copy(end);
+    sceneRef.current.add(endSphere);
+    measurementLinesRef.current.push(endSphere as any);
+    
+    console.log(`Measurement: ${distance.toFixed(3)} units`);
+  };
+  
+  const clearMeasurements = () => {
+    if (!sceneRef.current) return;
+    
+    measurementLinesRef.current.forEach(line => {
+      sceneRef.current!.remove(line);
+      line.geometry?.dispose();
+      (line.material as THREE.Material)?.dispose();
+    });
+    
+    measurementLinesRef.current = [];
+    setMeasurementPoints([]);
+  };
+  
+  // X-Ray mode functions
+  const toggleXRayMode = () => {
+    if (!sceneRef.current) return;
+    
+    const newXrayMode = !xrayMode;
+    setXrayMode(newXrayMode);
+    
+    sceneRef.current.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh && child !== shadowPlaneRef.current) {
+        const mesh = child as THREE.Mesh;
+        const material = mesh.material as THREE.Material;
+        
+        if (newXrayMode) {
+          material.transparent = true;
+          material.opacity = xrayOpacity;
+          material.depthWrite = false;
+        } else {
+          material.transparent = false;
+          material.opacity = 1.0;
+          material.depthWrite = true;
+        }
+      }
+    });
+  };
+  
+  // Cross-section functions
+  const updateCrossSection = (position: number, axis: 'x' | 'y' | 'z') => {
+    if (!sceneRef.current || !rendererRef.current) return;
+    
+    const axisMap = { x: 0, y: 1, z: 2 };
+    const normal = new THREE.Vector3();
+    normal.setComponent(axisMap[axis], 1);
+    
+    const constant = position;
+    const plane = new THREE.Plane(normal, constant);
+    
+    clippingPlaneRef.current = plane;
+    rendererRef.current.clippingPlanes = [plane];
+    rendererRef.current.localClippingEnabled = true;
+  };
+  
+  const toggleCrossSection = () => {
+    const newMode = !crossSectionMode;
+    setCrossSectionMode(newMode);
+    
+    if (newMode) {
+      updateCrossSection(crossSectionPosition, crossSectionAxis);
+    } else {
+      if (rendererRef.current) {
+        rendererRef.current.clippingPlanes = [];
+        rendererRef.current.localClippingEnabled = false;
+      }
+    }
+  };
+  
+  // Technical view functions
+  const setCameraView = (view: 'perspective' | 'top' | 'front' | 'side') => {
+    if (!cameraRef.current || !controlsRef.current) return;
+    
+    setTechnicalView(view);
+    
+    // Calculate bounding box of all objects
+    const box = new THREE.Box3();
+    generatedObjectsRef.current.forEach(obj => {
+      box.expandByObject(obj);
+    });
+    
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const distance = maxDim * 2;
+    
+    switch (view) {
+      case 'top':
+        cameraRef.current.position.set(center.x, center.y + distance, center.z);
+        cameraRef.current.up.set(0, 0, -1);
+        break;
+      case 'front':
+        cameraRef.current.position.set(center.x, center.y, center.z + distance);
+        cameraRef.current.up.set(0, 1, 0);
+        break;
+      case 'side':
+        cameraRef.current.position.set(center.x + distance, center.y, center.z);
+        cameraRef.current.up.set(0, 1, 0);
+        break;
+      case 'perspective':
+        cameraRef.current.position.set(center.x + distance, center.y + distance, center.z + distance);
+        cameraRef.current.up.set(0, 1, 0);
+        break;
+    }
+    
+    controlsRef.current.target.copy(center);
+    controlsRef.current.update();
+  };
+
   const handleClick = (event: React.MouseEvent) => {
     if (showInferenceLoader || !raycasterRef.current || !cameraRef.current || !sceneRef.current)
       return;
@@ -411,6 +570,25 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     );
 
     if (intersects.length > 0) {
+      const point = intersects[0].point;
+      
+      // Measurement mode: add points and draw lines
+      if (measurementMode) {
+        setMeasurementPoints(prev => {
+          const newPoints = [...prev, point.clone()];
+          
+          // If we have 2 points, create a measurement line
+          if (newPoints.length === 2) {
+            createMeasurementLine(newPoints[0], newPoints[1]);
+            return []; // Reset for next measurement
+          }
+          
+          return newPoints;
+        });
+        return;
+      }
+      
+      // Normal object selection
       const object = intersects[0].object;
       if ((object as any).userData?.name) {
         handleObjectClick(object);
@@ -1919,6 +2097,73 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
               ))}
             </select>
             
+            {/* Inspection Mode Buttons */}
+            <button
+              onClick={() => {
+                setMeasurementMode(!measurementMode);
+                if (!measurementMode) clearMeasurements();
+              }}
+              className={`h-[32px] px-4 border text-[10px] font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 shadow-md ${
+                measurementMode 
+                  ? 'bg-[#3B82F6] border-[#3B82F6] text-white' 
+                  : 'bg-[#1D1E15] border-[#1D1E15] text-[#E5E6DA] hover:bg-[#3B82F6] hover:border-[#3B82F6]'
+              }`}
+              title="Click two points to measure distance"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M3 3l18 18M8 8l8 8M3 21l18-18"/>
+              </svg>
+              MEASURE
+            </button>
+
+            <button
+              onClick={toggleXRayMode}
+              className={`h-[32px] px-4 border text-[10px] font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 shadow-md ${
+                xrayMode 
+                  ? 'bg-[#3B82F6] border-[#3B82F6] text-white' 
+                  : 'bg-[#1D1E15] border-[#1D1E15] text-[#E5E6DA] hover:bg-[#3B82F6] hover:border-[#3B82F6]'
+              }`}
+              title="See through components"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v12M6 12h12"/>
+              </svg>
+              X-RAY
+            </button>
+
+            <button
+              onClick={toggleCrossSection}
+              className={`h-[32px] px-4 border text-[10px] font-bold uppercase tracking-wide transition-all duration-200 flex items-center gap-2 shadow-md ${
+                crossSectionMode 
+                  ? 'bg-[#3B82F6] border-[#3B82F6] text-white' 
+                  : 'bg-[#1D1E15] border-[#1D1E15] text-[#E5E6DA] hover:bg-[#3B82F6] hover:border-[#3B82F6]'
+              }`}
+              title="Slice through model"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M21 21H3M3 16V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/>
+              </svg>
+              SECTION
+            </button>
+
+            <button
+              onClick={() => {
+                const views: ('perspective' | 'top' | 'front' | 'side')[] = ['perspective', 'top', 'front', 'side'];
+                const currentIndex = views.indexOf(technicalView);
+                const nextView = views[(currentIndex + 1) % views.length];
+                setCameraView(nextView);
+              }}
+              className="h-[32px] px-4 bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold uppercase tracking-wide hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-all duration-200 flex items-center gap-2 shadow-md"
+              title="Cycle camera views"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
+              </svg>
+              {technicalView.toUpperCase()}
+            </button>
+            
             <div className="flex items-center gap-1.5 bg-white border border-[#1D1E15] p-1 backdrop-blur-md h-[32px]">
               <button
                 onClick={() => setViewMode("holo")}
@@ -2466,6 +2711,125 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Cross-Section Controls */}
+        {crossSectionMode && (
+          <div className="absolute bottom-24 right-4 z-20 w-80 bg-white border-2 border-[#3B82F6] backdrop-blur-md p-4 shadow-xl">
+            <h3 className="text-sm font-bold text-[#1D1E15] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5">
+                <path d="M21 21H3M3 16V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8"/>
+              </svg>
+              Cross-Section Cutter
+            </h3>
+            
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-[#1D1E15]/70 uppercase tracking-wider mb-1 block">Axis</label>
+                <div className="flex gap-2">
+                  {(['x', 'y', 'z'] as const).map((axis) => (
+                    <button
+                      key={axis}
+                      onClick={() => {
+                        setCrossSectionAxis(axis);
+                        updateCrossSection(crossSectionPosition, axis);
+                      }}
+                      className={`flex-1 px-3 py-2 text-xs font-bold uppercase transition-all ${
+                        crossSectionAxis === axis
+                          ? 'bg-[#3B82F6] text-white'
+                          : 'bg-[#1D1E15]/10 text-[#1D1E15] hover:bg-[#1D1E15] hover:text-white'
+                      }`}
+                    >
+                      {axis.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-xs text-[#1D1E15]/70 uppercase tracking-wider mb-1 block">
+                  Position: {crossSectionPosition.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="-10"
+                  max="10"
+                  step="0.1"
+                  value={crossSectionPosition}
+                  onChange={(e) => {
+                    const pos = parseFloat(e.target.value);
+                    setCrossSectionPosition(pos);
+                    updateCrossSection(pos, crossSectionAxis);
+                  }}
+                  className="w-full h-2 bg-[#1D1E15]/20 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* X-Ray Mode Controls */}
+        {xrayMode && (
+          <div className="absolute bottom-24 left-72 z-20 w-64 bg-white border-2 border-[#3B82F6] backdrop-blur-md p-4 shadow-xl">
+            <h3 className="text-sm font-bold text-[#1D1E15] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v12M6 12h12"/>
+              </svg>
+              X-Ray Transparency
+            </h3>
+            
+            <div>
+              <label className="text-xs text-[#1D1E15]/70 uppercase tracking-wider mb-1 block">
+                Opacity: {(xrayOpacity * 100).toFixed(0)}%
+              </label>
+              <input
+                type="range"
+                min="0.1"
+                max="0.9"
+                step="0.05"
+                value={xrayOpacity}
+                onChange={(e) => {
+                  const opacity = parseFloat(e.target.value);
+                  setXrayOpacity(opacity);
+                  
+                  // Update all meshes
+                  if (sceneRef.current) {
+                    sceneRef.current.traverse((child) => {
+                      if ((child as THREE.Mesh).isMesh && child !== shadowPlaneRef.current) {
+                        const mesh = child as THREE.Mesh;
+                        const material = mesh.material as THREE.Material;
+                        material.opacity = opacity;
+                      }
+                    });
+                  }
+                }}
+                className="w-full h-2 bg-[#1D1E15]/20 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Measurement Mode Indicator */}
+        {measurementMode && (
+          <div className="absolute top-24 left-1/2 transform -translate-x-1/2 z-20 bg-[#3B82F6] text-white px-6 py-3 rounded-lg shadow-xl flex items-center gap-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M3 3l18 18M8 8l8 8M3 21l18-18"/>
+            </svg>
+            <div>
+              <div className="text-sm font-bold uppercase">Measurement Mode Active</div>
+              <div className="text-xs opacity-80">Click two points on the model to measure</div>
+            </div>
+            <button
+              onClick={() => {
+                clearMeasurements();
+                setMeasurementMode(false);
+              }}
+              className="ml-4 px-3 py-1 bg-white text-[#3B82F6] text-xs font-bold uppercase rounded hover:bg-[#1D1E15] hover:text-white transition-all"
+            >
+              Exit
+            </button>
           </div>
         )}
 

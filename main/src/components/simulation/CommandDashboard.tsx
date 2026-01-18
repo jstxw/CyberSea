@@ -90,7 +90,7 @@ export default function CommandDashboard({
         <div className="text-[10px] uppercase tracking-wider opacity-50 mb-3">Asset Status</div>
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 bg-[#3B82F6]/20 border border-[#3B82F6]/50 rounded flex items-center justify-center">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" aria-hidden="true">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
           </div>
@@ -117,7 +117,7 @@ export default function CommandDashboard({
         <div className="flex-1 overflow-y-auto space-y-2">
           {events.slice(0, currentEventIndex + 1).reverse().map((event, idx) => (
             <div
-              key={idx}
+              key={`${event.time}-${event.type}`}
               className={`text-xs flex gap-2 ${idx === 0 ? 'text-[#3B82F6]' : 'opacity-70'}`}
             >
               <span className="font-mono w-12 shrink-0">{formatTime(event.time)}</span>
@@ -129,6 +129,7 @@ export default function CommandDashboard({
                 {event.type === 'deploy' && '▶'}
                 {event.type === 'route_start' && '→'}
                 {event.type === 'return' && '↩'}
+                {event.type === 'route_complete' && '✓'}
               </span>
               <span>{event.message}</span>
             </div>

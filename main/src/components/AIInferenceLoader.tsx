@@ -226,14 +226,14 @@ export default function AIInferenceLoader({
   const nextStageData = currentStage < STAGES.length - 1 ? STAGES[currentStage + 1] : null;
 
   return (
-    <div className="fixed inset-0 z-[100] pointer-events-none">
+    <div className="fixed inset-0 z-[100] pointer-events-none bg-[#0a0a0a]">
       {/* Left Panel - Primary Context */}
       <div className="absolute top-0 bottom-0 left-0 w-72 bg-[#0a0a0a] border-r border-[#E5E6DA]/20 p-6 flex flex-col gap-6 pointer-events-auto">
         {/* Target Object - Primary */}
         <div className="space-y-3">
           <div className="text-[9px] text-[#E5E6DA]/50 uppercase tracking-widest font-mono">TARGET OBJECT</div>
           <div className="text-2xl font-mono text-[#E5E6DA] font-bold leading-tight break-words">
-            {objectName || 'Unknown Component'}
+            {objectName || 'Sub-Assembly 2'}
           </div>
         </div>
 
@@ -244,14 +244,14 @@ export default function AIInferenceLoader({
         <div className="space-y-2">
           <div className="text-[9px] text-[#E5E6DA]/40 uppercase tracking-widest font-mono">CURRENT SCAN</div>
           <div className="text-sm font-mono text-[#E5E6DA]/70 break-all">
-            {currentMeshName}
+            {currentMeshName || 'Scanning...'}
           </div>
-          <div className="h-px w-full bg-[#E5E6DA]/10 mt-2 overflow-hidden relative">
+          <div className="h-1 w-full bg-[#1D1E15] overflow-hidden relative mt-2">
             <motion.div 
-              className="absolute inset-0 bg-[#3B82F6]"
-              initial={{ x: "-100%" }}
-              animate={{ x: "100%" }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-y-0 left-0 bg-[#3B82F6]"
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min(((currentScanningIndex + 1) / Math.max(allMeshes.length, 1)) * 100, 100)}%` }}
+              transition={{ duration: 0.3, ease: "linear" }}
             />
           </div>
         </div>
@@ -259,13 +259,13 @@ export default function AIInferenceLoader({
         {/* Telemetry - Visually De-emphasized */}
         <div className="mt-auto pt-6 border-t border-[#E5E6DA]/10">
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-[#1D1E15]/50 p-3 border border-[#E5E6DA]/5">
+            <div className="bg-[#1D1E15]/30 p-3 border border-[#E5E6DA]/5">
               <div className="text-[9px] text-[#E5E6DA]/30 mb-1 uppercase tracking-widest font-mono">MESHES</div>
-              <div className="text-base font-mono text-[#E5E6DA]/50 font-light">{allMeshes.length}</div>
+              <div className="text-base font-mono text-[#E5E6DA]/40 font-light">{allMeshes.length}</div>
             </div>
-            <div className="bg-[#1D1E15]/50 p-3 border border-[#E5E6DA]/5">
+            <div className="bg-[#1D1E15]/30 p-3 border border-[#E5E6DA]/5">
               <div className="text-[9px] text-[#E5E6DA]/30 mb-1 uppercase tracking-widest font-mono">STAGE</div>
-              <div className="text-base font-mono text-[#E5E6DA]/50 font-light">{currentStage + 1}/{STAGES.length}</div>
+              <div className="text-base font-mono text-[#E5E6DA]/40 font-light">{currentStage + 1}/{STAGES.length}</div>
             </div>
           </div>
         </div>
@@ -277,13 +277,13 @@ export default function AIInferenceLoader({
         
         <div className="space-y-4">
           {/* Current Step - High Contrast */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-[#3B82F6] text-[#0a0a0a] rounded-sm">
                 <currentStageData.icon size={16} strokeWidth={2.5} />
               </div>
               <div className="flex-1">
-                <div className="text-[10px] font-mono uppercase text-[#3B82F6] tracking-wider font-bold">
+                <div className="text-[11px] font-mono uppercase text-[#3B82F6] tracking-wider font-bold">
                   {currentStageData.label}
                 </div>
                 <div className="text-[9px] font-mono text-[#E5E6DA]/40 mt-0.5">
@@ -292,7 +292,7 @@ export default function AIInferenceLoader({
               </div>
             </div>
             {/* Progress bar for current step */}
-            <div className="h-1 w-full bg-[#1D1E15] overflow-hidden">
+            <div className="h-1 w-full bg-[#1D1E15] border border-[#E5E6DA]/10 overflow-hidden">
               <motion.div 
                 className="h-full bg-[#3B82F6]"
                 initial={{ width: 0 }}
@@ -304,13 +304,13 @@ export default function AIInferenceLoader({
 
           {/* Next Step - Subtle */}
           {nextStageData && (
-            <div className="space-y-2 pt-2 border-t border-[#E5E6DA]/10">
+            <div className="space-y-2 pt-3 border-t border-[#E5E6DA]/10">
               <div className="text-[9px] text-[#E5E6DA]/30 uppercase tracking-widest font-mono mb-2">NEXT</div>
-              <div className="flex items-center gap-3 opacity-50">
-                <div className="p-2 bg-[#1D1E15] text-[#E5E6DA]/40 rounded-sm border border-[#E5E6DA]/10">
+              <div className="flex items-center gap-3 opacity-40">
+                <div className="p-2 bg-[#1D1E15] text-[#E5E6DA]/30 rounded-sm border border-[#E5E6DA]/10">
                   <nextStageData.icon size={14} strokeWidth={2} />
                 </div>
-                <div className="text-[10px] font-mono uppercase text-[#E5E6DA]/40 tracking-wide">
+                <div className="text-[10px] font-mono uppercase text-[#E5E6DA]/30 tracking-wide">
                   {nextStageData.label}
                 </div>
               </div>
@@ -319,9 +319,9 @@ export default function AIInferenceLoader({
 
           {/* Collapsed Steps - Minimal */}
           {currentStage < STAGES.length - 2 && (
-            <div className="pt-4 border-t border-[#E5E6DA]/10">
-              <div className="text-[9px] text-[#E5E6DA]/20 uppercase tracking-widest font-mono mb-2">
-                REMAINING: {STAGES.length - currentStage - 2} STEPS
+            <div className="pt-3 border-t border-[#E5E6DA]/10">
+              <div className="text-[8px] text-[#E5E6DA]/20 uppercase tracking-widest font-mono">
+                {STAGES.length - currentStage - 2} STEPS REMAINING
               </div>
             </div>
           )}
@@ -383,33 +383,33 @@ export default function AIInferenceLoader({
       <div className="absolute top-0 bottom-0 left-72 right-64 pointer-events-auto cursor-wait">
         {/* In-Viewport Status Overlay - Military Style */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="bg-[#0a0a0a]/95 border-2 border-[#3B82F6] p-8 max-w-md w-full mx-4 shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+          <div className="bg-[#0a0a0a]/98 border-2 border-[#3B82F6] p-8 max-w-lg w-full mx-4 shadow-[0_0_40px_rgba(59,130,246,0.4)]">
             {/* Status Header */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-2 h-2 bg-[#3B82F6] animate-pulse"></div>
-              <div className="text-[10px] font-mono uppercase text-[#E5E6DA]/50 tracking-widest">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[#E5E6DA]/10">
+              <div className="w-2.5 h-2.5 bg-[#3B82F6] animate-pulse rounded-full"></div>
+              <div className="text-[10px] font-mono uppercase text-[#E5E6DA]/60 tracking-widest font-bold">
                 ANALYSIS ACTIVE
               </div>
             </div>
 
             {/* Current Step Display */}
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <div className="text-[9px] font-mono uppercase text-[#E5E6DA]/40 tracking-widest mb-2">
+                <div className="text-[9px] font-mono uppercase text-[#E5E6DA]/40 tracking-widest mb-3">
                   CURRENT OPERATION
                 </div>
-                <div className="text-xl font-mono text-[#3B82F6] font-bold uppercase tracking-wide leading-tight">
+                <div className="text-2xl font-mono text-[#3B82F6] font-bold uppercase tracking-wide leading-tight">
                   {currentStageData.label}
                 </div>
               </div>
 
               {/* Progress Indicator */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-[9px] font-mono text-[#E5E6DA]/50 uppercase tracking-widest">
+                <div className="flex items-center justify-between text-[10px] font-mono text-[#E5E6DA]/50 uppercase tracking-widest">
                   <span>STAGE {currentStage + 1} OF {STAGES.length}</span>
-                  <span>{Math.floor(progress)}%</span>
+                  <span className="text-[#3B82F6] font-bold">{Math.floor(progress)}%</span>
                 </div>
-                <div className="h-2 w-full bg-[#1D1E15] border border-[#E5E6DA]/10 overflow-hidden">
+                <div className="h-2.5 w-full bg-[#1D1E15] border border-[#E5E6DA]/10 overflow-hidden">
                   <motion.div 
                     className="h-full bg-[#3B82F6]"
                     initial={{ width: 0 }}
@@ -419,13 +419,13 @@ export default function AIInferenceLoader({
                 </div>
               </div>
 
-              {/* Diagnostic Info */}
-              <div className="pt-4 border-t border-[#E5E6DA]/10">
-                <div className="text-[9px] font-mono uppercase text-[#E5E6DA]/30 tracking-widest mb-1">
-                  SCANNING: {currentMeshName}
+              {/* Diagnostic Info - De-emphasized */}
+              <div className="pt-4 border-t border-[#E5E6DA]/10 space-y-1">
+                <div className="text-[9px] font-mono uppercase text-[#E5E6DA]/30 tracking-widest">
+                  SCANNING: <span className="text-[#E5E6DA]/50">{currentMeshName}</span>
                 </div>
                 <div className="text-[9px] font-mono text-[#E5E6DA]/30 tracking-widest">
-                  MESHES PROCESSED: {currentScanningIndex + 1} / {allMeshes.length}
+                  MESHES: <span className="text-[#E5E6DA]/50">{currentScanningIndex + 1} / {allMeshes.length}</span>
                 </div>
               </div>
             </div>
@@ -434,13 +434,13 @@ export default function AIInferenceLoader({
 
         {/* Subtle Diagnostic Grid Overlay */}
         <div 
-          className="absolute inset-0 opacity-10 pointer-events-none"
+          className="absolute inset-0 opacity-[0.08] pointer-events-none"
           style={{
             backgroundImage: `
               linear-gradient(#3B82F6 1px, transparent 1px),
               linear-gradient(90deg, #3B82F6 1px, transparent 1px)
             `,
-            backgroundSize: '40px 40px'
+            backgroundSize: '50px 50px'
           }}
         />
       </div>

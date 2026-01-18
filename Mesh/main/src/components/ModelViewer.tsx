@@ -54,7 +54,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     description: "",
     type: "",
   });
-  const [showInspector, setShowInspector] = useState(false);
+  const [showInspector, setShowInspector] = useState(true);
   const [annotationOverlay, setAnnotationOverlay] = useState<string | null>(
     null
   );
@@ -858,7 +858,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     setShowAnnotatedModal(false);
   };
 
-  // Smart component naming based on position and size
+  // Enhanced military-specific component naming based on position, size, and geometry
   const generateComponentName = (
     centroid: THREE.Vector3,
     size: THREE.Vector3,
@@ -867,79 +867,144 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     totalComponents: number
   ): string => {
     const relativePos = centroid.clone().sub(modelCenter);
+    const normalized = relativePos.clone().normalize();
     
-    // Determine position descriptors
-    const isForward = relativePos.z > 0.5;
-    const isRear = relativePos.z < -0.5;
-    const isTop = relativePos.y > 0.5;
-    const isBottom = relativePos.y < -0.5;
-    const isLeft = relativePos.x < -0.5;
-    const isRight = relativePos.x > 0.5;
+    // Position descriptors (normalized coordinates)
+    const isForward = relativePos.z > 0.3;
+    const isRear = relativePos.z < -0.3;
+    const isTop = relativePos.y > 0.3;
+    const isBottom = relativePos.y < -0.3;
+    const isLeft = relativePos.x < -0.3;
+    const isRight = relativePos.x > 0.3;
+    const isCentral = Math.abs(relativePos.x) < 0.3 && Math.abs(relativePos.z) < 0.3;
     
-    // Determine size descriptors
+    // Size and shape descriptors
     const volume = size.x * size.y * size.z;
-    const isLarge = volume > 2.0;
-    const isSmall = volume < 0.3;
+    const isLarge = volume > 1.5;
+    const isMedium = volume > 0.5 && volume <= 1.5;
+    const isSmall = volume <= 0.5;
+    const isTiny = volume < 0.1;
     
     const aspectRatio = Math.max(size.x, size.y, size.z) / Math.min(size.x, size.y, size.z);
-    const isElongated = aspectRatio > 3;
-    const isFlatHorizontal = size.y < Math.min(size.x, size.z) * 0.3;
-    const isFlatVertical = size.x < Math.min(size.y, size.z) * 0.3 || size.z < Math.min(size.x, size.y) * 0.3;
+    const isElongated = aspectRatio > 4;
+    const isFlatHorizontal = size.y < Math.min(size.x, size.z) * 0.4;
+    const isFlatVertical = (size.x < Math.min(size.y, size.z) * 0.4) || (size.z < Math.min(size.x, size.y) * 0.4);
+    const isCylindrical = aspectRatio > 2.5 && !isFlatHorizontal && !isFlatVertical;
     
-    // Generate descriptive names
-    if (isLarge && Math.abs(relativePos.length()) < 0.5) {
-      return "Main Fuselage";
+    // Identify specific military components
+    
+    // ENGINE COMPONENTS
+    if (isRear && isCylindrical && isMedium) {
+      return isLeft ? "Port Engine Nacelle" : isRight ? "Starboard Engine Nacelle" : "Engine Assembly";
+    }
+    if (isRear && isCylindrical && isSmall) {
+      return "Exhaust Nozzle";
     }
     
-    if (isForward && isSmall) {
-      return "Nose Section";
+    // COCKPIT / CANOPY
+    if (isForward && isTop && isSmall && !isFlatHorizontal) {
+      return "Cockpit Canopy";
+    }
+    if (isForward && isTop && isTiny) {
+      return "Windscreen";
     }
     
-    if (isForward && !isSmall) {
-      return isTop ? "Forward Upper Body" : "Forward Section";
+    // NOSE / RADOME
+    if (isForward && isCentral && isElongated) {
+      return "Nose Cone (Radome)";
+    }
+    if (isForward && isSmall && !isTop && !isBottom) {
+      return "Forward Avionics Bay";
     }
     
-    if (isRear && isSmall) {
-      return "Tail Section";
-    }
-    
-    if (isRear) {
-      return isTop ? "Tail Assembly" : "Rear Section";
-    }
-    
+    // WING COMPONENTS
     if ((isLeft || isRight) && isFlatHorizontal && isElongated) {
-      return isLeft ? "Left Wing" : "Right Wing";
+      const side = isLeft ? "Port" : "Starboard";
+      if (isLarge) return `${side} Wing Assembly`;
+      if (isMedium) return `${side} Wing`;
+      return `${side} Wing Tip`;
+    }
+    if ((isLeft || isRight) && isFlatHorizontal && !isElongated) {
+      return isLeft ? "Port Flap" : "Starboard Aileron";
     }
     
-    if ((isLeft || isRight) && !isFlatHorizontal) {
-      return isLeft ? "Left Component" : "Right Component";
+    // TAIL ASSEMBLY
+    if (isRear && isTop && isFlatVertical && isElongated) {
+      return "Vertical Stabilizer";
+    }
+    if (isRear && isFlatHorizontal && !isCentral) {
+      return isLeft ? "Port Horizontal Stabilizer" : "Starboard Horizontal Stabilizer";
+    }
+    if (isRear && isTop && isSmall) {
+      return "Rudder Assembly";
     }
     
+    // FUSELAGE SECTIONS
+    if (isLarge && isCentral) {
+      if (isForward) return "Forward Fuselage";
+      if (isRear) return "Aft Fuselage";
+      return "Center Fuselage Section";
+    }
+    if (isMedium && isCentral) {
+      if (isForward) return "Nose Section";
+      if (isRear) return "Tail Boom";
+      return "Mid-Fuselage";
+    }
+    
+    // WEAPONS & HARDPOINTS
+    if (isBottom && isTiny && (isLeft || isRight)) {
+      return isLeft ? "Port Wing Pylon" : "Starboard Wing Pylon";
+    }
+    if (isBottom && isSmall && isCentral) {
+      return "Weapons Bay Door";
+    }
+    
+    // LANDING GEAR
+    if (isBottom && isSmall) {
+      if (isForward) return "Nose Landing Gear Bay";
+      if (isRear || isLeft || isRight) return "Main Landing Gear Well";
+      return "Landing Gear Strut";
+    }
+    
+    // AIR INTAKES
+    if (!isTop && !isBottom && (isLeft || isRight) && isCylindrical) {
+      return isLeft ? "Port Air Intake" : "Starboard Air Intake";
+    }
+    
+    // AVIONICS & SENSORS
+    if (isTop && isTiny) {
+      return "Antenna Mount";
+    }
+    if (isTop && isSmall && isCentral) {
+      return "Avionics Hump";
+    }
+    
+    // STRUCTURAL PANELS
+    if (isFlatVertical && !isElongated) {
+      if (isLeft) return "Port Side Panel";
+      if (isRight) return "Starboard Side Panel";
+      if (isRear) return "Rear Bulkhead";
+      return "Access Panel";
+    }
+    
+    // GENERIC DESCRIPTIVE FALLBACKS
     if (isTop && isFlatHorizontal) {
-      return "Top Panel";
+      return "Upper Skin Panel";
     }
-    
     if (isBottom && isFlatHorizontal) {
-      return "Undercarriage";
+      return "Lower Belly Panel";
     }
-    
-    if (isTop) {
-      return "Upper Structure";
+    if (isForward) {
+      return isTop ? "Forward Upper Assembly" : "Forward Lower Structure";
     }
-    
-    if (isBottom) {
-      return "Lower Structure";
+    if (isRear) {
+      return isTop ? "Tail Section" : "Rear Lower Structure";
     }
-    
-    if (isFlatVertical && isElongated) {
-      return "Stabilizer";
-    }
-    
     if (isSmall) {
       return `Detail Component ${componentIndex + 1}`;
     }
     
-    return `Section ${componentIndex + 1}`;
+    return `Sub-Assembly ${componentIndex + 1}`;
   };
 
   const handleSplitMesh = async () => {
@@ -1630,7 +1695,25 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         )}
         
         {/* Top Controls */}
-        <div className="absolute top-0 left-0 w-full z-10 p-4 flex justify-end items-center pointer-events-none">
+        <div className="absolute top-0 left-0 w-full z-10 p-4 flex justify-between items-center pointer-events-none">
+          {/* Back Button */}
+          <Link 
+            href="/"
+            className="pointer-events-auto h-[32px] px-4 bg-[#1D1E15] border border-[#1D1E15] text-[#E5E6DA] text-[10px] font-bold hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-colors flex items-center gap-2 uppercase tracking-wide cursor-pointer shadow-md"
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Home
+          </Link>
+
           <div className="flex items-center gap-2 pointer-events-auto">
             {/* Model Catalog Dropdown */}
             <select
@@ -1866,32 +1949,43 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         </div>
         )}
 
-        {/* Inspector Panel */}
-        {showInspector && (
-          <div
-            className={`absolute top-20 left-4 bottom-20 w-64 bg-white border border-[#1D1E15] backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20 ${
-              showInspector ? "translate-x-0" : "-translate-x-full"
-            }`}
-          >
+        {/* Inspector Panel - Always Visible */}
+        <div
+          className="absolute top-20 left-4 bottom-20 w-64 bg-white border border-[#1D1E15] backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20 translate-x-0"
+        >
             <div className="flex-shrink-0 border-b border-[#1D1E15]/20 pb-3 px-4 pt-4">
-              <h2 className="text-base font-bold text-[#1D1E15] mb-1.5 truncate font-sans">
-                {inspectorData.name}
-              </h2>
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <h2 className="text-base font-bold text-[#1D1E15] truncate font-sans flex-1">
+                  {inspectorData.name || "Component Inspector"}
+                </h2>
+                {showSplitSection && (
+                  <div className="flex items-center gap-1 bg-gradient-to-br from-[#3B82F6]/20 to-[#3B82F6]/10 border border-[#3B82F6] rounded px-1.5 py-0.5 shrink-0 animate-pulse">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5">
+                      <path d="M21 8v13H3V8" />
+                      <path d="M1 3h22v5H1z" />
+                      <path d="M10 12h4" />
+                    </svg>
+                    <span className="text-[8px] font-bold text-[#3B82F6] uppercase">Splittable</span>
+                  </div>
+                )}
+              </div>
               <span className="px-1.5 py-0.5 bg-[#3B82F6]/10 border border-[#3B82F6] rounded text-[10px] text-[#3B82F6] font-mono uppercase">
-                {inspectorData.type}
+                {inspectorData.type || "Select a component"}
               </span>
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 font-mono">
-              <div>
-                <h3 className="text-[10px] text-[#1D1E15]/50 uppercase tracking-wider mb-1.5">
-                  Description
-                </h3>
-                <p className="text-[10px] text-[#1D1E15] leading-relaxed break-words">
-                  {inspectorData.description}
-                </p>
-                
-                {/* Prominent AI Identification Section */}
-                <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">
+              {selectedObject ? (
+              <>
+                <div>
+                  <h3 className="text-[10px] text-[#1D1E15]/50 uppercase tracking-wider mb-1.5">
+                    Description
+                  </h3>
+                  <p className="text-[10px] text-[#1D1E15] leading-relaxed break-words">
+                    {inspectorData.description}
+                  </p>
+                  
+                  {/* Prominent AI Identification Section */}
+                  <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-6 h-6 bg-[#3B82F6] rounded flex items-center justify-center shrink-0">
                       <svg
@@ -1940,8 +2034,8 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                     )}
                   </button>
                 </div>
-              </div>
-              {showSplitSection && (
+                </div>
+                {showSplitSection && (
                 <div className="mt-2 p-3 bg-[#1D1E15]/5 border border-[#1D1E15]/10 rounded-xl">
                   <div className="text-[10px] text-[#1D1E15]/70 mb-2 font-bold uppercase tracking-wider">
                     Actions
@@ -2024,9 +2118,24 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                   </div>
                 </div>
               </div>
+              </>
+              ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center px-6">
+                <div className="w-16 h-16 bg-[#3B82F6]/10 rounded-full flex items-center justify-center mb-4">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                  </svg>
+                </div>
+                <h3 className="text-sm font-bold text-[#1D1E15] mb-2 uppercase tracking-wide">No Component Selected</h3>
+                <p className="text-[10px] text-[#1D1E15]/60 leading-relaxed">
+                  Click on any component in the 3D view to inspect its properties and use AI identification.
+                </p>
+              </div>
+              )}
             </div>
           </div>
-        )}
 
         {/* Tooltip */}
         <div

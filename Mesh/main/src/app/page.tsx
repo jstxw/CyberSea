@@ -82,7 +82,7 @@ export default function Home() {
       }}>
         <div className="flex items-center h-full flex-1">
           {/* Nav Items */}
-          <div className="hidden md:flex h-full items-center px-6 gap-8 text-[10px] font-medium uppercase tracking-wide flex-1">
+          <div className="hidden md:flex h-full items-center px-6 gap-8 text-sm font-medium uppercase tracking-wide flex-1">
             {[
               { name: 'Protocol', href: '#process' },
               { name: 'Intelligence', href: '#metrics' },
@@ -110,7 +110,16 @@ export default function Home() {
           </div>
         </div>
 
-
+        <div className="flex items-center gap-4 px-6">
+          <div className="text-sm uppercase tracking-widest opacity-50">Mesh</div>
+          <Link
+            href="/dashboard"
+            className="px-5 py-1.5 bg-[#3B82F6] text-[#E5E6DA] text-sm uppercase font-bold hover:bg-[#E5E6DA] hover:text-[#0a0a0a] transition-colors"
+            onClick={handleLaunchDemoClick}
+          >
+            Access Platform
+          </Link>
+        </div>
       </nav>
 
       {/* Main Content Grid */}

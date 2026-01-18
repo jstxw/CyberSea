@@ -116,11 +116,22 @@
   * {
     @apply border-border outline-ring/50;
     font-family: 'Lato', sans-serif;
+    cursor: none !important;
   }
   body {
     @apply bg-background text-foreground;
     background: radial-gradient(ellipse at center, #0e477a 0%, #0b3b6d 100%);
   }
+}
+
+/* Target cursor blink animation */
+@keyframes target-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.target-blink {
+  animation: target-blink 1s ease-in-out infinite;
 }
 
 /* Corner bracket button style */

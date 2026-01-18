@@ -1834,13 +1834,13 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
               ))}
             </select>
             
-            <div className="flex items-center gap-1.5 bg-white border border-[#1D1E15] p-1 backdrop-blur-md h-[32px]">
+            <div className="flex items-center gap-1.5 bg-[#2a2b22] border border-white/20 p-1 backdrop-blur-md h-[32px]">
               <button
                 onClick={() => setViewMode("holo")}
                 className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${
                   viewMode === "holo"
-                    ? "bg-[#3B82F6] text-[#E5E6DA]"
-                    : "bg-transparent text-[#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA]"
+                    ? "bg-[#3B82F6] text-white"
+                    : "bg-transparent text-white/70 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 Wireframe
@@ -1849,8 +1849,8 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                 onClick={() => setViewMode("solid")}
                 className={`h-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors cursor-pointer flex items-center justify-center ${
                   viewMode === "solid"
-                    ? "bg-[#3B82F6] text-[#E5E6DA]"
-                    : "bg-transparent text-[#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA]"
+                    ? "bg-[#3B82F6] text-white"
+                    : "bg-transparent text-white/70 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 Solid
@@ -1858,7 +1858,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
             </div>
             <button
               onClick={exportGLB}
-              className="h-[32px] px-3 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
+              className="h-[32px] px-3 bg-[#2a2b22] border border-white/20 text-white text-[10px] font-bold hover:bg-white/10 transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
             >
               <svg
                 width="12"
@@ -1876,7 +1876,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
             </button>
             <button
               onClick={resetView}
-              className="h-[32px] px-3 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold hover:bg-[#1D1E15] hover:text-[#E5E6DA] transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
+              className="h-[32px] px-3 bg-[#2a2b22] border border-white/20 text-white text-[10px] font-bold hover:bg-white/10 transition-colors flex items-center gap-1.5 uppercase tracking-wide cursor-pointer"
             >
               <svg
                 width="12"
@@ -2052,12 +2052,12 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
 
         {/* Inspector Panel - Always Visible */}
         <div
-          className="absolute top-20 left-4 bottom-20 w-64 bg-white border border-[#1D1E15] backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20 translate-x-0"
+          className="absolute top-20 left-4 bottom-20 w-64 bg-[#1D1E15]/90 border border-white/20 backdrop-blur-md flex flex-col overflow-hidden transition-transform duration-300 shadow-xl z-20 translate-x-0"
         >
-            <div className="flex-shrink-0 border-b border-[#1D1E15]/20 pb-3 px-4 pt-4">
+            <div className="flex-shrink-0 border-b border-white/10 pb-3 px-4 pt-4">
               {/* Component Dropdown */}
               <div className="mb-3">
-                <label className="text-[9px] text-[#1D1E15]/50 uppercase tracking-wider mb-1 block">
+                <label className="text-[9px] text-white/50 uppercase tracking-wider mb-1 block">
                   Component Selector
                 </label>
                 <select
@@ -2074,7 +2074,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                       });
                     }
                   }}
-                  className="w-full px-2 py-1.5 bg-white border border-[#1D1E15] text-[10px] font-mono text-[#1D1E15] cursor-pointer hover:border-[#3B82F6] transition-colors"
+                  className="w-full px-2 py-1.5 bg-[#2a2b22] border border-white/20 text-[10px] font-mono text-white cursor-pointer hover:border-[#3B82F6] transition-colors"
                 >
                   <option value="overall">📊 Overall Model View</option>
                   {generatedObjectsRef.current.map((group) => {
@@ -2095,11 +2095,11 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
               </div>
 
               <div className="flex items-start justify-between gap-2 mb-1.5">
-                <h2 className="text-base font-bold text-[#1D1E15] truncate font-sans flex-1">
+                <h2 className="text-base font-bold text-white truncate font-sans flex-1">
                   {inspectorData.name || "Component Inspector"}
                 </h2>
                 {showSplitSection && (
-                  <div className="flex items-center gap-1 bg-gradient-to-br from-[#3B82F6]/20 to-[#3B82F6]/10 border border-[#3B82F6] rounded px-1.5 py-0.5 shrink-0 animate-pulse">
+                  <div className="flex items-center gap-1 bg-gradient-to-br from-[#3B82F6]/30 to-[#3B82F6]/20 border border-[#3B82F6] rounded px-1.5 py-0.5 shrink-0 animate-pulse">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5">
                       <path d="M21 8v13H3V8" />
                       <path d="M1 3h22v5H1z" />
@@ -2109,7 +2109,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                   </div>
                 )}
               </div>
-              <span className="px-1.5 py-0.5 bg-[#3B82F6]/10 border border-[#3B82F6] rounded text-[10px] text-[#3B82F6] font-mono uppercase">
+              <span className="px-1.5 py-0.5 bg-[#3B82F6]/20 border border-[#3B82F6] rounded text-[10px] text-[#3B82F6] font-mono uppercase">
                 {inspectorData.type || "Select a component"}
               </span>
             </div>
@@ -2117,25 +2117,25 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
               {selectedObject ? (
               <>
                 <div>
-                  <h3 className="text-[10px] text-[#1D1E15]/50 uppercase tracking-wider mb-1.5">
+                  <h3 className="text-[10px] text-white/50 uppercase tracking-wider mb-1.5">
                     Description
                   </h3>
-                  <p className="text-[10px] text-[#1D1E15] leading-relaxed break-words">
+                  <p className="text-[10px] text-white/80 leading-relaxed break-words">
                     {inspectorData.description}
                   </p>
-                  
+
                   {/* Prominent AI Identification Section */}
-                  <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">
+                  <div className="mt-4 p-3 bg-gradient-to-br from-[#3B82F6]/20 to-[#3B82F6]/10 border-2 border-[#3B82F6]/30 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <div>
-                      <h4 className="text-[10px] font-bold text-[#1D1E15] uppercase tracking-wide">AI Analysis</h4>
-                      <p className="text-[9px] text-[#1D1E15]/60">Get detailed component intel</p>
+                      <h4 className="text-[10px] font-bold text-white uppercase tracking-wide">AI Analysis</h4>
+                      <p className="text-[9px] text-white/60">Get detailed component intel</p>
                     </div>
                   </div>
                   <button
                     onClick={identifyPart}
                     disabled={isIdentifying}
-                    className="mt-2 w-full px-4 py-3 bg-[#3B82F6] border-2 border-[#1D1E15] text-white text-[11px] font-bold hover:bg-[#1D1E15] hover:border-[#3B82F6] transition-all uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+                    className="mt-2 w-full px-4 py-3 bg-[#3B82F6] border-2 border-[#3B82F6] text-white text-[11px] font-bold hover:bg-[#3B82F6]/80 transition-all uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
                   >
                     {isIdentifying ? (
                       <>
@@ -2164,13 +2164,13 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                 </div>
                 </div>
                 {showSplitSection && (
-                <div className="mt-2 p-3 bg-[#1D1E15]/5 border border-[#1D1E15]/10 rounded-xl">
-                  <div className="text-[10px] text-[#1D1E15]/70 mb-2 font-bold uppercase tracking-wider">
+                <div className="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl">
+                  <div className="text-[10px] text-white/70 mb-2 font-bold uppercase tracking-wider">
                     Actions
                   </div>
                   <button
                     onClick={handleSplitMesh}
-                    className="w-full px-3 py-2 bg-white border border-[#1D1E15] text-[#1D1E15] text-[10px] font-bold flex items-center justify-center gap-1.5 mb-2 hover:bg-[#3B82F6] hover:text-white transition-colors uppercase tracking-wide cursor-pointer"
+                    className="w-full px-3 py-2 bg-[#2a2b22] border border-white/20 text-white text-[10px] font-bold flex items-center justify-center gap-1.5 mb-2 hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-colors uppercase tracking-wide cursor-pointer"
                   >
                     <svg
                       width="12"
@@ -2186,13 +2186,13 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                     </svg>
                     Split Mesh
                   </button>
-                  <p className="text-[10px] text-[#1D1E15]/60 mb-2 leading-relaxed break-words">
+                  <p className="text-[10px] text-white/60 mb-2 leading-relaxed break-words">
                     Separates disconnected geometry into distinct parts.
                   </p>
                   {showExplodedControls && (
-                    <div className="mt-2 pt-2 border-t border-[#1D1E15]/10">
+                    <div className="mt-2 pt-2 border-t border-white/10">
                       <div className="flex items-center justify-between mb-1.5">
-                        <label className="text-[10px] text-[#1D1E15] font-bold uppercase">
+                        <label className="text-[10px] text-white font-bold uppercase">
                           Exploded View
                         </label>
                         <button
@@ -2201,15 +2201,15 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                           }}
                           className={`px-2 py-1 text-[10px] font-bold uppercase border transition-colors cursor-pointer ${
                             isExploded
-                              ? "bg-[#3B82F6] text-[#E5E6DA] border-[#3B82F6]"
-                              : "bg-transparent text-[#1D1E15] border-[#1D1E15] hover:bg-[#1D1E15] hover:text-[#E5E6DA]"
+                              ? "bg-[#3B82F6] text-white border-[#3B82F6]"
+                              : "bg-transparent text-white border-white/30 hover:bg-white/10"
                           }`}
                         >
                           {isExploded ? "On" : "Off"}
                         </button>
                       </div>
                       <div className="mt-1.5">
-                        <label className="text-[10px] text-[#1D1E15]/60 block mb-1">
+                        <label className="text-[10px] text-white/60 block mb-1">
                           Distance: {explosionDistance.toFixed(1)}
                         </label>
                         <input
@@ -2221,7 +2221,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                           onChange={(e) =>
                             setExplosionDistance(parseFloat(e.target.value))
                           }
-                          className="w-full h-1 bg-[#1D1E15]/20 rounded-lg appearance-none cursor-pointer"
+                          className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
                         />
                       </div>
                     </div>
@@ -2229,19 +2229,19 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                 </div>
               )}
               <div className="grid grid-cols-2 gap-2">
-                <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10">
-                  <div className="text-[10px] text-[#1D1E15]/50 mb-1 uppercase">
+                <div className="bg-white/5 p-2 border border-white/10">
+                  <div className="text-[10px] text-white/50 mb-1 uppercase">
                     Geometry
                   </div>
-                  <div className="text-[#1D1E15] font-bold text-[10px]">
+                  <div className="text-white font-bold text-[10px]">
                     High Poly
                   </div>
                 </div>
-                <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10">
-                  <div className="text-[10px] text-[#1D1E15]/50 mb-1 uppercase">
+                <div className="bg-white/5 p-2 border border-white/10">
+                  <div className="text-[10px] text-white/50 mb-1 uppercase">
                     Status
                   </div>
-                  <div className="text-[#1D1E15] font-bold text-[10px]">
+                  <div className="text-white font-bold text-[10px]">
                     Active
                   </div>
                 </div>
@@ -2250,18 +2250,18 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
               ) : (
               <div className="space-y-4">
                 <div className="flex flex-col items-center text-center px-6 py-4">
-                  <div className="w-16 h-16 bg-[#3B82F6]/10 rounded-full flex items-center justify-center mb-3">
+                  <div className="w-16 h-16 bg-[#3B82F6]/20 rounded-full flex items-center justify-center mb-3">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
                       <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                       <path d="M2 17l10 5 10-5"/>
                       <path d="M2 12l10 5 10-5"/>
                     </svg>
                   </div>
-                  <h3 className="text-sm font-bold text-[#1D1E15] mb-2 uppercase tracking-wide">
+                  <h3 className="text-sm font-bold text-white mb-2 uppercase tracking-wide">
                     {currentDemoModelId ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.name : "Overall Model View"}
                   </h3>
-                  <p className="text-[10px] text-[#1D1E15]/60 leading-relaxed mb-4">
-                    {currentDemoModelId 
+                  <p className="text-[10px] text-white/60 leading-relaxed mb-4">
+                    {currentDemoModelId
                       ? "Select a component from the dropdown above or click on the 3D model to inspect individual parts."
                       : "Load a model from the dropdown at the top to begin analysis."}
                   </p>
@@ -2270,11 +2270,11 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                 {/* Model Statistics */}
                 {generatedObjectsRef.current.length > 0 && (
                   <div className="px-4">
-                    <h4 className="text-[10px] font-bold text-[#1D1E15] uppercase tracking-wider mb-2">Model Statistics</h4>
+                    <h4 className="text-[10px] font-bold text-white uppercase tracking-wider mb-2">Model Statistics</h4>
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10 rounded">
-                        <div className="text-[9px] text-[#1D1E15]/50 mb-1 uppercase">Components</div>
-                        <div className="text-[#1D1E15] font-bold text-sm">
+                      <div className="bg-white/5 p-2 border border-white/10 rounded">
+                        <div className="text-[9px] text-white/50 mb-1 uppercase">Components</div>
+                        <div className="text-white font-bold text-sm">
                           {(() => {
                             let count = 0;
                             generatedObjectsRef.current.forEach(group => {
@@ -2286,13 +2286,13 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                           })()}
                         </div>
                       </div>
-                      <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10 rounded">
-                        <div className="text-[9px] text-[#1D1E15]/50 mb-1 uppercase">View Mode</div>
-                        <div className="text-[#1D1E15] font-bold text-sm capitalize">{viewMode}</div>
+                      <div className="bg-white/5 p-2 border border-white/10 rounded">
+                        <div className="text-[9px] text-white/50 mb-1 uppercase">View Mode</div>
+                        <div className="text-white font-bold text-sm capitalize">{viewMode}</div>
                       </div>
-                      <div className="bg-[#1D1E15]/5 p-2 border border-[#1D1E15]/10 rounded col-span-2">
-                        <div className="text-[9px] text-[#1D1E15]/50 mb-1 uppercase">Model Type</div>
-                        <div className="text-[#1D1E15] font-bold text-[10px]">
+                      <div className="bg-white/5 p-2 border border-white/10 rounded col-span-2">
+                        <div className="text-[9px] text-white/50 mb-1 uppercase">Model Type</div>
+                        <div className="text-white font-bold text-[10px]">
                           {currentDemoModelId ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.annotation.category : "No Model Loaded"}
                         </div>
                       </div>
@@ -2358,117 +2358,6 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
           </div>
         )}
 
-        {/* Annotated Image Modal */}
-        {showAnnotatedModal && annotatedImage && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#1D1E15]/80 backdrop-blur-sm animate-in fade-in duration-300"
-            onClick={() => setShowAnnotatedModal(false)}
-          >
-            <div
-              className="relative max-w-4xl max-h-[90vh] bg-[#E5E6DA] border-2 border-[#1D1E15] rounded-lg shadow-2xl overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Close button */}
-              <button
-                onClick={() => setShowAnnotatedModal(false)}
-                className="absolute top-2 right-2 z-10 w-8 h-8 bg-[#1D1E15] text-[#E5E6DA] rounded-full flex items-center justify-center hover:bg-[#3B82F6] transition-colors cursor-pointer"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-
-              {/* Image */}
-              <div className="relative w-full">
-                <img
-                  src={annotatedImage}
-                  alt="Annotated brain part"
-                  className="w-full h-auto object-contain"
-                />
-              </div>
-
-              {/* Enhanced Caption with Specifications */}
-              <div className="px-6 py-4 border-t border-[#1D1E15]/20">
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div className="flex-1">
-                    <h3 className="text-sm font-bold text-[#1D1E15] mb-1 font-sans">
-                      {inspectorData.name}
-                    </h3>
-                    <span className="px-2 py-0.5 bg-[#3B82F6]/10 border border-[#3B82F6] rounded text-[9px] text-[#3B82F6] font-mono uppercase">
-                      {inspectorData.type}
-                    </span>
-                  </div>
-                  {(selectedObject as any)?.userData?.aiAnalysis?.confidence && (
-                    <div className="text-right">
-                      <div className="text-[9px] text-[#1D1E15]/50 uppercase mb-0.5">Confidence</div>
-                      <div className="text-sm font-bold text-[#3B82F6]">
-                        {(selectedObject as any).userData.aiAnalysis.confidence}%
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                <p className="text-xs text-[#1D1E15]/80 leading-relaxed font-mono mb-3">
-                  {inspectorData.description}
-                </p>
-
-                {/* Specifications Section */}
-                {(selectedObject as any)?.userData?.aiAnalysis?.specifications && (
-                  <div className="mb-3 p-3 bg-[#1D1E15]/5 border border-[#1D1E15]/10 rounded">
-                    <h4 className="text-[9px] font-bold text-[#1D1E15]/60 uppercase tracking-wider mb-1.5">
-                      Technical Specifications
-                    </h4>
-                    <p className="text-[10px] text-[#1D1E15] leading-relaxed font-mono">
-                      {(selectedObject as any).userData.aiAnalysis.specifications}
-                    </p>
-                  </div>
-                )}
-
-                {/* Secondary Split Button */}
-                {(selectedObject as any)?.userData?.aiAnalysis?.hasSubComponents && (
-                  <div className="mt-3 p-3 bg-gradient-to-br from-[#3B82F6]/10 to-[#1D1E15]/5 border-2 border-[#3B82F6]/30 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
-                        <path d="M21 8v13H3V8" />
-                        <path d="M1 3h22v5H1z" />
-                        <path d="M10 12h4" />
-                      </svg>
-                      <span className="text-[9px] font-bold text-[#1D1E15] uppercase">Sub-Components Detected</span>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setShowAnnotatedModal(false);
-                        // Trigger split on the currently selected object
-                        if (selectedObject && (selectedObject as any).isMesh) {
-                          handleSplitMesh();
-                        }
-                      }}
-                      className="w-full px-3 py-2.5 bg-[#3B82F6] border-2 border-[#1D1E15] text-white text-[10px] font-bold hover:bg-[#1D1E15] hover:border-[#3B82F6] transition-all uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer shadow-lg"
-                    >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path d="M21 8v13H3V8" />
-                        <path d="M1 3h22v5H1z" />
-                        <path d="M10 12h4" />
-                      </svg>
-                      EXPLODE INTO SUB-ASSEMBLIES
-                    </button>
-                    <p className="text-[9px] text-[#1D1E15]/60 mt-2 text-center">
-                      Break down this component into its internal parts
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Loader */}
         {loading && (

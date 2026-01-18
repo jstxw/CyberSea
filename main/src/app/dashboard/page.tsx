@@ -80,7 +80,7 @@ export default function DashboardPage() {
       )}
 
       {/* Header */}
-      <nav className="border-b border-[#E5E6DA] px-0 h-12 flex justify-between items-center bg-black z-50">
+      <nav className="px-0 h-12 flex justify-between items-center bg-black z-50">
         <div className="flex items-center h-full flex-1">
           <div className="px-4 text-[10px] font-medium uppercase tracking-wide text-[#E5E6DA]">
             Dashboard / Model Viewer

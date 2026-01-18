@@ -123,6 +123,35 @@
   }
 }
 
+/* Corner bracket button style */
+.corner-brackets {
+  position: relative;
+}
+
+.corner-brackets::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(white, white) top left,
+              linear-gradient(white, white) top left,
+              linear-gradient(white, white) top right,
+              linear-gradient(white, white) top right,
+              linear-gradient(white, white) bottom left,
+              linear-gradient(white, white) bottom left,
+              linear-gradient(white, white) bottom right,
+              linear-gradient(white, white) bottom right;
+  background-size: 2px 12px, 12px 2px, 2px 12px, 12px 2px,
+                   2px 12px, 12px 2px, 2px 12px, 12px 2px;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.corner-brackets > * {
+  position: relative;
+  z-index: 2;
+}
+
 /* Custom scrollbar for Linear style */
 ::-webkit-scrollbar {
   width: 6px;

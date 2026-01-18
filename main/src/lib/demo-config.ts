@@ -1,4 +1,4 @@
-    export interface DemoAnnotation {
+﻿    export interface DemoAnnotation {
     name: string;
     description: string;
     category: string;

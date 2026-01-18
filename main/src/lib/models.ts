@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Centralized Model Registry
  * Maps model IDs to their file paths and metadata
  */

@@ -11,12 +11,12 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
-import { AnimatePresence } from "framer-motion";
 import BlockyLoader from "./BlockyLoader";
 import AIInferenceLoader from "./AIInferenceLoader";
 import OnboardingOverlay from "./OnboardingOverlay";
 import { DEMO_MODELS, getDemoAnnotation, DemoModel } from "@/lib/demo-config";
 import { MODEL_REGISTRY, getModelById, hasModel } from "@/lib/models";
+import { AnimatePresence } from "framer-motion";
 
 const IS_PRODUCTION_DEMO = true; // Always show model catalog
 
@@ -2356,9 +2356,35 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
         )}
 
 
-        {/* Loader */}
-        {loading && (
-          <BlockyLoader onFinished={() => setAnimationFinished(true)} />
+        {/* Model Loading / AI Inference Loader - Shows for both model loading and AI identification */}
+        {(loading || showInferenceLoader) && (
+          <AIInferenceLoader
+            key={loading ? 'model-loading' : 'ai-inference'}
+            objectName={
+              showInferenceLoader 
+                ? ((selectedObject as any)?.userData?.name || "Selected Object")
+                : (() => {
+                    const model = currentDemoModelId 
+                      ? (getModelById(currentDemoModelId) || DEMO_MODELS.find(m => m.id === currentDemoModelId))
+                      : null;
+                    return (model as any)?.name || (model as any)?.displayName || "Military Vehicle";
+                  })()
+            }
+            shouldClose={showInferenceLoader ? inferenceLoaderReady : false}
+            onFinished={() => {
+              if (showInferenceLoader) {
+                setShowInferenceLoader(false);
+              } else if (loading) {
+                setAnimationFinished(true);
+              }
+            }}
+            scene={sceneRef.current}
+            camera={cameraRef.current}
+            renderer={rendererRef.current}
+            composer={composerRef.current}
+            allObjects={generatedObjectsRef.current}
+            controls={controlsRef.current}
+          />
         )}
 
         {/* AI Inference Loader */}

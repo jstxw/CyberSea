@@ -1,4 +1,4 @@
-# Mesh - Arctic Maritime Domain Awareness Platform
+# CypberSea - Arctic Maritime Domain Awareness Platform
 
 An AI-powered 3D visualization platform for Canadian Arctic maritime surveillance and real-time situational awareness.
 

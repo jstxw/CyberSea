@@ -42,6 +42,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   const [prompt, setPrompt] = useState("");
   const [isExploded, setIsExploded] = useState(false);
   const [explosionDistance, setExplosionDistance] = useState(1.0);
+  const [engineExplosionDistance, setEngineExplosionDistance] = useState(3.0); // Engines explode further
   const [selectedObject, setSelectedObject] = useState<THREE.Object3D | null>(
     null
   );
@@ -79,6 +80,51 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
   const [isBottomDropdownOpen, setIsBottomDropdownOpen] = useState(false);
   const bottomDropdownRef = useRef<HTMLDivElement>(null);
   const [showInteractionHint, setShowInteractionHint] = useState(false);
+
+  // Get context-aware explosion labels based on model type
+  const getExplosionLabels = () => {
+    const modelName = currentDemoModelId ? DEMO_MODELS.find(m => m.id === currentDemoModelId)?.name.toLowerCase() || '' : '';
+    
+    // Detect model type and return appropriate labels
+    if (modelName.includes('tank') || modelName.includes('t-90') || modelName.includes('challenger') || modelName.includes('leopard')) {
+      return {
+        primary: 'Hull/Chassis',
+        secondary: 'Turret/Weapons',
+        secondaryDesc: 'Turret assembly moves further'
+      };
+    } else if (modelName.includes('helicopter') || modelName.includes('seahawk')) {
+      return {
+        primary: 'Fuselage/Frame',
+        secondary: 'Rotor/Engines',
+        secondaryDesc: 'Rotor and powerplant systems'
+      };
+    } else if (modelName.includes('humvee') || modelName.includes('vehicle')) {
+      return {
+        primary: 'Chassis/Body',
+        secondary: 'Wheels/Suspension',
+        secondaryDesc: 'Running gear components'
+      };
+    } else if (modelName.includes('destroyer') || modelName.includes('ship')) {
+      return {
+        primary: 'Hull/Superstructure',
+        secondary: 'Weapons/Sensors',
+        secondaryDesc: 'Weapons and radar systems'
+      };
+    } else if (modelName.includes('drone') || modelName.includes('uav')) {
+      return {
+        primary: 'Airframe/Body',
+        secondary: 'Propulsion/Props',
+        secondaryDesc: 'Motors and propeller assemblies'
+      };
+    } else {
+      // Default for aircraft (A-10, F-35, F-18, etc.)
+      return {
+        primary: 'Airframe/Chassis',
+        secondary: 'Engines/Propulsion',
+        secondaryDesc: 'Engines move further for visibility'
+      };
+    }
+  };
   
   // Advanced inspection modes
   const [measurementMode, setMeasurementMode] = useState(false);
@@ -1622,10 +1668,17 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
         direction.normalize();
       }
 
+      // Detect if this is an engine component
+      const meshName = data.mesh.name?.toLowerCase() || '';
+      const isEngine = meshName.includes('engine') || meshName.includes('turbine') || meshName.includes('object_'); // Blender engine imports as Object_0-18
+      
+      // Use different explosion distances for engines vs airframe
+      const baseDistance = isEngine ? engineExplosionDistance : explosionDistance;
+
       // Adjust explosion distance by model scale to ensure consistent visual displacement
       // regardless of the model's original size or the applied normalization scale.
       const scale = group.scale.x || 1;
-      const adjustedDistance = explosionDistance / scale;
+      const adjustedDistance = baseDistance / scale;
 
       const offset = direction.multiplyScalar(adjustedDistance);
       data.mesh.position.copy(data.originalLocalPos).add(offset);
@@ -1636,7 +1689,7 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
     explodedGroupsRef.current.forEach((data, group) => {
       applyExplodedView(group, data.components, data.originalCenter);
     });
-  }, [isExploded, explosionDistance]);
+  }, [isExploded, explosionDistance, engineExplosionDistance]);
 
   useEffect(() => {
     if (modelReady && animationFinished) {
@@ -2561,10 +2614,18 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                           {isExploded ? "On" : "Off"}
                         </button>
                       </div>
-                      <div className="mt-1.5">
-                        <label className="text-[10px] text-[#1D1E15]/60 block mb-1">
-                          Distance: {explosionDistance.toFixed(1)}
-                        </label>
+                      
+                      {/* PRIMARY COMPONENTS SLIDER (Context-Aware) */}
+                      <div className="mt-2.5">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                          </svg>
+                          <label className="text-[10px] text-[#1D1E15] font-bold uppercase">
+                            {getExplosionLabels().primary}: {explosionDistance.toFixed(1)}
+                          </label>
+                        </div>
                         <input
                           type="range"
                           min="0"
@@ -2574,8 +2635,33 @@ export default function ModelViewer({ onClose }: ModelViewerProps) {
                           onChange={(e) =>
                             setExplosionDistance(parseFloat(e.target.value))
                           }
-                          className="w-full h-1 bg-[#1D1E15]/20 rounded-lg appearance-none cursor-pointer"
+                          className="w-full h-1 bg-[#3B82F6]/20 rounded-lg appearance-none cursor-pointer"
                         />
+                      </div>
+
+                      {/* SECONDARY COMPONENTS SLIDER (Context-Aware, Bigger Range) */}
+                      <div className="mt-2.5 p-2 bg-gradient-to-r from-[#3B82F6]/5 to-[#1D1E15]/5 border border-[#3B82F6]/20 rounded">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v12M6 12h12"/>
+                          </svg>
+                          <label className="text-[10px] text-[#EF4444] font-bold uppercase">
+                            {getExplosionLabels().secondary}: {engineExplosionDistance.toFixed(1)}
+                          </label>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="8"
+                          step="0.2"
+                          value={engineExplosionDistance}
+                          onChange={(e) =>
+                            setEngineExplosionDistance(parseFloat(e.target.value))
+                          }
+                          className="w-full h-2 bg-[#EF4444]/20 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <p className="text-[9px] text-[#1D1E15]/50 mt-1">{getExplosionLabels().secondaryDesc}</p>
                       </div>
                     </div>
                   )}

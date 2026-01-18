@@ -73,6 +73,7 @@ export default function PlaybackControls({
           <option value={1}>1x</option>
           <option value={2}>2x</option>
           <option value={4}>4x</option>
+          <option value={8}>8x</option>
         </select>
       </div>
 

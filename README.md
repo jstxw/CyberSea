@@ -128,4 +128,4 @@ npm start
 
 ## License
 
-Built for the CyberSea Hackathon.
+Built for the uOttawa Hackathon.

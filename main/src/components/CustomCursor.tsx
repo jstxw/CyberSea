@@ -31,12 +31,27 @@ export default function CustomCursor() {
         lastHoveredRef.current = null;
       } else {
         const rect = interactive.getBoundingClientRect();
+
+        // Check for custom cursor color attribute first, then fall back to defaults
+        const customColor = interactive.getAttribute('data-cursor-color');
+        const color = customColor || '#ef4444'; // use custom color or default red
+
         if (expandedRef.current) {
           expandedRef.current.style.display = 'block';
           expandedRef.current.style.left = `${rect.left - 6}px`;
           expandedRef.current.style.top = `${rect.top - 6}px`;
           expandedRef.current.style.width = `${rect.width + 12}px`;
           expandedRef.current.style.height = `${rect.height + 12}px`;
+
+          // Update colors dynamically
+          const corners = expandedRef.current.querySelectorAll('[data-corner]');
+          corners.forEach((corner) => {
+            (corner as HTMLElement).style.borderColor = color;
+          });
+          const dot = expandedRef.current.querySelector('[data-dot]');
+          if (dot) {
+            (dot as HTMLElement).style.backgroundColor = color;
+          }
         }
         if (cursorRef.current) {
           cursorRef.current.style.opacity = '0';
@@ -98,16 +113,16 @@ export default function CustomCursor() {
         style={{ display: 'none', zIndex: 99999, transition: 'all 200ms ease-out' }}
       >
         {/* Top-left corner */}
-        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-red-500" />
+        <div data-corner className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2" style={{ borderColor: '#ef4444' }} />
         {/* Top-right corner */}
-        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-red-500" />
+        <div data-corner className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2" style={{ borderColor: '#ef4444' }} />
         {/* Bottom-left corner */}
-        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-red-500" />
+        <div data-corner className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2" style={{ borderColor: '#ef4444' }} />
         {/* Bottom-right corner */}
-        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-red-500" />
+        <div data-corner className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2" style={{ borderColor: '#ef4444' }} />
 
         {/* Center dot */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-red-500" />
+        <div data-dot className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full" style={{ backgroundColor: '#ef4444' }} />
       </div>
     </>
   );

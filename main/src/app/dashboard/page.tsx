@@ -84,7 +84,7 @@ export default function DashboardPage() {
         <div className="flex items-center h-full flex-1">
           <Link
             href="/"
-            className="px-4 h-full flex items-center gap-2 text-[10px] font-medium uppercase tracking-wide text-[#E5E6DA]/60 hover:text-[#E5E6DA] hover:bg-white/5 transition-colors"
+            className="px-4 h-full flex items-center gap-2 text-[10px] font-medium uppercase tracking-wide text-[#E5E6DA]/60 hover:text-[#E5E6DA] hover:bg-[#3B82F6] transition-colors"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="15 18 9 12 15 6" />

@@ -383,7 +383,7 @@ export default function AIInferenceLoader({
       <div className="absolute top-0 bottom-0 left-72 right-64 pointer-events-auto cursor-wait">
         {/* In-Viewport Status Overlay - Military Style */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="bg-[#0a0a0a]/95 border-2 border-[#3B82F6] p-8 max-w-md w-full mx-4 shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+          <div className="bg-[#0a0a0a]/95 border border-[#3B82F6] p-8 max-w-md w-full mx-4 shadow-[0_0_30px_rgba(59,130,246,0.3)]">
             {/* Status Header */}
             <div className="flex items-center gap-3 mb-6">
               <div className="w-2 h-2 bg-[#3B82F6] animate-pulse"></div>

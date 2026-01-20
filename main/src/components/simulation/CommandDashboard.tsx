@@ -114,7 +114,7 @@ export default function CommandDashboard({
             </div>
             <div className="flex justify-between">
               <span className="opacity-60">Cost</span>
-              <span className="font-mono text-[#F59E0B]">${missionCost.toLocaleString()}</span>
+              <span className="font-mono text-[#F59E0B]">${missionCost.toLocaleString()}k</span>
             </div>
           </div>
         </div>

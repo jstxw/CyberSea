@@ -3,14 +3,15 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
-const MESSAGES = [
-  'Rendering model...',
-  'Fetching geospatial scene...',
-  'Analyzing topology...',
-  'Optimizing meshes...',
-  'Computing lightmaps...',
-  'Calibrating sensors...',
-  'Initializing viewer...',
+const STAGES = [
+  'Initializing System',
+  'Rendering Model',
+  'Fetching Geospatial Scene',
+  'Analyzing Topology',
+  'Optimizing Meshes',
+  'Computing Lightmaps',
+  'Calibrating Sensors',
+  'Finalizing Viewer',
 ];
 
 interface BlockyLoaderProps {
@@ -18,154 +19,96 @@ interface BlockyLoaderProps {
 }
 
 export default function BlockyLoader({ onFinished }: BlockyLoaderProps) {
-  const [currentMessage, setCurrentMessage] = useState(0);
+  const [currentStage, setCurrentStage] = useState(0);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const messageInterval = setInterval(() => {
-      setCurrentMessage((prev) => (prev + 1) % MESSAGES.length);
+    const stageInterval = setInterval(() => {
+      setCurrentStage((prev) => (prev < STAGES.length - 1 ? prev + 1 : prev));
     }, 400);
 
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          // Wrap callback in setTimeout to avoid "Cannot update a component while rendering a different component"
-          // This ensures the state update happens in the next tick, not during this render cycle
           if (onFinished) {
-             setTimeout(() => onFinished(), 0);
+            setTimeout(() => onFinished(), 0);
           }
           return 100;
         }
-        return prev + Math.random() * 8; // Faster progress
+        return prev + Math.random() * 8;
       });
-    }, 80); // Faster interval
+    }, 80);
 
     return () => {
-      clearInterval(messageInterval);
+      clearInterval(stageInterval);
       clearInterval(progressInterval);
     };
   }, [onFinished]);
-
-  // Calculate number of filled blocks (20 total blocks for 100%)
-  const totalBlocks = 20;
-  const filledBlocks = Math.floor((progress / 100) * totalBlocks);
 
   return (
     <div className="fixed inset-0 bg-black backdrop-blur-md z-[60] flex flex-col items-center justify-center font-mono" style={{
       backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
       backgroundSize: '30px 30px'
     }}>
-      <div className="w-96 space-y-6">
-        {/* Hexagon/Cube Animation */}
-        <div className="flex justify-center mb-8">
-          <div className="relative w-24 h-24 grid grid-cols-2 gap-2">
-            <motion.div
-              className="bg-gray-600"
-              animate={{
-                scale: [1, 0.8, 1],
-                rotate: [0, 90, 0],
-                opacity: [1, 0.5, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                times: [0, 0.5, 1]
-              }}
-            />
-            <motion.div
-              className="bg-[#3B82F6]"
-              animate={{
-                scale: [1, 0.8, 1],
-                rotate: [0, -90, 0],
-                opacity: [1, 0.5, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                times: [0, 0.5, 1],
-                delay: 0.2
-              }}
-            />
-             <motion.div
-              className="bg-[#3B82F6]"
-              animate={{
-                scale: [1, 0.8, 1],
-                rotate: [0, -90, 0],
-                opacity: [1, 0.5, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                times: [0, 0.5, 1],
-                delay: 0.4
-              }}
-            />
-             <motion.div
-              className="bg-black border border-gray-600"
-              animate={{
-                scale: [1, 0.8, 1],
-                rotate: [0, 90, 0],
-                opacity: [1, 0.5, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                times: [0, 0.5, 1],
-                delay: 0.6
-              }}
-            />
+      {/* Center Status Box - Military Style */}
+      <div className="bg-[#0a0a0a]/95 border border-[#3B82F6] p-8 max-w-md w-full mx-4 shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+        {/* Status Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-2 h-2 bg-[#3B82F6] animate-pulse"></div>
+          <div className="text-[10px] font-mono uppercase text-[#E5E6DA]/50 tracking-widest">
+            SYSTEM LOADING
           </div>
         </div>
 
-        {/* Text Animation */}
-        <div className="h-8 relative overflow-hidden text-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentMessage}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "backOut" }}
-              className="absolute inset-x-0 text-[#E5E6DA] text-sm uppercase tracking-widest font-bold"
-            >
-              {MESSAGES[currentMessage]}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* Blocky Progress Bar */}
-        <div className="space-y-3">
-          <div className="flex justify-between text-sm font-medium text-[#E5E6DA] uppercase tracking-wider">
-            <span>System Status: Loading</span>
-            <span className="text-3xl">{Math.min(100, Math.floor(progress))}%</span>
+        {/* Current Step Display */}
+        <div className="space-y-4">
+          <div>
+            <div className="text-[9px] font-mono uppercase text-[#E5E6DA]/40 tracking-widest mb-2">
+              CURRENT OPERATION
+            </div>
+            <div className="h-8 relative overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentStage}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -20, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "backOut" }}
+                  className="text-xl font-mono text-[#3B82F6] font-bold uppercase tracking-wide leading-tight"
+                >
+                  {STAGES[currentStage]}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
-          <div className="flex gap-1.5 h-8">
-            {Array.from({ length: totalBlocks }).map((_, i) => (
+
+          {/* Progress Indicator */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-[9px] font-mono text-[#E5E6DA]/50 uppercase tracking-widest">
+              <span>STAGE {currentStage + 1} OF {STAGES.length}</span>
+              <span>{Math.min(100, Math.floor(progress))}%</span>
+            </div>
+            <div className="h-2 w-full bg-[#1D1E15] border border-[#E5E6DA]/10 overflow-hidden">
               <motion.div
-                key={i}
-                initial={{ scaleY: 0 }}
-                animate={{
-                  scaleY: i < filledBlocks ? 1 : 0.2,
-                  backgroundColor: i < filledBlocks ? '#3B82F6' : '#4B5563'
-                }}
-                transition={{ duration: 0.2 }}
-                className="flex-1 origin-bottom opacity-80"
+                className="h-full bg-[#3B82F6]"
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(100, progress)}%` }}
+                transition={{ ease: "linear" }}
               />
-            ))}
+            </div>
           </div>
-        </div>
 
-        <div className="text-center pt-4">
-             <div className="inline-block px-3 py-1 bg-[#E5E6DA]/5 border border-[#E5E6DA]/20 text-[#E5E6DA]/60 text-[10px] uppercase tracking-widest">
-                V.2.0.4 - GEOSPATIAL ENGINE
-             </div>
+          {/* Diagnostic Info */}
+          <div className="pt-4 border-t border-[#E5E6DA]/10">
+            <div className="text-[9px] font-mono uppercase text-[#E5E6DA]/30 tracking-widest mb-1">
+              GEOSPATIAL ENGINE V.2.0.4
+            </div>
+            <div className="text-[9px] font-mono text-[#E5E6DA]/30 tracking-widest">
+              RENDERING PIPELINE ACTIVE
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-

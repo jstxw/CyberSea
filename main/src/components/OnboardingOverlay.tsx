@@ -133,7 +133,7 @@ export default function OnboardingOverlay({
               <div className="flex justify-center pt-4">
                 <button
                   onClick={onImport}
-                  className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 rounded-xl"
+                  className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-all duration-300 rounded-xl"
                 >
                   <div className="w-8 h-8 bg-[#E5E6DA]/10 flex items-center justify-center border border-[#E5E6DA]/20 rounded-lg">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#E5E6DA]/60">
@@ -150,7 +150,7 @@ export default function OnboardingOverlay({
               </div>
 
               {/* Sketchfab Search */}
-              <div className="flex justify-center pt-4">
+              <div className="flex justify-center pt-4" data-no-cursor>
                 <div className="flex flex-col items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 rounded-xl w-full max-w-md">
                   <div className="flex items-center gap-2 w-full">
                     <div className="w-8 h-8 bg-[#E5E6DA]/10 flex items-center justify-center border border-[#E5E6DA]/20 rounded-lg shrink-0">
@@ -165,12 +165,12 @@ export default function OnboardingOverlay({
                       onChange={(e) => setSketchfabQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSketchfabSearch()}
                       placeholder="Search Sketchfab (e.g., car, robot)"
-                      className="flex-1 bg-white/5 border border-white/10 text-[#E5E6DA] text-[12px] font-mono px-3 py-2 uppercase tracking-wide outline-none focus:border-white/30 transition-colors rounded-lg placeholder:text-[#E5E6DA]/30 placeholder:normal-case"
+                      className="flex-1 bg-white/5 border border-white/10 text-[#E5E6DA] text-[12px] font-mono px-3 py-2 uppercase tracking-wide outline-none hover:bg-white/10 focus:bg-white/10 focus:border-white/30 transition-colors rounded-lg placeholder:text-[#E5E6DA]/30 placeholder:normal-case"
                     />
                     <button
                       onClick={handleSketchfabSearch}
                       disabled={isSearching || !sketchfabQuery.trim()}
-                      className="px-4 py-2 bg-[#3B82F6] hover:bg-[#3B82F6]/80 disabled:bg-white/10 disabled:text-[#E5E6DA]/30 text-white text-[10px] font-mono uppercase tracking-wide rounded-lg transition-colors"
+                      className="px-4 py-2 bg-white/20 hover:bg-white/40 disabled:bg-white/10 disabled:text-[#E5E6DA]/30 text-white text-[10px] font-mono uppercase tracking-wide rounded-lg transition-colors"
                     >
                       {isSearching ? 'LOADING...' : 'SEARCH'}
                     </button>
@@ -198,7 +198,7 @@ export default function OnboardingOverlay({
                         handleDemoSelect(selected.id, selected.name);
                       }
                     }}
-                    className="flex-1 bg-white/5 border border-white/10 text-[#E5E6DA] text-[12px] font-mono p-4 uppercase tracking-wide outline-none focus:border-white/30 transition-colors rounded-xl appearance-none cursor-pointer"
+                    className="flex-1 bg-white/5 border border-white/10 text-[#E5E6DA] text-[12px] font-mono p-4 uppercase tracking-wide outline-none hover:bg-white/10 focus:bg-white/10 focus:border-white/30 transition-colors rounded-xl appearance-none cursor-pointer"
                   >
                     <option value="" className="bg-[#0a0a0a]">SELECT A MODEL</option>
                     {DEMO_MODELS.map((m) => (
@@ -214,7 +214,7 @@ export default function OnboardingOverlay({
               <div className="flex justify-center pt-4">
                 <button
                   onClick={onImport}
-                  className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 rounded-xl"
+                  className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-all duration-300 rounded-xl"
                 >
                   <div className="w-8 h-8 bg-[#E5E6DA]/10 flex items-center justify-center border border-[#E5E6DA]/20 rounded-lg">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#E5E6DA]/60">
@@ -246,12 +246,13 @@ export default function OnboardingOverlay({
                       onChange={(e) => setSketchfabQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSketchfabSearch()}
                       placeholder="Search Sketchfab (e.g., car, robot)"
-                      className="flex-1 bg-white/5 border border-white/10 text-[#E5E6DA] text-[12px] font-mono px-3 py-2 uppercase tracking-wide outline-none focus:border-white/30 transition-colors rounded-lg placeholder:text-[#E5E6DA]/30 placeholder:normal-case"
+                      className="flex-1 bg-white/5 border border-white/10 text-[#E5E6DA] text-[12px] font-mono px-3 py-2 uppercase tracking-wide outline-none hover:bg-white/10 focus:bg-white/10 focus:border-white/30 transition-colors rounded-lg placeholder:text-[#E5E6DA]/30 placeholder:normal-case"
                     />
                     <button
                       onClick={handleSketchfabSearch}
                       disabled={isSearching || !sketchfabQuery.trim()}
-                      className="px-4 py-2 bg-[#3B82F6] hover:bg-[#3B82F6]/80 disabled:bg-white/10 disabled:text-[#E5E6DA]/30 text-white text-[10px] font-mono uppercase tracking-wide rounded-lg transition-colors"
+                      className="px-4 py-2 bg-white/20 hover:bg-white/40 disabled:bg-white/10 disabled:text-[#E5E6DA]/30 text-white text-[10px] font-mono uppercase tracking-wide rounded-lg transition-colors"
+                      data-no-cursor
                     >
                       {isSearching ? 'LOADING...' : 'SEARCH'}
                     </button>

@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 const CubeViewer = dynamic(() => import('@/components/CubeViewer'), { ssr: false });
 const AnimatedWave = dynamic(() => import('@/components/AnimatedWave'), { ssr: false });
 const Globe = dynamic(() => import('@/components/Globe'), { ssr: false });
-const WireframeShip = dynamic(() => import('@/components/WireframeShip'), { ssr: false });
+const AnimatedShipEntry = dynamic(() => import('@/components/AnimatedShipEntry'), { ssr: false });
 
 export default function Home() {
   const [showMobileModal, setShowMobileModal] = useState(false);
@@ -82,13 +82,11 @@ export default function Home() {
 
       {/* Hero Section with Blue Gradient */}
       <div className="relative z-10" style={{
-        backgroundImage: 'linear-gradient(to bottom, #3a6ea5 0%, #2a5080 30%, #1a3a5c 60%, #0a1a2e 100%)',
-        backgroundColor: '#3a6ea5'
+        backgroundImage: 'radial-gradient(ellipse at 70% 40%, #1a6b7c 0%, #155a6c 20%, #12445a 40%, #0e3048 55%, #0c2240 70%, #0a1832 85%, #08122a 100%)',
+        backgroundColor: '#08122a'
       }}>
         {/* Ship - Absolute positioned on its own layer */}
-        <div className="hidden lg:block absolute top-0 left-0 w-[90vw] h-[180%] -translate-x-[40%] -translate-y-[30%] z-30 pointer-events-none">
-          <WireframeShip className="w-full h-full" />
-        </div>
+        <AnimatedShipEntry className="hidden lg:block absolute top-0 left-0 w-[90vw] h-[180%] -translate-x-[40%] -translate-y-[30%] z-30 pointer-events-none" />
 
         {/* Navigation Header */}
         <nav className="px-0 h-8 flex justify-between items-center relative z-20">
@@ -106,14 +104,14 @@ export default function Home() {
 
             {/* Hero Section */}
             <motion.div
-              className="px-4 lg:px-4 flex flex-col justify-center items-end text-right gap-4 lg:gap-6 flex-1"
+              className="px-4 lg:px-4 flex flex-col justify-center items-end text-right gap-6 lg:gap-8 flex-1"
               initial="hidden"
               animate="visible"
               variants={staggerContainer}
             >
 
               <motion.h2
-                className="text-5xl lg:text-7xl mr-36 font-medium leading-none tracking-tight text-[#E5E6DA]"
+                className="text-5xl lg:text-7xl mr-56 font-medium leading-none tracking-tight text-[#E5E6DA]"
                 style={{ fontFamily: "'Orbitron', sans-serif" }}
                 variants={staggerItem}
               >
@@ -121,10 +119,10 @@ export default function Home() {
               </motion.h2>
 
               <motion.p
-                className="text-xs lg:text-sm font-latos mr-36 opacity-70 max-w-lg lg:max-w-xl leading-relaxed"
+                className="text-sm lg:text-lg font-latos mr-56 opacity-70 max-w-lg lg:max-w-2xl leading-relaxed"
                 variants={staggerItem}
               >
-                Real-time 3D wireframe analysis for rapid identification of enemy vehicles, aircraft,<br />and weapon systems using AI-driven component recognition.
+                Real-time 3D wireframe analysis for rapid identification of enemy vehicles, aircraft, and weapon systems using AI-driven component recognition.
               </motion.p>
 
               {/* Mobile 3D Visualization Box */}
@@ -147,7 +145,7 @@ export default function Home() {
                 <div className="corner-arrows-wrapper w-full sm:w-auto mb-2 sm:mb-0">
                   <Link
                     href="/dashboard"
-                    className="corner-arrows-button w-full sm:w-auto px-10 mr-36 py-3 bg-transparent text-[#E5E6DA] text-[12px] uppercase font-bold hover:text-white transition-colors text-center sm:text-left block"
+                    className="corner-arrows-button w-full sm:w-auto px-12 mr-56 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-[#E5E6DA] text-sm uppercase font-bold hover:bg-white/20 hover:text-white transition-all duration-300 text-center sm:text-left block"
                     onClick={handleLaunchDemoClick}
                   >
                     <span className="corner-arrows-top-right"></span>
@@ -180,8 +178,6 @@ export default function Home() {
               viewport={{ once: true, amount: 0.2 }}
               variants={staggerContainer}
             >
-
-
               {/* Video Section */}
               <motion.div
                 className="flex justify-center mb-12"
@@ -208,7 +204,7 @@ export default function Home() {
               </motion.h3>
 
               <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0"
+                className="grid grid-cols-1 md:grid-cols-2 gap-6"
                 variants={staggerContainer}
               >
                 {[
@@ -235,18 +231,13 @@ export default function Home() {
                 ].map((item, idx) => (
                   <motion.div
                     key={idx}
-                    className={`p-8 hover:bg-[#1e3a5f] hover:text-white transition-colors group`}
+                    role="button"
+                    className="p-8 hover:bg-[#1e3a5f] hover:text-white transition-colors cursor-pointer"
                     variants={staggerItem}
                   >
                     <div className="text-[10px] uppercase opacity-50 mb-4 font-mono">{item.step}</div>
                     <h4 className="text-xl font-medium mb-3">{item.title}</h4>
                     <p className="text-sm opacity-70 leading-relaxed">{item.description}</p>
-                    {idx < 3 && (
-                      <div className="mt-6 flex items-center gap-2 opacity-20 group-hover:opacity-40">
-                        <div className="w-full h-px bg-[#1D1E15]"></div>
-                        <div className="w-1.5 h-1.5 bg-[#3B82F6]"></div>
-                      </div>
-                    )}
                   </motion.div>
                 ))}
               </motion.div>
@@ -430,7 +421,7 @@ export default function Home() {
               viewport={{ once: true, amount: 0.2 }}
               variants={staggerContainer}
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12" data-no-cursor>
                 <div>
                   <div className="text-[10px] uppercase opacity-50 mb-4">Quick Links</div>
                   <div className="flex flex-col gap-2">

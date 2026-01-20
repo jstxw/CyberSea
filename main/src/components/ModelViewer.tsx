@@ -1496,10 +1496,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
             name: annotation.name,
             description: annotation.description,
             type: annotation.category,
-            annotatedImage: annotation.annotatedImage,
           }));
-          setAnnotatedImage(annotation.annotatedImage);
-          setShowAnnotatedModal(true);
           setAiIdentifyActive(true);
         } else {
           console.warn("No demo annotation found for model:", currentDemoModelId);
@@ -1516,11 +1513,6 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
         // Hide loader
         setIsIdentifying(false);
         setShowInferenceLoader(false);
-
-        // Show image after identification completes
-        if (currentDemoModelId === "demo-1" || currentDemoModelId === "demo-2" || currentDemoModelId === "demo-3") {
-          setShowA10Image(true);
-        }
       }, 5000); // 5 second delay
 
       return;

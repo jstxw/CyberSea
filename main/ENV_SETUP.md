@@ -282,3 +282,4 @@ After setting up your `.env`:
    ```
 
 Need help? Check the main README or create an issue on GitHub.
+hi

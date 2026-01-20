@@ -1,4 +1,4 @@
-# Cybersea (Mesh)
+# Cybersea
 
 An AI-powered 3D visualization platform for military equipment intelligence and Canadian Arctic maritime domain awareness. Built for the CyberSea Hackathon.
 
@@ -128,4 +128,4 @@ npm start
 
 ## License
 
-Built for the CyberSea Hackathon.
+Built for the uOttawa Hackathon.

@@ -136,24 +136,16 @@ export default function OnboardingOverlay({
                 <label className="text-[11px] font-mono uppercase text-[#E5E6DA]/60 tracking-widest block text-center">
                   SELECT VEHICLE MODEL
                 </label>
-                <div className="flex gap-3">
-                  <select
-                    value={selectedDemo}
-                    onChange={(e) => {
-                      const selected = DEMO_MODELS.find(m => m.name === e.target.value);
-                      if (selected) {
-                        handleDemoSelect(selected.id, selected.name);
-                      }
-                    }}
-                    className="flex-1 bg-white/5 border border-white/10 text-[#E5E6DA] text-[12px] font-mono p-4 uppercase tracking-wide outline-none hover:bg-white/10 focus:bg-white/10 focus:border-white/30 transition-colors rounded-xl appearance-none cursor-pointer"
-                  >
-                    <option value="" className="bg-[#0a0a0a]">SELECT A MODEL</option>
-                    {DEMO_MODELS.map((m) => (
-                      <option key={m.id} value={m.name} className="bg-[#0a0a0a]">
-                        {m.name}
-                      </option>
-                    ))}
-                  </select>
+                <div className="flex flex-col">
+                  {DEMO_MODELS.map((m, index) => (
+                    <button
+                      key={m.id}
+                      onClick={() => handleDemoSelect(m.id, m.name)}
+                      className={`w-full bg-white/5 border border-white/10 text-[#E5E6DA] text-[12px] font-mono p-4 uppercase tracking-wide outline-none hover:bg-[#3B82F6]/30 hover:border-[#3B82F6] transition-colors cursor-pointer text-left ${index > 0 ? '-mt-px' : ''}`}
+                    >
+                      {m.name}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>

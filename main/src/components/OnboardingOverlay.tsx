@@ -128,59 +128,6 @@ export default function OnboardingOverlay({
                   </button>
                 ))}
               </div>
-
-              {/* Import Button - Centered below */}
-              <div className="flex justify-center pt-4">
-                <button
-                  onClick={onImport}
-                  className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-all duration-300 rounded-xl"
-                >
-                  <div className="w-8 h-8 bg-[#E5E6DA]/10 flex items-center justify-center border border-[#E5E6DA]/20 rounded-lg">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#E5E6DA]/60">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="17 8 12 3 7 8" />
-                      <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                  </div>
-                  <div className="text-left">
-                    <div className="text-[12px] font-mono uppercase tracking-wide text-[#E5E6DA]">IMPORT CUSTOM ASSET</div>
-                    <div className="text-[10px] text-[#E5E6DA]/50 font-mono uppercase">GLB / GLTF FORMAT</div>
-                  </div>
-                </button>
-              </div>
-
-              {/* Sketchfab Search */}
-              <div className="flex justify-center pt-4" data-no-cursor>
-                <div className="flex flex-col items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 rounded-xl w-full max-w-md">
-                  <div className="flex items-center gap-2 w-full">
-                    <div className="w-8 h-8 bg-[#E5E6DA]/10 flex items-center justify-center border border-[#E5E6DA]/20 rounded-lg shrink-0">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#E5E6DA]/60">
-                        <circle cx="11" cy="11" r="8"/>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                      </svg>
-                    </div>
-                    <input
-                      type="text"
-                      value={sketchfabQuery}
-                      onChange={(e) => setSketchfabQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSketchfabSearch()}
-                      placeholder="Search Sketchfab (e.g., car, robot)"
-                      className="flex-1 bg-white/5 border border-white/10 text-[#E5E6DA] text-[12px] font-mono px-3 py-2 uppercase tracking-wide outline-none hover:bg-white/10 focus:bg-white/10 focus:border-white/30 transition-colors rounded-lg placeholder:text-[#E5E6DA]/30 placeholder:normal-case"
-                    />
-                    <button
-                      onClick={handleSketchfabSearch}
-                      disabled={isSearching || !sketchfabQuery.trim()}
-                      className="px-4 py-2 bg-white/20 hover:bg-white/40 disabled:bg-white/10 disabled:text-[#E5E6DA]/30 text-white text-[10px] font-mono uppercase tracking-wide rounded-lg transition-colors"
-                    >
-                      {isSearching ? 'LOADING...' : 'SEARCH'}
-                    </button>
-                  </div>
-                  {searchError && (
-                    <div className="text-[10px] text-red-400 font-mono">{searchError}</div>
-                  )}
-                  <div className="text-[10px] text-[#E5E6DA]/40 font-mono uppercase">SEARCH SKETCHFAB 3D MODELS</div>
-                </div>
-              </div>
             </div>
           ) : (
             /* Normal Mode: Model Selection */
@@ -207,60 +154,6 @@ export default function OnboardingOverlay({
                       </option>
                     ))}
                   </select>
-                </div>
-              </div>
-
-              {/* Import Button */}
-              <div className="flex justify-center pt-4">
-                <button
-                  onClick={onImport}
-                  className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-all duration-300 rounded-xl"
-                >
-                  <div className="w-8 h-8 bg-[#E5E6DA]/10 flex items-center justify-center border border-[#E5E6DA]/20 rounded-lg">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#E5E6DA]/60">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="17 8 12 3 7 8" />
-                      <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                  </div>
-                  <div className="text-left">
-                    <div className="text-[12px] font-mono uppercase tracking-wide text-[#E5E6DA]">IMPORT CUSTOM ASSET</div>
-                    <div className="text-[10px] text-[#E5E6DA]/50 font-mono uppercase">GLB / GLTF FORMAT</div>
-                  </div>
-                </button>
-              </div>
-
-              {/* Sketchfab Search */}
-              <div className="flex justify-center pt-4">
-                <div className="flex flex-col items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 rounded-xl w-full">
-                  <div className="flex items-center gap-2 w-full">
-                    <div className="w-8 h-8 bg-[#E5E6DA]/10 flex items-center justify-center border border-[#E5E6DA]/20 rounded-lg shrink-0">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#E5E6DA]/60">
-                        <circle cx="11" cy="11" r="8"/>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                      </svg>
-                    </div>
-                    <input
-                      type="text"
-                      value={sketchfabQuery}
-                      onChange={(e) => setSketchfabQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSketchfabSearch()}
-                      placeholder="Search Sketchfab (e.g., car, robot)"
-                      className="flex-1 bg-white/5 border border-white/10 text-[#E5E6DA] text-[12px] font-mono px-3 py-2 uppercase tracking-wide outline-none hover:bg-white/10 focus:bg-white/10 focus:border-white/30 transition-colors rounded-lg placeholder:text-[#E5E6DA]/30 placeholder:normal-case"
-                    />
-                    <button
-                      onClick={handleSketchfabSearch}
-                      disabled={isSearching || !sketchfabQuery.trim()}
-                      className="px-4 py-2 bg-white/20 hover:bg-white/40 disabled:bg-white/10 disabled:text-[#E5E6DA]/30 text-white text-[10px] font-mono uppercase tracking-wide rounded-lg transition-colors"
-                      data-no-cursor
-                    >
-                      {isSearching ? 'LOADING...' : 'SEARCH'}
-                    </button>
-                  </div>
-                  {searchError && (
-                    <div className="text-[10px] text-red-400 font-mono">{searchError}</div>
-                  )}
-                  <div className="text-[10px] text-[#E5E6DA]/40 font-mono uppercase">SEARCH SKETCHFAB 3D MODELS</div>
                 </div>
               </div>
             </div>

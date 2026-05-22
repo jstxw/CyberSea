@@ -2176,7 +2176,7 @@ export default function ModelViewer({ onClose, selectedModelId: externalSelected
                     </div>
                     <button
                       onClick={handleSplitMesh}
-                      className="w-full px-3 py-2 bg-[#2a2b22] border border-white/20 text-white text-[10px] font-bold flex items-center justify-center gap-1.5 mb-2 hover:bg-[#3B82F6] hover:border-[#3B82F6] transition-colors uppercase tracking-wide cursor-pointer"
+                      className="w-full px-3 py-2 bg-[#3B82F6] border border-[#3B82F6] text-white text-[10px] font-bold flex items-center justify-center gap-1.5 mb-2 hover:bg-[#3B82F6]/80 transition-colors uppercase tracking-wide cursor-pointer"
                     >
                       <svg
                         width="12"
